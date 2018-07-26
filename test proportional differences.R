@@ -1,3 +1,11 @@
+################################################################################
+##  test_proportional_differences.R: Chi-squared test for differences among significant responses by treatment or treatment category for richness and compositional responses.
+##
+##  Author: Kimberly La Pierre
+##  Date created: March 22, 2018
+################################################################################
+
+
 library(tidyverse)
 
 
