@@ -1,5 +1,5 @@
 ################################################################################
-##  results_figures_20yr.R: Compiles Bayesian output and makes figures for the primary analysis of richness and compositonal differences between treatment and control plots for datasets cut off at 20 years.
+##  results_figures_20yr.R: Compiles Bayesian output and makes figures for supplemental analysis of absval(richness) and compositonal differences between treatment and control plots for datasets cut off at 20 years.
 ##
 ##  Author: Kimberly La Pierre
 ##  Date created: January 22, 2018
