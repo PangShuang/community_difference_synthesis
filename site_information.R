@@ -140,7 +140,7 @@ siteClimate<-read.csv("siteList_climate_Feb2016.csv")%>%
 #merge site and project dataframes
 siteExpDetails<-merge(siteClimate, expDetails, by="site_code")
 
-#kim
-write.csv(siteExpDetails, 'C:\\Users\\lapie\\Dropbox (Smithsonian)\\working groups\\converge diverge working group\\converge_diverge\\datasets\\LongForm\\SiteExperimentDetails_Dec2016.csv')
+# #kim
+# write.csv(siteExpDetails, 'C:\\Users\\lapie\\Dropbox (Smithsonian)\\working groups\\converge diverge working group\\converge_diverge\\datasets\\LongForm\\SiteExperimentDetails_Dec2016.csv')
 
 rm(list=setdiff(ls(), "siteExpDetails"))
