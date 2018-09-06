@@ -139,7 +139,7 @@ div <- for.analysis%>%
   mutate(expH=exp(H))
 
 #import site and project level data (MAP, MAT, ANPP of controls, and rarefied gamma diversity)
-SiteExp<-read.csv("SiteExperimentDetails_Dec2016.csv")%>%
+SiteExp<-read.csv("SiteExperimentDetails_09062018.csv")%>%
   select(-X)
 
 ###calculate difference in dispersion, H, S, and evenness between treatment and control plots for each year
