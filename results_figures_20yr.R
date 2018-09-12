@@ -10,7 +10,7 @@ library(grid)
 library(tidyverse)
 
 #kim
-setwd("C:\\Users\\lapie\\Dropbox (Smithsonian)\\working groups\\converge diverge working group\\converge_diverge\\datasets\\LongForm")
+setwd("C:\\Users\\la pierrek\\Dropbox (Smithsonian)\\working groups\\converge diverge working group\\converge_diverge\\datasets\\LongForm")
 
 theme_set(theme_bw())
 theme_update(axis.title.x=element_text(size=40, vjust=-0.35, margin=margin(t=15)), axis.text.x=element_text(size=34, color='black'),
@@ -62,7 +62,7 @@ trtInfo <- read.csv('ExperimentInformation_Nov2017.csv')%>%
   select(-X)
 
 #import diversity metrics that went into Bayesian analysis
-rawData <- read.csv('ForAnalysis_allAnalysis20yr.csv')
+rawData <- read.csv('ForAnalysis_allAnalysis20yr_S_PC_09062018.csv')
 
 #calculate means and standard deviations across all data for richness and compositonal differences to backtransform
 rawData2<- rawData%>%
