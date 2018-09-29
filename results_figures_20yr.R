@@ -10,7 +10,7 @@ library(grid)
 library(tidyverse)
 
 #kim
-setwd("C:\\Users\\lapie\\Dropbox (Smithsonian)\\working groups\\converge diverge working group\\converge_diverge\\datasets\\LongForm")
+setwd("C:\\Users\\la pierrek\\Dropbox (Smithsonian)\\working groups\\converge diverge working group\\converge_diverge\\datasets\\LongForm")
 
 theme_set(theme_bw())
 theme_update(axis.title.x=element_text(size=40, vjust=-0.35, margin=margin(t=15)), axis.text.x=element_text(size=34, color='black'),
@@ -62,7 +62,7 @@ trtInfo <- read.csv('ExperimentInformation_Nov2017.csv')%>%
   select(-X)
 
 #import diversity metrics that went into Bayesian analysis
-rawData <- read.csv('ForAnalysis_allAnalysis20yr.csv')
+rawData <- read.csv('ForAnalysis_allAnalysis20yr_S_PC_09062018.csv')
 
 #calculate means and standard deviations across all data for richness and compositonal differences to backtransform
 rawData2<- rawData%>%
@@ -1297,7 +1297,7 @@ names(NrichnessSD)[names(NrichnessSD) == 'colSd(Nrichness)'] <- 'sd'
 NrichnessOverall <- NrichnessMean%>%
   left_join(NrichnessSD)
 
-richnessNPlotFinal <- ggplot(data=nData, aes(x=n, y=S_PC, color=MAP)) +
+richnessNPlotFinal <- ggplot(data=nData, aes(x=n, y=S_PC)) +
   geom_point(size=5) +
   coord_cartesian(ylim=c(-0.8,1)) +
   scale_y_continuous(name='Richness Response') +
@@ -1317,7 +1317,7 @@ meanDroPlotFinal <- ggplot(data=droData, aes(x=precip, y=mean_change)) +
   xlab(expression(paste(H[2], 'O deviation from ambient (%)'))) +
   annotate('text', x=-80, y=1, label='(e)', size=12, hjust='left')
 
-richnessDroPlotFinal <- ggplot(data=droData, aes(x=precip, y=S_PC, color=MAP)) +
+richnessDroPlotFinal <- ggplot(data=droData, aes(x=precip, y=S_PC)) +
   geom_point(size=5) +
   coord_cartesian(ylim=c(-0.8,1)) +
   scale_y_continuous(name='') +
@@ -1336,7 +1336,7 @@ meanIrrPlotFinal <- ggplot(data=irrData, aes(x=precip, y=mean_change)) +
   xlab(expression(paste(H[2], 'O deviation from ambient (%)'))) +
   annotate('text', x=0, y=1, label='(f)', size=12, hjust='left')
 
-richnessIrrPlotFinal <- ggplot(data=irrData, aes(x=precip, y=S_PC, color=MAP)) +
+richnessIrrPlotFinal <- ggplot(data=irrData, aes(x=precip, y=S_PC)) +
   geom_point(size=5) +
   coord_cartesian(ylim=c(-0.8,1)) +
   scale_y_continuous(name='') +

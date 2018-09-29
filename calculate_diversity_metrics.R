@@ -13,7 +13,7 @@ library(grid)
 
 
 #kim
-setwd('C:\\Users\\lapie\\Dropbox (Smithsonian)\\working groups\\converge diverge working group\\converge_diverge\\datasets\\LongForm')
+setwd('C:\\Users\\la pierrek\\Dropbox (Smithsonian)\\working groups\\converge diverge working group\\converge_diverge\\datasets\\LongForm')
 
 #meghan
 setwd("~/Dropbox/converge_diverge/datasets/LongForm")
@@ -139,7 +139,7 @@ div <- for.analysis%>%
   mutate(expH=exp(H))
 
 #import site and project level data (MAP, MAT, ANPP of controls, and rarefied gamma diversity)
-SiteExp<-read.csv("SiteExperimentDetails_Dec2016.csv")%>%
+SiteExp<-read.csv("SiteExperimentDetails_09062018.csv")%>%
   select(-X)
 
 ###calculate difference in dispersion, H, S, and evenness between treatment and control plots for each year
@@ -172,20 +172,15 @@ divTrt<-rbind(divTrt1, divCDRe002, divCDRe001)
 #merge controls and treatments
 divCompare <- divControls%>%
   left_join(divTrt)%>%
-  #calculate difference in disperion, expH, S, and evenness (note anytime it says change in a header, it is really a difference between treatment and control plots)
-  mutate(dispersion_change=dispersion-ctl_dispersion, 
-         expH_PC=(expH-ctl_expH)/ctl_expH, 
-         S_PC=(S-ctl_S)/ctl_S, 
-         SimpEven_change=SimpEven-ctl_SimpEven)%>%
-  select(exp_year, treatment_year, treatment, plot_mani, mean_change, dispersion_change, expH_PC,  SimpEven_change, S_PC, site_code, project_name, community_type, calendar_year)
+  #calculate the proportional difference and log response ratio of S and eH
+  mutate(expH_PC=(expH-ctl_expH)/ctl_expH, 
+         S_PC=(S-ctl_S)/ctl_S,  
+         expH_lnRR=log(expH/ctl_expH), 
+         S_lnRR=log(S/ctl_S))%>%
+  select(exp_year, treatment_year, treatment, plot_mani, mean_change, expH_PC, expH_lnRR, S_PC, S_lnRR, site_code, project_name, community_type, calendar_year)
 
 #some preliminary histograms
 theme_set(theme_bw(16))
-d2<-qplot(dispersion_change, data=divCompare, geom="histogram")+
-  ggtitle("Within Treatment Change")+
-  xlab("Trt Disp - Cont Disp")+
-  geom_vline(xintercept = 0, size=2)
-
 m<-qplot(mean_change, data=divCompare, geom="histogram")+
   ggtitle("Among Treatment Change")+
   xlab(" Distance between Centriods")+
@@ -196,12 +191,22 @@ s1<-qplot(S_PC, data=divCompare, geom="histogram")+
   xlab("Percent Change in Richness")+
   geom_vline(xintercept = 0, size=2)
 
-e2<-qplot(SimpEven_change, data=divCompare, geom="histogram")+
-  ggtitle("Evenness Change")+
+e2<-qplot(expH_PC, data=divCompare, geom="histogram")+
+  ggtitle("Effective Diversity Percent Change")+
   xlab("Trt Evenness - Cont Evenness")+
   geom_vline(xintercept = 0, size=2)
 
-grid.arrange( m, d2, s1, e2, ncol=2)
+s2<-qplot(S_lnRR, data=divCompare, geom="histogram")+
+  ggtitle("Richness ln Response Ratio")+
+  xlab("Percent Change in Richness")+
+  geom_vline(xintercept = 0, size=2)
+
+e3<-qplot(expH_lnRR, data=divCompare, geom="histogram")+
+  ggtitle("Effective Diversity ln Response Ratio")+
+  xlab("Trt Evenness - Cont Evenness")+
+  geom_vline(xintercept = 0, size=2)
+
+grid.arrange(m, s1, e2, s2, e3, ncol=3)
 
 
 ###merging with treatment information
@@ -231,7 +236,7 @@ singleResource <- ForAnalysis%>%
   #create categorical treatment type column
   mutate(trt_type=ifelse(n2>0, 'N', ifelse(p2>0, 'P', ifelse(k2>0, 'K', ifelse(precip<0, 'drought', ifelse(precip>0, 'irr', ifelse(CO2>0, 'CO2', 'precip_vari')))))))%>%
   #keep just relevent column names for this analysis
-  select(site_code, project_name, community_type, exp_year, treatment_year, calendar_year, treatment, trt_type, mean_change, S_PC, expH_PC, experiment_length, rrich, anpp, MAT, MAP)
+  select(site_code, project_name, community_type, exp_year, treatment_year, calendar_year, treatment, trt_type, mean_change, expH_PC, expH_lnRR, S_PC, S_lnRR, experiment_length, rrich, anpp, MAT, MAP)
 
 #step 2: single non-resource
 singleNonresource <- ForAnalysis%>%
@@ -245,7 +250,7 @@ singleNonresource <- ForAnalysis%>%
   #create categorical treatment type column
   mutate(trt_type=ifelse(burn==1, 'burn', ifelse(mow_clip==1, 'mow_clip', ifelse(herb_removal==1, 'herb_rem', ifelse(temp>0, 'temp', ifelse(plant_trt==1, 'plant_mani', 'other'))))))%>%
   #keep just relevent column names for this analysis
-  select(site_code, project_name, community_type, exp_year, treatment_year, calendar_year, treatment, trt_type, mean_change, S_PC, expH_PC, experiment_length, rrich, anpp, MAT, MAP)
+  select(site_code, project_name, community_type, exp_year, treatment_year, calendar_year, treatment, trt_type, mean_change, expH_PC, expH_lnRR, S_PC, S_lnRR, experiment_length, rrich, anpp, MAT, MAP)
 
 #step 3: 2-way interactions
 twoWay <- ForAnalysis%>%
@@ -261,7 +266,7 @@ twoWay <- ForAnalysis%>%
   #drop R*herb_removal (single rep)
   filter(trt_type!='R*herb_rem')%>%
   #keep just relevent column names for this analysis
-  select(site_code, project_name, community_type, exp_year, treatment_year, calendar_year, treatment, trt_type, mean_change, S_PC, expH_PC, experiment_length, rrich, anpp, MAT, MAP)
+  select(site_code, project_name, community_type, exp_year, treatment_year, calendar_year, treatment, trt_type, mean_change, expH_PC, expH_lnRR, S_PC, S_lnRR, experiment_length, rrich, anpp, MAT, MAP)
 
 #step 4: 3+ way interactions
 threeWay <- ForAnalysis%>%
@@ -277,7 +282,7 @@ threeWay <- ForAnalysis%>%
   #drop single all-nonresource treatment (NIN herbdiv 5NF)
   filter(trt_type!='all_nonresource')%>%
   #keep just relevent column names for this analysis
-  select(site_code, project_name, community_type, exp_year, treatment_year, calendar_year, treatment, trt_type, mean_change, S_PC, expH_PC, experiment_length, rrich, anpp, MAT, MAP)
+  select(site_code, project_name, community_type, exp_year, treatment_year, calendar_year, treatment, trt_type, mean_change, expH_PC, expH_lnRR, S_PC, S_lnRR, experiment_length, rrich, anpp, MAT, MAP)
 
 #combine for analysis - one big model, 19 trt types
 allAnalysis <- rbind(singleResource, singleNonresource, twoWay, threeWay)
@@ -304,10 +309,10 @@ numPoints <- allAnalysis20yr%>%
   group_by(site_code, project_name, community_type, treatment)%>%
   summarise(num_datapoints=length(treatment_year))
 
-# write.csv(allAnalysis20yr, 'ForAnalysis_allAnalysis20yr_pairwise.csv')
+# write.csv(allAnalysis20yr, 'ForAnalysis_allAnalysis20yr_pairwise_09062018.csv')
 
 #subset out 20th or final year of all data
 allAnalysisFinalYear <- allAnalysis20yr%>%
   group_by(site_code, project_name, community_type, treatment)%>%
   filter(treatment_year==max(treatment_year))
-# write.csv(allAnalysisFinalYear, 'ForAnalysis_allAnalysisFinalYear.csv')
+# write.csv(allAnalysisFinalYear, 'ForAnalysis_allAnalysisFinalYear_09062018.csv')
