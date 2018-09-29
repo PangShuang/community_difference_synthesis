@@ -1297,7 +1297,7 @@ names(NrichnessSD)[names(NrichnessSD) == 'colSd(Nrichness)'] <- 'sd'
 NrichnessOverall <- NrichnessMean%>%
   left_join(NrichnessSD)
 
-richnessNPlotFinal <- ggplot(data=nData, aes(x=n, y=S_PC)) +
+richnessNPlotFinal <- ggplot(data=nData, aes(x=n, y=S_PC, color=MAP)) +
   geom_point(size=5) +
   coord_cartesian(ylim=c(-0.8,1)) +
   scale_y_continuous(name='Richness Response') +
@@ -1317,7 +1317,7 @@ meanDroPlotFinal <- ggplot(data=droData, aes(x=precip, y=mean_change)) +
   xlab(expression(paste(H[2], 'O deviation from ambient (%)'))) +
   annotate('text', x=-80, y=1, label='(e)', size=12, hjust='left')
 
-richnessDroPlotFinal <- ggplot(data=droData, aes(x=precip, y=S_PC)) +
+richnessDroPlotFinal <- ggplot(data=droData, aes(x=precip, y=S_PC, color=MAP)) +
   geom_point(size=5) +
   coord_cartesian(ylim=c(-0.8,1)) +
   scale_y_continuous(name='') +
@@ -1336,7 +1336,7 @@ meanIrrPlotFinal <- ggplot(data=irrData, aes(x=precip, y=mean_change)) +
   xlab(expression(paste(H[2], 'O deviation from ambient (%)'))) +
   annotate('text', x=0, y=1, label='(f)', size=12, hjust='left')
 
-richnessIrrPlotFinal <- ggplot(data=irrData, aes(x=precip, y=S_PC)) +
+richnessIrrPlotFinal <- ggplot(data=irrData, aes(x=precip, y=S_PC, color=MAP)) +
   geom_point(size=5) +
   coord_cartesian(ylim=c(-0.8,1)) +
   scale_y_continuous(name='') +
