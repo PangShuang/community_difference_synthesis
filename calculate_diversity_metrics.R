@@ -64,7 +64,7 @@ for(i in 1:length(exp_year$exp_year)) {
    spread(genus_species, relcov, fill=0)
 
   #calculate bray-curtis dissimilarities
-  bc=vegdist(species[,5:ncol(species)], method="bray")
+  bc=sqrt(vegdist(species[,5:ncol(species)], method="bray"))
   
   #calculate distances of each plot to treatment centroid (i.e., dispersion)
   disp=betadisper(bc, species$treatment, type="centroid")
@@ -115,7 +115,7 @@ for(i in 1:length(exp_year$exp_year)) {
     for.analysis=rbind(alldiv, for.analysis)  
 }
 
-# write.csv(for.analysis, 'DiversityMetrics_Nov2017.csv')
+# write.csv(for.analysis, 'DiversityMetrics_Nov2018.csv')
 
 rm(list=setdiff(ls(), "for.analysis"))
 
@@ -216,7 +216,7 @@ SiteExp<-read.csv("SiteExperimentDetails_Dec2016.csv")%>%
 ForAnalysis<-merge(divCompare, SiteExp, by=c("site_code","project_name","community_type"))
 
 # full dataset
-# write.csv(ForAnalysis, "ForBayesianAnalysis_May2017.csv")
+# write.csv(ForAnalysis, "ForBayesianAnalysis_Nov2018.csv")
 
 
 ###generating treatment categories (resource, non-resource, and interactions)
@@ -309,7 +309,7 @@ numPoints <- allAnalysis20yr%>%
   group_by(site_code, project_name, community_type, treatment)%>%
   summarise(num_datapoints=length(treatment_year))
 
-# write.csv(allAnalysis20yr, 'ForAnalysis_allAnalysis20yr_pairwise_09062018.csv')
+# write.csv(allAnalysis20yr, 'ForAnalysis_allAnalysis20yr_pairwise_11272018.csv')
 
 #subset out 20th or final year of all data
 allAnalysisFinalYear <- allAnalysis20yr%>%
