@@ -13,7 +13,7 @@ library(grid)
 
 
 #kim
-setwd('C:\\Users\\la pierrek\\Dropbox (Smithsonian)\\working groups\\converge diverge working group\\converge_diverge\\datasets\\LongForm')
+setwd('C:\\Users\\lapie\\Dropbox (Smithsonian)\\working groups\\converge diverge working group\\converge_diverge\\datasets\\LongForm')
 
 #meghan
 setwd("~/Dropbox/converge_diverge/datasets/LongForm")
@@ -64,10 +64,10 @@ for(i in 1:length(exp_year$exp_year)) {
    spread(genus_species, relcov, fill=0)
 
   #calculate bray-curtis dissimilarities
-  bc=sqrt(vegdist(species[,5:ncol(species)], method="bray"))
+  bc=vegdist(species[,5:ncol(species)], method="bray")
   
   #calculate distances of each plot to treatment centroid (i.e., dispersion)
-  disp=betadisper(bc, species$treatment, type="centroid")
+  disp=betadisper(bc, species$treatment, type="centroid", bias.adjust=T) #bias.adjust takes sqrt
   
   #getting distances among treatment centroids; these centroids are in BC space, so that's why this uses euclidean distances
   cent_dist=as.data.frame(as.matrix(vegdist(disp$centroids, method="euclidean"))) 
@@ -115,7 +115,7 @@ for(i in 1:length(exp_year$exp_year)) {
     for.analysis=rbind(alldiv, for.analysis)  
 }
 
-# write.csv(for.analysis, 'DiversityMetrics_Nov2018.csv')
+# write.csv(for.analysis, 'DiversityMetrics_Nov2018_2.csv')
 
 rm(list=setdiff(ls(), "for.analysis"))
 
@@ -216,7 +216,7 @@ SiteExp<-read.csv("SiteExperimentDetails_Dec2016.csv")%>%
 ForAnalysis<-merge(divCompare, SiteExp, by=c("site_code","project_name","community_type"))
 
 # full dataset
-# write.csv(ForAnalysis, "ForBayesianAnalysis_Nov2018.csv")
+# write.csv(ForAnalysis, "ForBayesianAnalysis_Nov2018_2.csv")
 
 
 ###generating treatment categories (resource, non-resource, and interactions)
@@ -309,7 +309,18 @@ numPoints <- allAnalysis20yr%>%
   group_by(site_code, project_name, community_type, treatment)%>%
   summarise(num_datapoints=length(treatment_year))
 
-# write.csv(allAnalysis20yr, 'ForAnalysis_allAnalysis20yr_pairwise_11272018.csv')
+
+#subset out treatment years 10 or less (i.e., cut off datasets at 20 years)
+allAnalysis10yr <- allAnalysisAllDatasets%>%
+  filter(treatment_year<11)%>%
+  select(-num_datapoints)
+numPoints <- allAnalysis10yr%>%
+  select(site_code, project_name, community_type, treatment, treatment_year)%>%
+  unique()%>%
+  group_by(site_code, project_name, community_type, treatment)%>%
+  summarise(num_datapoints=length(treatment_year))
+
+# write.csv(allAnalysis10yr, 'ForAnalysis_allAnalysis10yr_pairwise_12142018.csv')
 
 #subset out 20th or final year of all data
 allAnalysisFinalYear <- allAnalysis20yr%>%
