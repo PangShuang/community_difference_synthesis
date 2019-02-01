@@ -10,6 +10,9 @@ library(vegan)
 library(tidyverse)
 library(gridExtra)
 library(grid)
+library(devtools)
+install_github("NCEAS/codyn", ref = "anderson")
+library(codyn)
 
 
 #kim
@@ -31,94 +34,68 @@ expinfo<-read.csv("ExperimentInformation_Nov2017.csv")%>%
   select(exp_year, plot_mani, treatment)
 
 #merge treatment information with species relative abundancecs
-alldata2<-merge(alldata, expinfo, by=c("exp_year","treatment"), all=F)
+alldata2<-merge(alldata, expinfo, by=c("exp_year","treatment"), all=F)%>%
+  mutate(site_project_comm=paste(site_code, project_name, community_type, sep='_'))
 
 
 
 ###calculating bray-curtis dissimilarities within and among treatments to get distances between treatment centroids and dispersion among replicate plots within a treatment
 #make a new dataframe with just the label
 exp_year=alldata2%>%
-  select(exp_year)%>%
+  select(site_project_comm)%>%
   unique()
 
 #makes an empty dataframe
 for.analysis=data.frame(row.names=1) 
 
-###first, get bray curtis dissimilarity values for each year within each experiment between all combinations of plots
-###second, get distance of each plot within a trt to the trt centroid 
-###third: mean_change is the distance between trt and control centriods
-####fourth: dispersion is the average dispersion of plots within a treatment to treatment centriod
-for(i in 1:length(exp_year$exp_year)) {
+###first: composition_diff is the distance between trt and controls
+####second: dispersion is the average dispersion of plots within a treatment to treatment centriod
+####third: richness and exp_H also calculated
+for(i in 1:length(exp_year$site_project_comm)) {
   
   #creates a dataset for each unique year, trt, exp combo
-  subset=alldata2[alldata2$exp_year==as.character(exp_year$exp_year[i]),]%>%
-    select(exp_year, treatment, plot_mani, genus_species, relcov, plot_id)
+  subset <- alldata2[alldata2$site_project_comm==as.character(exp_year$site_project_comm[i]),]%>%
+    select(site_project_comm, calendar_year, treatment, plot_mani, genus_species, relcov, plot_id)%>%
+    mutate(treatment2=ifelse(plot_mani==0, 'TRUECONTROL', as.character(treatment)))
   
-  #need this to keep track of plot mani
-  labels=subset%>%
-    select(plot_mani, treatment)%>%
+  #need this to keep track of treatment
+  treatments <- subset%>%
+    select(plot_id, treatment)%>%
     unique()
+   
+  #calculating composition difference and abs(dispersion difference)
+  multivariate <- multivariate_difference(subset, time.var = 'calendar_year', species.var = "genus_species", abundance.var = 'relcov', replicate.var = 'plot_id', treatment='treatment2', reference.treatment='TRUECONTROL')%>%
+    rename(treatment=treatment22)%>%
+    select(-treatment2, -trt_greater_disp)
+
+  #calculating univariate community metrics for each plot
+  univariate <- community_structure(subset, time.var = 'calendar_year', abundance.var = 'relcov', replicate.var = 'plot_id')%>%
+    left_join(treatments)%>%
+    group_by(calendar_year, treatment)%>%
+    summarise(S=mean(richness))%>%
+    ungroup()
   
-  #transpose data
+  #calculate e^H
   species=subset%>%
-   spread(genus_species, relcov, fill=0)
+    spread(genus_species, relcov, fill=0)
+  H <- diversity(species[,7:ncol(species)])%>%
+    cbind(species[,1:6])%>%
+    mutate(expH=exp(.))%>%
+    group_by(calendar_year, treatment)%>%
+    summarise(exp_H=mean(expH))%>%
+    ungroup()
 
-  #calculate bray-curtis dissimilarities
-  bc=vegdist(species[,5:ncol(species)], method="bray")
-  
-  #calculate distances of each plot to treatment centroid (i.e., dispersion)
-  disp=betadisper(bc, species$treatment, type="centroid", bias.adjust=T) #bias.adjust takes sqrt
-  
-  #getting distances among treatment centroids; these centroids are in BC space, so that's why this uses euclidean distances
-  cent_dist=as.data.frame(as.matrix(vegdist(disp$centroids, method="euclidean"))) 
-  
-  #extracting only the distances we need and adding labels for the comparisons;
-  cent_C_T=data.frame(exp_year=exp_year$exp_year[i],
-                      treatment=row.names(cent_dist),
-                      mean_change=t(cent_dist[names(cent_dist)==labels$treatment[labels$plot_mani==0],]))
-  
-  #not sure why the name didn't work in the previous line of code, so fixing it here
-  names(cent_C_T)[3]="mean_change" 
-  
-  #merging back with labels to get back plot_mani
-  centroid=merge(cent_C_T, labels, by="treatment")
-  
-  #collecting and labeling distances to centroid from betadisper
-  trt_disp=data.frame(data.frame(exp_year=exp_year$exp_year[i], 
-                                 plot_id=species$plot_id,
-                                 treatment=species$treatment,
-                                 dist=disp$distances))%>%
-    tbl_df()%>%
-    group_by(exp_year, treatment)%>%
-    summarize(dispersion=mean(dist))
-  
-  #merge together change in mean and dispersion data
-  distances<-merge(centroid, trt_disp, by=c("exp_year","treatment"))
-  
-  #getting diversity indixes
-    H<-diversity(species[,5:ncol(species)])
-    S<-specnumber(species[,5:ncol(species)])
-    InvD<-diversity(species[,5:ncol(species)],"inv")
-    SimpEven<-InvD/S
-    out1<-cbind(H, S)
-    output<-cbind(out1, SimpEven)
-    divmeasure<-cbind(species, output)%>%
-      select(exp_year, treatment, H, S, SimpEven)%>%
-      tbl_df()%>%
-      group_by(exp_year, treatment)%>%
-      summarise(H=mean(H), S=mean(S), SimpEven=mean(SimpEven))
-    
-    ##merging all measures of diversity
-    alldiv<-merge(distances, divmeasure, by=c("exp_year","treatment"))
+  #merge multivariate and univariate metrics
+  all <- univariate%>%
+    full_join(H)%>%
+    full_join(multivariate)%>%
+    mutate(site_project_comm=exp_year$site_project_comm[i])
 
-    #pasting dispersions into the dataframe made for this analysis
-    for.analysis=rbind(alldiv, for.analysis)  
+  #pasting dispersions into the dataframe made for this analysis
+  for.analysis=rbind(all, for.analysis)  
 }
 
-# write.csv(for.analysis, 'DiversityMetrics_Nov2018_2.csv')
-
 rm(list=setdiff(ls(), "for.analysis"))
-
 
 
 ###formatting data for Bayesian analysis in python
@@ -131,12 +108,8 @@ expInfo <- read.csv('ExperimentInformation_Nov2017.csv')%>%
 
 #diversity data
 div <- for.analysis%>%
-  separate(exp_year, c('site_code', 'project_name','community_type', 'calendar_year'), sep='::')%>%
-  mutate(calendar_year=as.integer(calendar_year))%>%
   left_join(expInfo)%>%
-  filter(treatment_year!=0)%>%
-  #calculate e^H metric
-  mutate(expH=exp(H))
+  filter(treatment_year!=0)
 
 #import site and project level data (MAP, MAT, ANPP of controls, and rarefied gamma diversity)
 SiteExp<-read.csv("SiteExperimentDetails_09062018.csv")%>%
@@ -146,18 +119,12 @@ SiteExp<-read.csv("SiteExperimentDetails_09062018.csv")%>%
 
 #subset out controls and treatments
 divControls <- subset(div, subset=(plot_mani==0))%>%
-  select(exp_year, dispersion, expH, S, SimpEven, calendar_year, treatment_year)
-names(divControls)[names(divControls)=='dispersion'] <- 'ctl_dispersion'
-names(divControls)[names(divControls)=='expH'] <- 'ctl_expH'
-names(divControls)[names(divControls)=='S'] <- 'ctl_S'
-names(divControls)[names(divControls)=='SimpEven'] <- 'ctl_SimpEven'
+  select(exp_year, exp_H, S, calendar_year, treatment_year)%>%
+  rename(ctl_expH=exp_H, ctl_S=S)
 
 #filtering to get only non-e002, e001 treatments, later will remove a subset of the treatments from these two projects because they have so many levels and make up a disproportionate amount of the entire dataset
 divTrt1 <- div%>%
   filter(pulse==0, plot_mani>0, project_name!="e001"&project_name!="e002")
-
-#calculate average dispersion among just control plots (this is an estimate of average community dissimilarity, to use as a baseline for dissimilarity change between treatment and control plots)
-summary(divControls$ctl_dispersion) #mean=0.2811, median=0.2778
 
 #removing a subset of CDR e001 and e002 treatments to prevent the majority of data being from CDR; keeping lowest, highest, and 10 gm-2 N additions (levels most comparable to other studies)
 divCDRe001<-div%>%
@@ -173,37 +140,32 @@ divTrt<-rbind(divTrt1, divCDRe002, divCDRe001)
 divCompare <- divControls%>%
   left_join(divTrt)%>%
   #calculate the proportional difference and log response ratio of S and eH
-  mutate(expH_PC=(expH-ctl_expH)/ctl_expH, 
+  mutate(expH_PC=(exp_H-ctl_expH)/ctl_expH, 
          S_PC=(S-ctl_S)/ctl_S,  
-         expH_lnRR=log(expH/ctl_expH), 
+         expH_lnRR=log(exp_H/ctl_expH), 
          S_lnRR=log(S/ctl_S))%>%
-  select(exp_year, treatment_year, treatment, plot_mani, mean_change, expH_PC, expH_lnRR, S_PC, S_lnRR, site_code, project_name, community_type, calendar_year)
+  select(exp_year, treatment_year, treatment, plot_mani, composition_diff, expH_PC, expH_lnRR, S_PC, S_lnRR, site_code, project_name, community_type, calendar_year)
 
 #some preliminary histograms
 theme_set(theme_bw(16))
-m<-qplot(mean_change, data=divCompare, geom="histogram")+
+m<-qplot(composition_diff, data=divCompare, geom="histogram")+
   ggtitle("Among Treatment Change")+
-  xlab(" Distance between Centriods")+
   geom_vline(xintercept = 0, size=2)
 
 s1<-qplot(S_PC, data=divCompare, geom="histogram")+
   ggtitle("Richness Percent Change")+
-  xlab("Percent Change in Richness")+
   geom_vline(xintercept = 0, size=2)
 
 e2<-qplot(expH_PC, data=divCompare, geom="histogram")+
   ggtitle("Effective Diversity Percent Change")+
-  xlab("Trt Evenness - Cont Evenness")+
   geom_vline(xintercept = 0, size=2)
 
 s2<-qplot(S_lnRR, data=divCompare, geom="histogram")+
   ggtitle("Richness ln Response Ratio")+
-  xlab("Percent Change in Richness")+
   geom_vline(xintercept = 0, size=2)
 
 e3<-qplot(expH_lnRR, data=divCompare, geom="histogram")+
   ggtitle("Effective Diversity ln Response Ratio")+
-  xlab("Trt Evenness - Cont Evenness")+
   geom_vline(xintercept = 0, size=2)
 
 grid.arrange(m, s1, e2, s2, e3, ncol=3)
@@ -236,7 +198,7 @@ singleResource <- ForAnalysis%>%
   #create categorical treatment type column
   mutate(trt_type=ifelse(n2>0, 'N', ifelse(p2>0, 'P', ifelse(k2>0, 'K', ifelse(precip<0, 'drought', ifelse(precip>0, 'irr', ifelse(CO2>0, 'CO2', 'precip_vari')))))))%>%
   #keep just relevent column names for this analysis
-  select(site_code, project_name, community_type, exp_year, treatment_year, calendar_year, treatment, trt_type, mean_change, expH_PC, expH_lnRR, S_PC, S_lnRR, experiment_length, rrich, anpp, MAT, MAP)
+  select(site_code, project_name, community_type, exp_year, treatment_year, calendar_year, treatment, trt_type, composition_diff, expH_PC, expH_lnRR, S_PC, S_lnRR, experiment_length, rrich, anpp, MAT, MAP)
 
 #step 2: single non-resource
 singleNonresource <- ForAnalysis%>%
@@ -250,7 +212,7 @@ singleNonresource <- ForAnalysis%>%
   #create categorical treatment type column
   mutate(trt_type=ifelse(burn==1, 'burn', ifelse(mow_clip==1, 'mow_clip', ifelse(herb_removal==1, 'herb_rem', ifelse(temp>0, 'temp', ifelse(plant_trt==1, 'plant_mani', 'other'))))))%>%
   #keep just relevent column names for this analysis
-  select(site_code, project_name, community_type, exp_year, treatment_year, calendar_year, treatment, trt_type, mean_change, expH_PC, expH_lnRR, S_PC, S_lnRR, experiment_length, rrich, anpp, MAT, MAP)
+  select(site_code, project_name, community_type, exp_year, treatment_year, calendar_year, treatment, trt_type, composition_diff, expH_PC, expH_lnRR, S_PC, S_lnRR, experiment_length, rrich, anpp, MAT, MAP)
 
 #step 3: 2-way interactions
 twoWay <- ForAnalysis%>%
@@ -266,7 +228,7 @@ twoWay <- ForAnalysis%>%
   #drop R*herb_removal (single rep)
   filter(trt_type!='R*herb_rem')%>%
   #keep just relevent column names for this analysis
-  select(site_code, project_name, community_type, exp_year, treatment_year, calendar_year, treatment, trt_type, mean_change, expH_PC, expH_lnRR, S_PC, S_lnRR, experiment_length, rrich, anpp, MAT, MAP)
+  select(site_code, project_name, community_type, exp_year, treatment_year, calendar_year, treatment, trt_type, composition_diff, expH_PC, expH_lnRR, S_PC, S_lnRR, experiment_length, rrich, anpp, MAT, MAP)
 
 #step 4: 3+ way interactions
 threeWay <- ForAnalysis%>%
@@ -282,7 +244,7 @@ threeWay <- ForAnalysis%>%
   #drop single all-nonresource treatment (NIN herbdiv 5NF)
   filter(trt_type!='all_nonresource')%>%
   #keep just relevent column names for this analysis
-  select(site_code, project_name, community_type, exp_year, treatment_year, calendar_year, treatment, trt_type, mean_change, expH_PC, expH_lnRR, S_PC, S_lnRR, experiment_length, rrich, anpp, MAT, MAP)
+  select(site_code, project_name, community_type, exp_year, treatment_year, calendar_year, treatment, trt_type, composition_diff, expH_PC, expH_lnRR, S_PC, S_lnRR, experiment_length, rrich, anpp, MAT, MAP)
 
 #combine for analysis - one big model, 19 trt types
 allAnalysis <- rbind(singleResource, singleNonresource, twoWay, threeWay)
@@ -302,28 +264,35 @@ allAnalysisAllDatasets <- allAnalysis%>%
 #subset out treatment years 20 or less (i.e., cut off datasets at 20 years)
 allAnalysis20yr <- allAnalysisAllDatasets%>%
   filter(treatment_year<21)%>%
-  select(-num_datapoints)
+  select(-num_datapoints)%>%
+  filter(!is.na(composition_diff))%>%
+  rename(mean_change=composition_diff)
 numPoints <- allAnalysis20yr%>%
   select(site_code, project_name, community_type, treatment, treatment_year)%>%
   unique()%>%
   group_by(site_code, project_name, community_type, treatment)%>%
-  summarise(num_datapoints=length(treatment_year))
+  summarise(num_datapoints=length(treatment_year))%>%
+  ungroup()
 
+# write.csv(allAnalysis20yr, 'ForAnalysis_allAnalysis20yr_pairwise_01092019.csv')
 
 #subset out treatment years 10 or less (i.e., cut off datasets at 20 years)
 allAnalysis10yr <- allAnalysisAllDatasets%>%
   filter(treatment_year<11)%>%
-  select(-num_datapoints)
+  select(-num_datapoints)%>%
+  filter(!is.na(composition_diff))%>%
+  rename(mean_change=composition_diff)
 numPoints <- allAnalysis10yr%>%
   select(site_code, project_name, community_type, treatment, treatment_year)%>%
   unique()%>%
   group_by(site_code, project_name, community_type, treatment)%>%
   summarise(num_datapoints=length(treatment_year))
 
-# write.csv(allAnalysis10yr, 'ForAnalysis_allAnalysis10yr_pairwise_12142018.csv')
+# write.csv(allAnalysis10yr, 'ForAnalysis_allAnalysis10yr_pairwise_01092019.csv')
 
 #subset out 20th or final year of all data
 allAnalysisFinalYear <- allAnalysis20yr%>%
   group_by(site_code, project_name, community_type, treatment)%>%
-  filter(treatment_year==max(treatment_year))
-# write.csv(allAnalysisFinalYear, 'ForAnalysis_allAnalysisFinalYear_09062018.csv')
+  filter(treatment_year==max(treatment_year))%>%
+  ungroup()
+# write.csv(allAnalysisFinalYear, 'ForAnalysis_allAnalysisFinalYear_01092019.csv')
