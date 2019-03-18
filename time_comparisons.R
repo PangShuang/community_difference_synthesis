@@ -1,0 +1,139 @@
+################################################################################
+##  time_comparisons.R: Calculating changes and differences between treatment and control plots between first and last years of treatments for only the treatments that exhibited significant curvature.
+##
+##  Author: Kimberly La Pierre
+##  Date created: March 18, 2019
+################################################################################
+
+library(tidyverse)
+library(codyn)
+
+
+#kim
+setwd('C:\\Users\\la pierrek\\Dropbox (Smithsonian)\\working groups\\converge diverge working group\\converge_diverge\\datasets\\LongForm')
+
+
+#import relative species abundance data
+alldata <- read.csv("SpeciesRelativeAbundance_Oct2017.csv")%>%
+  select(site_code, project_name, community_type, calendar_year, treatment, block, plot_id, genus_species, relcov)%>%
+  mutate(exp_year=paste(site_code, project_name, community_type, calendar_year, sep="::"))
+
+maxMin <- alldata%>%
+  select(site_code, project_name, community_type, treatment, calendar_year)%>%
+  group_by(site_code, project_name, community_type, treatment)%>%
+  mutate(max_year=max(calendar_year), min_year=min(calendar_year))%>%
+  ungroup()%>%
+  select(-calendar_year)%>%
+  unique()
+
+#import treatment information and subset to get number of factors manipulated (i.e., plot_mani) for each plot
+expinfo <- read.csv("ExperimentInformation_Nov2017.csv")%>%
+  mutate(exp_year=paste(site_code, project_name, community_type, calendar_year, sep="::"))%>%
+  select(exp_year, plot_mani, treatment)
+
+#merge treatment information with species relative abundancecs
+alldata2 <- merge(alldata, expinfo, by=c("exp_year","treatment"), all=F)%>%
+  mutate(site_project_comm=paste(site_code, project_name, community_type, sep='_'))%>%
+  #merge first and last years of data for each experiment
+  left_join(maxMin)%>%
+  #filter to only keep first and last years
+  mutate(keep=ifelse(max_year==calendar_year, 'last', ifelse(min_year==calendar_year, 'first', 'drop')))%>%
+  filter(keep!='drop')%>%
+  #kbs needs special treatment, see below
+  filter(site_code!='KBS')
+
+
+
+
+###calculating bray-curtis dissimilarities within and among treatments to get distances between treatment centroids and dispersion among replicate plots within a treatment
+#make a new dataframe with just the label
+exp_year=alldata2%>%
+  select(site_project_comm)%>%
+  unique()
+
+#makes an empty dataframe
+for.analysis.difference=data.frame(row.names=1) 
+for.analysis.change=data.frame(row.names=1) 
+
+###first: composition_diff is the distance between trt and controls
+####second: dispersion is the average dispersion of plots within a treatment to treatment centriod
+####third: richness and exp_H also calculated
+for(i in 1:length(exp_year$site_project_comm)) {
+  
+  #creates a dataset for each unique year, trt, exp combo
+  subset <- alldata2[alldata2$site_project_comm==as.character(exp_year$site_project_comm[i]),]%>%
+    select(site_project_comm, calendar_year, treatment, plot_mani, genus_species, relcov, plot_id)%>%
+    mutate(treatment2=ifelse(plot_mani==0, 'TRUECONTROL', as.character(treatment)))
+  
+  #need this to keep track of treatment
+  treatments <- subset%>%
+    select(plot_id, treatment)%>%
+    unique()
+  
+  #calculating composition difference and abs(dispersion difference)
+  difference <- multivariate_difference(subset, time.var = 'calendar_year', species.var = "genus_species", abundance.var = 'relcov', replicate.var = 'plot_id', treatment.var='treatment2', reference.treatment='TRUECONTROL')%>%
+    rename(treatment=treatment22)%>%
+    select(-treatment2, -trt_greater_disp)%>%
+    mutate(site_project_comm=exp_year$site_project_comm[i])
+  
+  #calculating composition difference and abs(dispersion difference)
+  change <- multivariate_change(subset, time.var = 'calendar_year', species.var = "genus_species", abundance.var = 'relcov', replicate.var = 'plot_id', treatment.var='treatment2', reference.time=min(subset$calendar_year))%>%
+    rename(treatment=treatment2)%>%
+    mutate(site_project_comm=exp_year$site_project_comm[i])
+  
+  #pasting dispersions into the dataframe made for this analysis
+  for.analysis.difference=rbind(difference, for.analysis.difference)  
+  for.analysis.change=rbind(change, for.analysis.change)  
+}
+
+#kbs T7 special treatment because tilling began one year after fertilization
+kbsUntilled <- merge(alldata, expinfo, by=c("exp_year","treatment"), all=F)%>%
+  filter(site_code=='KBS', calendar_year==1989|calendar_year==2012, treatment=='T0F0'|treatment=='T0F1')%>%
+  mutate(site_project_comm=paste(site_code, project_name, community_type, sep='_'))%>%
+  #filter to only keep first and last years
+  mutate(keep=ifelse(calendar_year==1989, 'first', 'last'))%>%
+  group_by(treatment)%>%
+  mutate(max_year=max(calendar_year), min_year=min(calendar_year))%>%
+  ungroup()%>%
+  select(site_project_comm, calendar_year, treatment, plot_mani, genus_species, relcov, plot_id)%>%
+  mutate(treatment2=ifelse(plot_mani==0, 'TRUECONTROL', as.character(treatment)))
+
+differenceKBSuntilled <- multivariate_difference(kbsUntilled, time.var = 'calendar_year', species.var = "genus_species", abundance.var = 'relcov', replicate.var = 'plot_id', treatment.var='treatment2', reference.treatment='TRUECONTROL')%>%
+  rename(treatment=treatment22)%>%
+  select(-treatment2, -trt_greater_disp)%>%
+  mutate(site_project_comm='KBS_T7_0')
+  
+
+changeKBSuntilled <- multivariate_change(kbsUntilled, time.var = 'calendar_year', species.var = "genus_species", abundance.var = 'relcov', replicate.var = 'plot_id', treatment.var='treatment2', reference.time=1989)%>%
+  rename(treatment=treatment2)%>%
+  mutate(site_project_comm='KBS_T7_0')
+
+
+kbsTilled <- merge(alldata, expinfo, by=c("exp_year","treatment"), all=F)%>%
+  filter(site_code=='KBS', calendar_year==1990|calendar_year==2012, treatment!='T0F1')%>%
+  mutate(site_project_comm=paste(site_code, project_name, community_type, sep='_'))%>%
+  #filter to only keep first and last years
+  mutate(keep=ifelse(calendar_year==1990, 'first', 'last'))%>%
+  group_by(treatment)%>%
+  mutate(max_year=max(calendar_year), min_year=min(calendar_year))%>%
+  ungroup()%>%
+  select(site_project_comm, calendar_year, treatment, plot_mani, genus_species, relcov, plot_id)%>%
+  mutate(treatment2=ifelse(plot_mani==0, 'TRUECONTROL', as.character(treatment)))
+
+#calculating composition difference and abs(dispersion difference)
+differenceKBStilled <- multivariate_difference(kbsTilled, time.var = 'calendar_year', species.var = "genus_species", abundance.var = 'relcov', replicate.var = 'plot_id', treatment.var='treatment2', reference.treatment='TRUECONTROL')%>%
+  rename(treatment=treatment22)%>%
+  select(-treatment2, -trt_greater_disp)%>%
+  mutate(site_project_comm='KBS_T7_0')
+
+#calculating composition difference and abs(dispersion difference)
+changeKBStilled <- multivariate_change(kbsTilled, time.var = 'calendar_year', species.var = "genus_species", abundance.var = 'relcov', replicate.var = 'plot_id', treatment.var='treatment2', reference.time=1990)%>%
+  rename(treatment=treatment2)%>%
+  mutate(site_project_comm='KBS_T7_0')
+
+for.analysis.difference=rbind(for.analysis.difference, differenceKBStilled, differenceKBSuntilled)  
+for.analysis.change=rbind(for.analysis.change, changeKBStilled, changeKBSuntilled) 
+
+
+
+
