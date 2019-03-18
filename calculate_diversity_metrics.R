@@ -62,7 +62,7 @@ for(i in 1:length(exp_year$site_project_comm)) {
     unique()
    
   #calculating composition difference and abs(dispersion difference)
-  multivariate <- multivariate_difference(subset, time.var = 'calendar_year', species.var = "genus_species", abundance.var = 'relcov', replicate.var = 'plot_id', treatment='treatment2', reference.treatment='TRUECONTROL')%>%
+  multivariate <- multivariate_difference(subset, time.var = 'calendar_year', species.var = "genus_species", abundance.var = 'relcov', replicate.var = 'plot_id', treatment.var='treatment2', reference.treatment='TRUECONTROL')%>%
     rename(treatment=treatment22)%>%
     select(-treatment2, -trt_greater_disp)
 
