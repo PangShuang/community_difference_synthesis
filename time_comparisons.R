@@ -13,6 +13,34 @@ library(codyn)
 setwd('C:\\Users\\la pierrek\\Dropbox (Smithsonian)\\working groups\\converge diverge working group\\converge_diverge\\datasets\\LongForm')
 
 
+theme_set(theme_bw())
+theme_update(axis.title.x=element_text(size=40, vjust=-0.35, margin=margin(t=15)), axis.text.x=element_text(size=34, color='black'),
+             axis.title.y=element_text(size=40, angle=90, vjust=0.5, margin=margin(r=15)), axis.text.y=element_text(size=34, color='black'),
+             plot.title = element_text(size=40, vjust=2),
+             panel.grid.major=element_blank(), panel.grid.minor=element_blank(),
+             legend.title=element_blank(), legend.text=element_text(size=20))
+
+
+###bar graph summary statistics function
+#barGraphStats(data=, variable="", byFactorNames=c(""))
+barGraphStats <- function(data, variable, byFactorNames) {
+  count <- length(byFactorNames)
+  N <- aggregate(data[[variable]], data[byFactorNames], FUN=length)
+  names(N)[1:count] <- byFactorNames
+  names(N) <- sub("^x$", "N", names(N))
+  mean <- aggregate(data[[variable]], data[byFactorNames], FUN=mean)
+  names(mean)[1:count] <- byFactorNames
+  names(mean) <- sub("^x$", "mean", names(mean))
+  sd <- aggregate(data[[variable]], data[byFactorNames], FUN=sd)
+  names(sd)[1:count] <- byFactorNames
+  names(sd) <- sub("^x$", "sd", names(sd))
+  preSummaryStats <- merge(N, mean, by=byFactorNames)
+  finalSummaryStats <- merge(preSummaryStats, sd, by=byFactorNames)
+  finalSummaryStats$se <- finalSummaryStats$sd / sqrt(finalSummaryStats$N)
+  return(finalSummaryStats)
+}
+
+
 #import relative species abundance data
 alldata <- read.csv("SpeciesRelativeAbundance_Oct2017.csv")%>%
   select(site_code, project_name, community_type, calendar_year, treatment, block, plot_id, genus_species, relcov)%>%
@@ -135,5 +163,36 @@ for.analysis.difference=rbind(for.analysis.difference, differenceKBStilled, diff
 for.analysis.change=rbind(for.analysis.change, changeKBStilled, changeKBSuntilled) 
 
 
+###final numbers for difference and change
+differenceAll <- for.analysis.difference%>%
+  #####INSERT STEP HERE TO FILTER DOWN TO THOSE WITH CURVED LINES ONLY
+  group_by(site_project_comm)%>%
+  mutate(comparison=ifelse(calendar_year==min(calendar_year), 'trt-ctl_first', 'trt-ctl_last'))%>%
+  ungroup()%>%
+  rename(value=composition_diff)%>%
+  select(comparison, site_project_comm, treatment, calendar_year, value)
+
+changeAll <- for.analysis.change%>%
+  #####INSERT STEP HERE TO FILTER DOWN TO THOSE WITH CURVED LINES ONLY
+  mutate(comparison=ifelse(treatment=='TRUECONTROL', 'ctl_first-last', 'trt_first-last'))%>%
+  rename(value=composition_change)%>%
+  select(comparison, site_project_comm, treatment, calendar_year, value)
+
+comparisons <- rbind(differenceAll, changeAll)
 
 
+###figures
+ggplot(data=barGraphStats(data=comparisons, variable="value", byFactorNames=c("comparison")), aes(x=comparison, y=mean)) +
+  geom_bar(stat='identity', color='black', fill='white') +
+  geom_errorbar(aes(ymin=mean-se, ymax=mean+se), width=0.2) +
+  ylab('Response Magnitude') +
+  scale_x_discrete(limits=c('ctl_first-last', 'trt_first-last', 'trt-ctl_first', 'trt-ctl_last'),
+                   labels=c('ctl change', 'trt change', 'initial diff', 'final diff')) +
+  theme(axis.title.x=element_blank())
+
+ggplot(data=comparisons, aes(x=comparison, y=value)) +
+  geom_boxplot() +
+  ylab('Response Magnitude') +
+  scale_x_discrete(limits=c('ctl_first-last', 'trt_first-last', 'trt-ctl_first', 'trt-ctl_last'),
+                   labels=c('ctl change', 'trt change', 'initial diff', 'final diff')) +
+  theme(axis.title.x=element_blank())
