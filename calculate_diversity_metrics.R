@@ -274,9 +274,9 @@ numPoints <- allAnalysis20yr%>%
   summarise(num_datapoints=length(treatment_year))%>%
   ungroup()
 
-# write.csv(allAnalysis20yr, 'ForAnalysis_allAnalysis20yr_pairwise_01092019.csv')
+# write.csv(allAnalysis20yr, 'ForAnalysis_allAnalysis20yr_pairwise_02012019.csv')
 
-#subset out treatment years 10 or less (i.e., cut off datasets at 20 years)
+#subset out treatment years 10 or less (i.e., cut off datasets at 10 years)
 allAnalysis10yr <- allAnalysisAllDatasets%>%
   filter(treatment_year<11)%>%
   select(-num_datapoints)%>%
