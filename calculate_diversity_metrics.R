@@ -10,13 +10,11 @@ library(vegan)
 library(tidyverse)
 library(gridExtra)
 library(grid)
-library(devtools)
-install_github("NCEAS/codyn", ref = "anderson")
 library(codyn)
 
 
 #kim
-setwd('C:\\Users\\lapie\\Dropbox (Smithsonian)\\working groups\\converge diverge working group\\converge_diverge\\datasets\\LongForm')
+setwd('C:\\Users\\la pierrek\\Dropbox (Smithsonian)\\working groups\\converge diverge working group\\converge_diverge\\datasets\\LongForm')
 
 #meghan
 setwd("~/Dropbox/converge_diverge/datasets/LongForm")
@@ -64,7 +62,7 @@ for(i in 1:length(exp_year$site_project_comm)) {
     unique()
    
   #calculating composition difference and abs(dispersion difference)
-  multivariate <- multivariate_difference(subset, time.var = 'calendar_year', species.var = "genus_species", abundance.var = 'relcov', replicate.var = 'plot_id', treatment='treatment2', reference.treatment='TRUECONTROL')%>%
+  multivariate <- multivariate_difference(subset, time.var = 'calendar_year', species.var = "genus_species", abundance.var = 'relcov', replicate.var = 'plot_id', treatment.var='treatment2', reference.treatment='TRUECONTROL')%>%
     rename(treatment=treatment22)%>%
     select(-treatment2, -trt_greater_disp)
 
@@ -273,8 +271,8 @@ numPoints <- allAnalysis20yr%>%
   group_by(site_code, project_name, community_type, treatment)%>%
   summarise(num_datapoints=length(treatment_year))%>%
   ungroup()
+# write.csv(allAnalysis20yr, 'ForAnalysis_allAnalysis20yr_pairwise_03132019.csv')
 
-# write.csv(allAnalysis20yr, 'ForAnalysis_allAnalysis20yr_pairwise_02012019.csv')
 
 #subset out treatment years 10 or less (i.e., cut off datasets at 10 years)
 allAnalysis10yr <- allAnalysisAllDatasets%>%
@@ -288,11 +286,11 @@ numPoints <- allAnalysis10yr%>%
   group_by(site_code, project_name, community_type, treatment)%>%
   summarise(num_datapoints=length(treatment_year))
 
-# write.csv(allAnalysis10yr, 'ForAnalysis_allAnalysis10yr_pairwise_01092019.csv')
+# write.csv(allAnalysis10yr, 'ForAnalysis_allAnalysis10yr_pairwise_03132019.csv')
 
 #subset out 20th or final year of all data
 allAnalysisFinalYear <- allAnalysis20yr%>%
   group_by(site_code, project_name, community_type, treatment)%>%
   filter(treatment_year==max(treatment_year))%>%
   ungroup()
-# write.csv(allAnalysisFinalYear, 'ForAnalysis_allAnalysisFinalYear_01092019.csv')
+# write.csv(allAnalysisFinalYear, 'ForAnalysis_allAnalysisFinalYear_03132019.csv')

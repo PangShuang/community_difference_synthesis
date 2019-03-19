@@ -10,7 +10,7 @@ library(grid)
 library(tidyverse)
 
 #kim
-setwd("C:\\Users\\lapie\\Dropbox (Smithsonian)\\working groups\\converge diverge working group\\converge_diverge\\datasets\\LongForm")
+setwd("C:\\Users\\la pierrek\\Dropbox (Smithsonian)\\working groups\\converge diverge working group\\converge_diverge\\datasets\\LongForm")
 
 theme_set(theme_bw())
 theme_update(axis.title.x=element_text(size=40, vjust=-0.35, margin=margin(t=15)), axis.text.x=element_text(size=34, color='black'),
@@ -62,7 +62,7 @@ trtInfo <- read.csv('ExperimentInformation_Nov2017.csv')%>%
   select(-X)
 
 #import diversity metrics that went into Bayesian analysis
-rawData <- read.csv('ForAnalysis_allAnalysis20yr_pairwise_legendre_10102019.csv')
+rawData <- read.csv('ForAnalysis_allAnalysis20yr_pairwise_01092019.csv')
 
 #calculate means and standard deviations across all data for richness and compositonal differences to backtransform
 rawData2<- rawData%>%
@@ -118,13 +118,13 @@ studyInfo <- rawData%>%
 #only run to generate initial chains files
 #raw chains data --------------------------------------------------------
 memory.limit(size=50000)
-chains1 <- read.csv('C:\\Users\\lapie\\Dropbox (Smithsonian)\\working groups\\converge diverge working group\\converge_diverge\\La Pierre_comm difference_final model results_01122018\\legendre method_01102019\\N01_legendre_01102019_0.csv', comment.char='#')
+chains1 <- read.csv('C:\\Users\\la pierrek\\Dropbox (Smithsonian)\\working groups\\converge diverge working group\\converge_diverge\\La Pierre_comm difference_final model results_01122018\\anderson method_01102018\\N01_01092019_lnRR_0.csv', comment.char='#')
 chains1 <- chains1[-1:-5000,]
-chains2 <- read.csv('C:\\Users\\lapie\\Dropbox (Smithsonian)\\working groups\\converge diverge working group\\converge_diverge\\La Pierre_comm difference_final model results_01122018\\legendre method_01102019\\N01_legendre_01102019_1.csv', comment.char='#')
+chains2 <- read.csv('C:\\Users\\la pierrek\\Dropbox (Smithsonian)\\working groups\\converge diverge working group\\converge_diverge\\La Pierre_comm difference_final model results_01122018\\anderson method_01102018\\N01_01092019_lnRR_1.csv', comment.char='#')
 chains2 <- chains2[-1:-5000,]
-chains3 <- read.csv('C:\\Users\\lapie\\Dropbox (Smithsonian)\\working groups\\converge diverge working group\\converge_diverge\\La Pierre_comm difference_final model results_01122018\\legendre method_01102019\\N01_legendre_01102019_2.csv', comment.char='#')
+chains3 <- read.csv('C:\\Users\\la pierrek\\Dropbox (Smithsonian)\\working groups\\converge diverge working group\\converge_diverge\\La Pierre_comm difference_final model results_01122018\\anderson method_01102018\\N01_01092019_lnRR_2.csv', comment.char='#')
 chains3 <- chains3[-1:-5000,]
-chains4 <- read.csv('C:\\Users\\lapie\\Dropbox (Smithsonian)\\working groups\\converge diverge working group\\converge_diverge\\La Pierre_comm difference_final model results_01122018\\legendre method_01102019\\N01_legendre_01102019_3.csv', comment.char='#')
+chains4 <- read.csv('C:\\Users\\la pierrek\\Dropbox (Smithsonian)\\working groups\\converge diverge working group\\converge_diverge\\La Pierre_comm difference_final model results_01122018\\anderson method_01102018\\N01_01092019_lnRR_3.csv', comment.char='#')
 chains4 <- chains4[-1:-5000,]
 
 chainsCommunity <- rbind(chains1, chains2, chains3, chains4)
@@ -193,41 +193,41 @@ chainsCommunity2 <- chainsCommunity%>%
   summarise(median=median(value), sd=sd(value))%>%
   mutate(lower=median-2*sd, upper=median+2*sd, lower_sign=sign(lower), upper_sign=sign(upper), diff=lower_sign-upper_sign, median=ifelse(diff==-2, 0, median))
 
-# write.csv(chainsCommunity2, 'bayesian_output_summary_expinteractions_20yr_legendre method_01102019.csv')
+# write.csv(chainsCommunity2, 'bayesian_output_summary_expinteraction_20yr_anderson method_01102019.csv')
 
-chainsCommunity2 <- read.csv('bayesian_output_summary_expinteractions_20yr_legendre method_01102019.csv')
+chainsCommunity2 <- read.csv('bayesian_output_summary_expinteraction_20yr_anderson method_01102019.csv')
 
-#gather the intercepts, linear slopes, and quadratic slopes for all treatments ---------------------------------------------
-#numbers are B.variable.number.parameter (e.g., B.mean.87.slope)
-#variable (second place): 1=mean change, 2=richness change
-#parameter (final digit): 1=intercept, 2=linear slope, 3=quad slope
-#set any that are not significant (CI overlaps 0) as 0
+# #gather the intercepts, linear slopes, and quadratic slopes for all treatments ---------------------------------------------
+# #numbers are B.variable.number.parameter (e.g., B.mean.87.slope)
+# #variable (second place): 1=mean change, 2=richness change
+# #parameter (final digit): 1=intercept, 2=linear slope, 3=quad slope
+# #set any that are not significant (CI overlaps 0) as 0
+# 
+# #get mean parameter values across all runs for each experiment, treatment, etc
+# chainsFinalMean <- as.data.frame(colMeans(chainsCommunity[,8220:10691]))%>% #may need to delete original four chains dataframes to get this to work
+#   add_rownames('parameter')
+# names(chainsFinalMean)[names(chainsFinalMean) == 'colMeans(chainsCommunity[, 8220:10691])'] <- 'mean'
+# #get sd of parameter values across all runs for each experiment, treatment, etc
+# chainsFinalSD <- as.data.frame(colSd(chainsCommunity[,8220:10691]))
+# names(chainsFinalSD)[names(chainsFinalSD) == 'colSd(chainsCommunity[, 8220:10691])'] <- 'sd'
+# 
+# chainsFinal <- cbind(chainsFinalMean, chainsFinalSD)%>%
+#   #split names into parts
+#   separate(parameter, c('B', 'variable', 'id', 'parameter'))%>%
+#   select(-B)%>%
+#   #rename parts to be more clear
+#   mutate(variable=ifelse(variable==1, 'mean', 'richness'),
+#          parameter=ifelse(parameter==1, 'intercept', ifelse(parameter==2, 'linear', 'quadratic')),
+#          id=as.integer(id))%>%
+#   #if 95% confidence interval overlaps 0, then set mean to 0
+#   mutate(lower=mean-2*sd, upper=mean+2*sd, lower_sign=sign(lower), upper_sign=sign(upper), diff=lower_sign-upper_sign, mean=ifelse(diff==-2, 0, mean))%>%
+#   #spread by variable
+#   select(variable, id, parameter, mean)%>%
+#   spread(key=parameter, value=mean)
+# 
+# # write.csv(chainsFinal, 'bayesian_output_mean sd_expinteractions_20yr_anderson method_01102019_noninf.csv')
 
-#get mean parameter values across all runs for each experiment, treatment, etc
-chainsFinalMean <- as.data.frame(colMeans(chainsCommunity[,8220:10691]))%>% #may need to delete original four chains dataframes to get this to work
-  add_rownames('parameter')
-names(chainsFinalMean)[names(chainsFinalMean) == 'colMeans(chainsCommunity[, 8220:10691])'] <- 'mean'
-#get sd of parameter values across all runs for each experiment, treatment, etc
-chainsFinalSD <- as.data.frame(colSd(chainsCommunity[,8220:10691]))
-names(chainsFinalSD)[names(chainsFinalSD) == 'colSd(chainsCommunity[, 8220:10691])'] <- 'sd'
-
-chainsFinal <- cbind(chainsFinalMean, chainsFinalSD)%>%
-  #split names into parts
-  separate(parameter, c('B', 'variable', 'id', 'parameter'))%>%
-  select(-B)%>%
-  #rename parts to be more clear
-  mutate(variable=ifelse(variable==1, 'mean', 'richness'),
-         parameter=ifelse(parameter==1, 'intercept', ifelse(parameter==2, 'linear', 'quadratic')),
-         id=as.integer(id))%>%
-  #if 95% confidence interval overlaps 0, then set mean to 0
-  mutate(lower=mean-2*sd, upper=mean+2*sd, lower_sign=sign(lower), upper_sign=sign(upper), diff=lower_sign-upper_sign, mean=ifelse(diff==-2, 0, mean))%>%
-  #spread by variable
-  select(variable, id, parameter, mean)%>%
-  spread(key=parameter, value=mean)
-
-# write.csv(chainsFinal, 'bayesian_output_mean sd_expinteractions_20yr_legendre method_01102019_noninf.csv')
-
-chainsFinal <- read.csv('bayesian_output_mean sd_expinteractions_20yr_legendre method_01102019_noninf.csv')
+chainsFinal <- read.csv('bayesian_output_mean sd_expinteractions_20yr_anderson method_01102019_noninf.csv')
 
 #merge together with experiment list
 chainsExperiment <- chainsFinal%>%
@@ -533,3 +533,139 @@ print(meanDroPlotFinal, vp=viewport(layout.pos.row = 2, layout.pos.col = 2))
 print(richnessIrrPlotFinal, vp=viewport(layout.pos.row = 1, layout.pos.col = 3))
 print(meanIrrPlotFinal, vp=viewport(layout.pos.row = 2, layout.pos.col = 3))
 #export at 2700 x 1600
+
+
+
+
+
+
+
+
+
+####testing lines  ---  mean change
+BGP <- ggplot(data=subset(rawData, project_name=='BGP'&treatment=='b_u_n'), aes(x=treatment_year, y=mean_change)) + 
+  # coord_cartesian(ylim=c(0,1))  +
+  # scale_x_continuous(limits=c(0,19), breaks=seq(4,19,5), labels=seq(5,20,5)) +
+  # ylim(-10,10) +
+  xlab('Standardized Experiment Year') +
+  ylab('Overall Community Difference') +
+  geom_point(color='red', size=5) +
+  stat_function(fun=function(x){(-0 + 0.449065262*x + -0.065372924*x^2)*(0.1718192)+(0.2935109)}, size=1, xlim=c(1,20), colour='black')
+
+BGP2 <- ggplot(data=subset(rawData, project_name=='BGP'&treatment=='b_u_p'), aes(x=treatment_year, y=mean_change)) + 
+  # coord_cartesian(ylim=c(0,1))  +
+  # scale_x_continuous(limits=c(0,19), breaks=seq(4,19,5), labels=seq(5,20,5)) +
+  # ylim(-10,10) +
+  xlab('Standardized Experiment Year') +
+  ylab('Overall Community Difference') +
+  geom_point(color='red', size=5) +
+  stat_function(fun=function(x){(-1.04788779 + 0.480665506*x + -0.06235107*x^2)*(0.1718192)+(0.2935109)}, size=1, xlim=c(1,20), colour='black')
+
+nfert <- ggplot(data=subset(rawData, project_name=='Nfert'&treatment=='F'), aes(x=treatment_year, y=mean_change)) + 
+  # coord_cartesian(ylim=c(0,1))  +
+  # scale_x_continuous(limits=c(0,19), breaks=seq(4,19,5), labels=seq(5,20,5)) +
+  # ylim(-10,10) +
+  xlab('Standardized Experiment Year') +
+  ylab('Overall Community Difference') +
+  geom_point(color='red', size=5) +
+  stat_function(fun=function(x){(0.822832418 + 0.699235591*x + -0.04209497*x^2)*(0.1718192)+(0.2935109)}, size=1, xlim=c(1,18), colour='black')
+
+wenndex <- ggplot(data=subset(rawData, project_name=='WENNDEx'&treatment=='PN'), aes(x=treatment_year, y=mean_change)) + 
+  # coord_cartesian(ylim=c(0,1))  +
+  # scale_x_continuous(limits=c(0,19), breaks=seq(4,19,5), labels=seq(5,20,5)) +
+  # ylim(-10,10) +
+  xlab('Standardized Experiment Year') +
+  ylab('Overall Community Difference') +
+  geom_point(color='red', size=5) +
+  stat_function(fun=function(x){(-0 + 0.693766164*x + -0.038141653*x^2)*(0.1718192)+(0.2935109)}, size=1, xlim=c(1,7), colour='black')
+
+fireplots <- ggplot(data=subset(rawData, project_name=='fireplots'&treatment=='wnug'), aes(x=treatment_year, y=mean_change)) + 
+  # coord_cartesian(ylim=c(0,1))  +
+  # scale_x_continuous(limits=c(0,19), breaks=seq(4,19,5), labels=seq(5,20,5)) +
+  # ylim(-10,10) +
+  xlab('Standardized Experiment Year') +
+  ylab('Overall Community Difference') +
+  geom_point(color='red', size=5) +
+  stat_function(fun=function(x){(-0 + 0.520600303*x + -0.0378649*x^2)*(0.1718192)+(0.2935109)}, size=1, xlim=c(1,9), colour='black')
+
+tmece <- ggplot(data=subset(rawData, project_name=='TMECE'&community_type=='SP'&treatment=='E'), aes(x=treatment_year, y=mean_change)) + 
+  # coord_cartesian(ylim=c(0,1))  +
+  # scale_x_continuous(limits=c(0,19), breaks=seq(4,19,5), labels=seq(5,20,5)) +
+  # ylim(-10,10) +
+  xlab('Standardized Experiment Year') +
+  ylab('Overall Community Difference') +
+  geom_point(color='red', size=5) +
+  stat_function(fun=function(x){(-0 + 0.711655574*x + -0.036138435*x^2)*(0.1718192)+(0.2935109)}, size=1, xlim=c(1,20), colour='black')
+
+pushViewport(viewport(layout=grid.layout(2,3)))
+print(BGP, vp=viewport(layout.pos.row = 1, layout.pos.col = 1))
+print(BGP2, vp=viewport(layout.pos.row = 2, layout.pos.col = 1))
+print(nfert, vp=viewport(layout.pos.row = 1, layout.pos.col = 2))
+print(wenndex, vp=viewport(layout.pos.row = 2, layout.pos.col = 2))
+print(fireplots, vp=viewport(layout.pos.row = 1, layout.pos.col = 3))
+print(tmece, vp=viewport(layout.pos.row = 2, layout.pos.col = 3))
+
+
+
+####testing lines  --  richness change
+BGP <- ggplot(data=subset(rawData, project_name=='BGP'&treatment=='b_u_n'), aes(x=treatment_year, y=mean_change)) + 
+  # coord_cartesian(ylim=c(0,1))  +
+  # scale_x_continuous(limits=c(0,19), breaks=seq(4,19,5), labels=seq(5,20,5)) +
+  # ylim(-10,10) +
+  xlab('Standardized Experiment Year') +
+  ylab('Overall Community Difference') +
+  geom_point(color='red', size=5) +
+  stat_function(fun=function(x){(-0 + 0.449065262*x + -0.065372924*x^2)*(0.1718192)+(0.2935109)}, size=1, xlim=c(1,20), colour='black')
+
+BGP2 <- ggplot(data=subset(rawData, project_name=='BGP'&treatment=='b_u_p'), aes(x=treatment_year, y=mean_change)) + 
+  # coord_cartesian(ylim=c(0,1))  +
+  # scale_x_continuous(limits=c(0,19), breaks=seq(4,19,5), labels=seq(5,20,5)) +
+  # ylim(-10,10) +
+  xlab('Standardized Experiment Year') +
+  ylab('Overall Community Difference') +
+  geom_point(color='red', size=5) +
+  stat_function(fun=function(x){(-1.04788779 + 0.480665506*x + -0.06235107*x^2)*(0.1718192)+(0.2935109)}, size=1, xlim=c(1,20), colour='black')
+
+nfert <- ggplot(data=subset(rawData, project_name=='Nfert'&treatment=='F'), aes(x=treatment_year, y=mean_change)) + 
+  # coord_cartesian(ylim=c(0,1))  +
+  # scale_x_continuous(limits=c(0,19), breaks=seq(4,19,5), labels=seq(5,20,5)) +
+  # ylim(-10,10) +
+  xlab('Standardized Experiment Year') +
+  ylab('Overall Community Difference') +
+  geom_point(color='red', size=5) +
+  stat_function(fun=function(x){(0.822832418 + 0.699235591*x + -0.04209497*x^2)*(0.1718192)+(0.2935109)}, size=1, xlim=c(1,18), colour='black')
+
+wenndex <- ggplot(data=subset(rawData, project_name=='WENNDEx'&treatment=='PN'), aes(x=treatment_year, y=mean_change)) + 
+  # coord_cartesian(ylim=c(0,1))  +
+  # scale_x_continuous(limits=c(0,19), breaks=seq(4,19,5), labels=seq(5,20,5)) +
+  # ylim(-10,10) +
+  xlab('Standardized Experiment Year') +
+  ylab('Overall Community Difference') +
+  geom_point(color='red', size=5) +
+  stat_function(fun=function(x){(-0 + 0.693766164*x + -0.038141653*x^2)*(0.1718192)+(0.2935109)}, size=1, xlim=c(1,7), colour='black')
+
+fireplots <- ggplot(data=subset(rawData, project_name=='fireplots'&treatment=='wnug'), aes(x=treatment_year, y=mean_change)) + 
+  # coord_cartesian(ylim=c(0,1))  +
+  # scale_x_continuous(limits=c(0,19), breaks=seq(4,19,5), labels=seq(5,20,5)) +
+  # ylim(-10,10) +
+  xlab('Standardized Experiment Year') +
+  ylab('Overall Community Difference') +
+  geom_point(color='red', size=5) +
+  stat_function(fun=function(x){(-0 + 0.520600303*x + -0.0378649*x^2)*(0.1718192)+(0.2935109)}, size=1, xlim=c(1,9), colour='black')
+
+tmece <- ggplot(data=subset(rawData, project_name=='TMECE'&community_type=='SP'&treatment=='E'), aes(x=treatment_year, y=mean_change)) + 
+  # coord_cartesian(ylim=c(0,1))  +
+  # scale_x_continuous(limits=c(0,19), breaks=seq(4,19,5), labels=seq(5,20,5)) +
+  # ylim(-10,10) +
+  xlab('Standardized Experiment Year') +
+  ylab('Overall Community Difference') +
+  geom_point(color='red', size=5) +
+  stat_function(fun=function(x){(-0 + 0.711655574*x + -0.036138435*x^2)*(0.1718192)+(0.2935109)}, size=1, xlim=c(1,20), colour='black')
+
+pushViewport(viewport(layout=grid.layout(2,3)))
+print(BGP, vp=viewport(layout.pos.row = 1, layout.pos.col = 1))
+print(BGP2, vp=viewport(layout.pos.row = 2, layout.pos.col = 1))
+print(nfert, vp=viewport(layout.pos.row = 1, layout.pos.col = 2))
+print(wenndex, vp=viewport(layout.pos.row = 2, layout.pos.col = 2))
+print(fireplots, vp=viewport(layout.pos.row = 1, layout.pos.col = 3))
+print(tmece, vp=viewport(layout.pos.row = 2, layout.pos.col = 3))
