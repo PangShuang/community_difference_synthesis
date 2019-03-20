@@ -10,7 +10,7 @@ library(grid)
 library(tidyverse)
 
 #kim
-setwd("C:\\Users\\la pierrek\\Dropbox (Smithsonian)\\working groups\\converge diverge working group\\converge_diverge\\datasets\\LongForm")
+setwd("C:\\Users\\lapie\\Dropbox (Smithsonian)\\working groups\\converge diverge working group\\converge_diverge\\datasets\\LongForm")
 
 theme_set(theme_bw())
 theme_update(axis.title.x=element_text(size=40, vjust=-0.35, margin=margin(t=15)), axis.text.x=element_text(size=34, color='black'),
@@ -62,7 +62,7 @@ trtInfo <- read.csv('ExperimentInformation_Nov2017.csv')%>%
   select(-X)
 
 #import diversity metrics that went into Bayesian analysis
-rawData <- read.csv('ForAnalysis_allAnalysis20yr_pairwise_01092019.csv')
+rawData <- read.csv('ForAnalysis_allAnalysis20yr_pairwise_03132019.csv')
 
 #calculate means and standard deviations across all data for richness and compositonal differences to backtransform
 rawData2<- rawData%>%
@@ -101,7 +101,7 @@ trtInfo <- rawData%>%
             anpp=mean(anpp), MAT=mean(MAT), MAP=mean(MAP))%>%
   ungroup()%>%
   left_join(expInfo)%>%
-  mutate(resource_mani=(nutrients+carbon+irrigation+drought), id=1:length(treatment))
+  mutate(resource_mani=(nutrients+carbon+irrigation+drought))
 
 #list of all treatments
 studyInfo <- rawData%>%
@@ -116,86 +116,65 @@ studyInfo <- rawData%>%
 ###Bayesian output processing
 
 #only run to generate initial chains files
-#raw chains data --------------------------------------------------------
-memory.limit(size=50000)
-chains1 <- read.csv('C:\\Users\\la pierrek\\Dropbox (Smithsonian)\\working groups\\converge diverge working group\\converge_diverge\\La Pierre_comm difference_final model results_01122018\\anderson method_01102018\\N01_01092019_lnRR_0.csv', comment.char='#')
-chains1 <- chains1[-1:-5000,]
-chains2 <- read.csv('C:\\Users\\la pierrek\\Dropbox (Smithsonian)\\working groups\\converge diverge working group\\converge_diverge\\La Pierre_comm difference_final model results_01122018\\anderson method_01102018\\N01_01092019_lnRR_1.csv', comment.char='#')
-chains2 <- chains2[-1:-5000,]
-chains3 <- read.csv('C:\\Users\\la pierrek\\Dropbox (Smithsonian)\\working groups\\converge diverge working group\\converge_diverge\\La Pierre_comm difference_final model results_01122018\\anderson method_01102018\\N01_01092019_lnRR_2.csv', comment.char='#')
-chains3 <- chains3[-1:-5000,]
-chains4 <- read.csv('C:\\Users\\la pierrek\\Dropbox (Smithsonian)\\working groups\\converge diverge working group\\converge_diverge\\La Pierre_comm difference_final model results_01122018\\anderson method_01102018\\N01_01092019_lnRR_3.csv', comment.char='#')
-chains4 <- chains4[-1:-5000,]
+# #raw chains data --------------------------------------------------------
+# memory.limit(size=50000)
+# chains1 <- read.csv('C:\\Users\\lapie\\Dropbox (Smithsonian)\\working groups\\converge diverge working group\\converge_diverge\\La Pierre_comm difference_final model results_01122018\\final models_03162019\\cholesky_noninformative_20yr_pairwise_03132019_lnRR_0.csv', comment.char='#')
+# chains1 <- chains1[-1:-5000,]
+# chains2 <- read.csv('C:\\Users\\lapie\\Dropbox (Smithsonian)\\working groups\\converge diverge working group\\converge_diverge\\La Pierre_comm difference_final model results_01122018\\final models_03162019\\cholesky_noninformative_20yr_pairwise_03132019_lnRR_1.csv', comment.char='#')
+# chains2 <- chains2[-1:-5000,]
+# chains3 <- read.csv('C:\\Users\\lapie\\Dropbox (Smithsonian)\\working groups\\converge diverge working group\\converge_diverge\\La Pierre_comm difference_final model results_01122018\\final models_03162019\\cholesky_noninformative_20yr_pairwise_03132019_lnRR_2.csv', comment.char='#')
+# chains3 <- chains3[-1:-5000,]
+# chains4 <- read.csv('C:\\Users\\lapie\\Dropbox (Smithsonian)\\working groups\\converge diverge working group\\converge_diverge\\La Pierre_comm difference_final model results_01122018\\final models_03162019\\cholesky_noninformative_20yr_pairwise_03132019_lnRR_3.csv', comment.char='#')
+# chains4 <- chains4[-1:-5000,]
+# 
+# chainsCommunity <- rbind(chains1, chains2, chains3, chains4)
+# 
+# 
+# #density plot of chains --------------------------------------------------------
+# plot(density(chainsCommunity$D.1.1.1))
+# plot(density(chainsCommunity$D.1.1.2))
+# plot(density(chainsCommunity$D.1.1.3))
+# 
+# 
+# #get values for overall (mean) lines across levels of plot mani --------------------------------------------------------
+# #mean change are the 1's, richness are the 2's
+# chainsCommunity2 <- chainsCommunity%>%
+#   select(lp__,
+#          #trt_type intercepts: center digit refers to trts
+#          E.1.1.1, E.2.1.1, E.1.2.1, E.2.2.1, E.1.3.1, E.2.3.1, E.1.4.1, E.2.4.1, E.1.5.1, E.2.5.1,
+#          E.1.6.1, E.2.6.1, E.1.7.1, E.2.7.1, E.1.8.1, E.2.8.1, E.1.9.1, E.2.9.1, E.1.10.1, E.2.10.1,
+#          E.1.11.1, E.2.11.1, E.1.12.1, E.2.12.1, E.1.13.1, E.2.13.1, E.1.14.1, E.2.14.1, E.1.15.1, E.2.15.1,
+#          E.1.16.1, E.2.16.1, E.1.17.1, E.2.17.1, E.1.18.1, E.2.18.1,
+#          #trt_type linear slopes: center digit refers to trts
+#          E.1.1.2, E.2.1.2, E.1.2.2, E.2.2.2, E.1.3.2, E.2.3.2, E.1.4.2, E.2.4.2, E.1.5.2, E.2.5.2,
+#          E.1.6.2, E.2.6.2, E.1.7.2, E.2.7.2, E.1.8.2, E.2.8.2, E.1.9.2, E.2.9.2, E.1.10.2, E.2.10.2,
+#          E.1.11.2, E.2.11.2, E.1.12.2, E.2.12.2, E.1.13.2, E.2.13.2, E.1.14.2, E.2.14.2, E.1.15.2, E.2.15.2,
+#          E.1.16.2, E.2.16.2, E.1.17.2, E.2.17.2, E.1.18.2, E.2.18.2,
+#          #trt_type quadratic slopes: center digit refers to trts and interactions with anpp and gamma diversity
+#          E.1.1.3, E.2.1.3, E.1.2.3, E.2.2.3, E.1.3.3, E.2.3.3, E.1.4.3, E.2.4.3, E.1.5.3, E.2.5.3,
+#          E.1.6.3, E.2.6.3, E.1.7.3, E.2.7.3, E.1.8.3, E.2.8.3, E.1.9.3, E.2.9.3, E.1.10.3, E.2.10.3,
+#          E.1.11.3, E.2.11.3, E.1.12.3, E.2.12.3, E.1.13.3, E.2.13.3, E.1.14.3, E.2.14.3, E.1.15.3, E.2.15.3,
+#          E.1.16.3, E.2.16.3, E.1.17.3, E.2.17.3, E.1.18.3, E.2.18.3,
+#          #ANPP intercept, linear, and quad slopes (center digit): 2=anpp
+#          D.1.2.1, D.2.2.1,
+#          D.1.2.2, D.2.2.2,
+#          D.1.2.3, D.2.2.3,
+#          #richness intercept, linear, and quad slopes (center digit): 3=gamma diversity
+#          D.1.3.1, D.2.3.1,
+#          D.1.3.2, D.2.3.2,
+#          D.1.3.3, D.2.3.3,
+#          #overall intercept, linear, and quad slopes (center digit): 1=overall
+#          D.1.1.1, D.2.1.1,
+#          D.1.1.2, D.2.1.2,
+#          D.1.1.3, D.2.1.3)%>%
+#   gather(key=parameter, value=value, E.1.1.1:D.2.1.3)%>%
+#   group_by(parameter)%>%
+#   summarise(median=median(value), sd=sd(value))%>%
+#   mutate(lower=median-2*sd, upper=median+2*sd, lower_sign=sign(lower), upper_sign=sign(upper), diff=lower_sign-upper_sign, median=ifelse(diff==-2, 0, median))
+# 
+# # write.csv(chainsCommunity2, 'bayesian_output_summary_expinteraction_20yr_03192019.csv')
 
-chainsCommunity <- rbind(chains1, chains2, chains3, chains4)
-
-
-#density plot of chains --------------------------------------------------------
-plot(density(chainsCommunity$D.1.1.1))
-plot(density(chainsCommunity$D.1.1.2))
-plot(density(chainsCommunity$D.1.1.3))
-
-
-#get values for overall (mean) lines across levels of plot mani --------------------------------------------------------
-#mean change are the 1's, richness are the 2's
-chainsCommunity2 <- chainsCommunity%>%
-  select(lp__,
-         # #trt_type intercepts: center digit refers to trts and interactions with anpp and gamma diversity
-         # U.1.1.1, U.2.1.1, U.1.2.1, U.2.2.1, U.1.3.1, U.2.3.1, U.1.4.1, U.2.4.1, U.1.5.1, U.2.5.1,
-         # U.1.6.1, U.2.6.1, U.1.7.1, U.2.7.1, U.1.8.1, U.2.8.1, U.1.9.1, U.2.9.1, U.1.10.1, U.2.10.1,
-         # U.1.11.1, U.2.11.1, U.1.12.1, U.2.12.1, U.1.13.1, U.2.13.1, U.1.14.1, U.2.14.1, U.1.15.1, U.2.15.1,
-         # U.1.16.1, U.2.16.1, U.1.17.1, U.2.17.1, U.1.18.1, U.2.18.1, U.1.19.1, U.2.19.1, U.1.20.1, U.2.20.1,
-         # U.1.21.1, U.2.21.1, U.1.22.1, U.2.22.1, U.1.23.1, U.2.23.1, U.1.24.1, U.2.24.1, U.1.25.1, U.2.25.1,
-         # U.1.26.1, U.2.26.1, U.1.27.1, U.2.27.1, U.1.28.1, U.2.28.1, U.1.29.1, U.2.29.1, U.1.30.1, U.2.30.1,
-         # U.1.31.1, U.2.31.1, U.1.32.1, U.2.32.1, U.1.33.1, U.2.33.1, U.1.34.1, U.2.34.1, U.1.35.1, U.2.35.1,
-         # U.1.36.1, U.2.36.1, U.1.37.1, U.2.37.1, U.1.38.1, U.2.38.1, U.1.39.1, U.2.39.1, U.1.40.1, U.2.40.1,
-         # U.1.41.1, U.2.41.1, U.1.42.1, U.2.42.1, U.1.43.1, U.2.43.1, U.1.44.1, U.2.44.1, U.1.45.1, U.2.45.1,
-         # U.1.46.1, U.2.46.1, U.1.47.1, U.2.47.1, U.1.48.1, U.2.48.1, U.1.49.1, U.2.49.1, U.1.50.1, U.2.50.1,
-         # U.1.51.1, U.2.51.1, U.1.52.1, U.2.52.1, U.1.53.1, U.2.53.1, U.1.54.1, U.2.54.1,
-         # #trt_type linear slopes: center digit refers to trts and interactions with anpp and gamma diversity
-         # U.1.1.2, U.2.1.2, U.1.2.2, U.2.2.2, U.1.3.2, U.2.3.2, U.1.4.2, U.2.4.2, U.1.5.2, U.2.5.2,
-         # U.1.6.2, U.2.6.2, U.1.7.2, U.2.7.2, U.1.8.2, U.2.8.2, U.1.9.2, U.2.9.2, U.1.10.2, U.2.10.2,
-         # U.1.11.2, U.2.11.2, U.1.12.2, U.2.12.2, U.1.13.2, U.2.13.2, U.1.14.2, U.2.14.2, U.1.15.2, U.2.15.2,
-         # U.1.16.2, U.2.16.2, U.1.17.2, U.2.17.2, U.1.18.2, U.2.18.2, U.1.19.2, U.2.19.2, U.1.20.2, U.2.20.2,
-         # U.1.21.2, U.2.21.2, U.1.22.2, U.2.22.2, U.1.23.2, U.2.23.2, U.1.24.2, U.2.24.2, U.1.25.2, U.2.25.2,
-         # U.1.26.2, U.2.26.2, U.1.27.2, U.2.27.2, U.1.28.2, U.2.28.2, U.1.29.2, U.2.29.2, U.1.30.2, U.2.30.2,
-         # U.1.31.2, U.2.31.2, U.1.32.2, U.2.32.2, U.1.33.2, U.2.33.2, U.1.34.2, U.2.34.2, U.1.35.2, U.2.35.2,
-         # U.1.36.2, U.2.36.2, U.1.37.2, U.2.37.2, U.1.38.2, U.2.38.2, U.1.39.2, U.2.39.2, U.1.40.2, U.2.40.2,
-         # U.1.41.2, U.2.41.2, U.1.42.2, U.2.42.2, U.1.43.2, U.2.43.2, U.1.44.2, U.2.44.2, U.1.45.2, U.2.45.2,
-         # U.1.46.2, U.2.46.2, U.1.47.2, U.2.47.2, U.1.48.2, U.2.48.2, U.1.49.2, U.2.49.2, U.1.50.2, U.2.50.2,
-         # U.1.51.2, U.2.51.2, U.1.52.2, U.2.52.2, U.1.53.2, U.2.53.2, U.1.54.2, U.2.54.2,
-         # #trt_type quadratic slopes: center digit refers to trts and interactions with anpp and gamma diversity
-         # U.1.1.3, U.2.1.3, U.1.2.3, U.2.2.3, U.1.3.3, U.2.3.3, U.1.4.3, U.2.4.3, U.1.5.3, U.2.5.3,
-         # U.1.6.3, U.2.6.3, U.1.7.3, U.2.7.3, U.1.8.3, U.2.8.3, U.1.9.3, U.2.9.3, U.1.10.3, U.2.10.3,
-         # U.1.11.3, U.2.11.3, U.1.12.3, U.2.12.3, U.1.13.3, U.2.13.3, U.1.14.3, U.2.14.3, U.1.15.3, U.2.15.3,
-         # U.1.16.3, U.2.16.3, U.1.17.3, U.2.17.3, U.1.18.3, U.2.18.3, U.1.19.3, U.2.19.3, U.1.20.3, U.2.20.3,
-         # U.1.21.3, U.2.21.3, U.1.22.3, U.2.22.3, U.1.23.3, U.2.23.3, U.1.24.3, U.2.24.3, U.1.25.3, U.2.25.3,
-         # U.1.26.3, U.2.26.3, U.1.27.3, U.2.27.3, U.1.28.3, U.2.28.3, U.1.29.3, U.2.29.3, U.1.30.3, U.2.30.3,
-         # U.1.31.3, U.2.31.3, U.1.32.3, U.2.32.3, U.1.33.3, U.2.33.3, U.1.34.3, U.2.34.3, U.1.35.3, U.2.35.3,
-         # U.1.36.3, U.2.36.3, U.1.37.3, U.2.37.3, U.1.38.3, U.2.38.3, U.1.39.3, U.2.39.3, U.1.40.3, U.2.40.3,
-         # U.1.41.3, U.2.41.3, U.1.42.3, U.2.42.3, U.1.43.3, U.2.43.3, U.1.44.3, U.2.44.3, U.1.45.3, U.2.45.3,
-         # U.1.46.3, U.2.46.3, U.1.47.3, U.2.47.3, U.1.48.3, U.2.48.3, U.1.49.3, U.2.49.3, U.1.50.3, U.2.50.3,
-         # U.1.51.3, U.2.51.3, U.1.52.3, U.2.52.3, U.1.53.3, U.2.53.3, U.1.54.3, U.2.54.3,
-         #ANPP intercept, linear, and quad slopes (center digit): 2=anpp
-         D.1.2.1, D.2.2.1,
-         D.1.2.2, D.2.2.2,
-         D.1.2.3, D.2.2.3,
-         #richness intercept, linear, and quad slopes (center digit): 3=gamma diversity
-         D.1.3.1, D.2.3.1,
-         D.1.3.2, D.2.3.2,
-         D.1.3.3, D.2.3.3,
-         #overall intercept, linear, and quad slopes (center digit): 1=overall
-         D.1.1.1, D.2.1.1,
-         D.1.1.2, D.2.1.2,
-         D.1.1.3, D.2.1.3)%>%
-  gather(key=parameter, value=value, D.1.2.1:D.2.1.3)%>%
-  group_by(parameter)%>%
-  summarise(median=median(value), sd=sd(value))%>%
-  mutate(lower=median-2*sd, upper=median+2*sd, lower_sign=sign(lower), upper_sign=sign(upper), diff=lower_sign-upper_sign, median=ifelse(diff==-2, 0, median))
-
-# write.csv(chainsCommunity2, 'bayesian_output_summary_expinteraction_20yr_anderson method_01102019.csv')
-
-chainsCommunity2 <- read.csv('bayesian_output_summary_expinteraction_20yr_anderson method_01102019.csv')
+chainsCommunity2 <- read.csv('bayesian_output_summary_expinteraction_20yr_03192019.csv')
 
 # #gather the intercepts, linear slopes, and quadratic slopes for all treatments ---------------------------------------------
 # #numbers are B.variable.number.parameter (e.g., B.mean.87.slope)
@@ -224,36 +203,52 @@ chainsCommunity2 <- read.csv('bayesian_output_summary_expinteraction_20yr_anders
 #   #spread by variable
 #   select(variable, id, parameter, mean)%>%
 #   spread(key=parameter, value=mean)
-# 
-# # write.csv(chainsFinal, 'bayesian_output_mean sd_expinteractions_20yr_anderson method_01102019_noninf.csv')
 
-chainsFinal <- read.csv('bayesian_output_mean sd_expinteractions_20yr_anderson method_01102019_noninf.csv')
+# write.csv(chainsFinal, 'bayesian_output_mean sd_expinteractions_20yr_03192019_noninf.csv')
+
+chainsFinal <- read.csv('bayesian_output_mean sd_expinteractions_20yr_03192019_noninf.csv')
+
+# chainsFinal2 <- cbind(chainsFinalMean, chainsFinalSD)%>%
+#   #split names into parts
+#   separate(parameter, c('B', 'variable', 'id', 'parameter'))%>%
+#   select(-B)%>%
+#   #rename parts to be more clear
+#   mutate(variable=ifelse(variable==1, 'mean', 'richness'),
+#          parameter=ifelse(parameter==1, 'intercept', ifelse(parameter==2, 'linear', 'quadratic')),
+#          id=as.integer(id))%>%
+#   #spread by variable
+#   select(variable, id, parameter, mean)%>%
+#   spread(key=parameter, value=mean)
 
 #merge together with experiment list
+trtID <- read.csv('bayesian_trt_index.csv')%>%
+  select(site_code, project_name, community_type, treatment, treat_INT)%>%
+  unique()%>%
+  rename(id=treat_INT)
 chainsExperiment <- chainsFinal%>%
-  arrange(id)%>%
-  left_join(trtInfo, by='id')
+  left_join(trtID, by='id')%>%
+  left_join(trtInfo)
 
 #generate equations for main figure of richness and compositional responses through time
 chainsEquations <- chainsExperiment%>%
   #get standardized experiment length
   mutate(alt_length=experiment_length - min_year)%>%
   mutate(alt_length=ifelse(alt_length>=20, 19, alt_length))%>%
-  mutate(yr9=ifelse(variable=='mean', (intercept+linear*7+quadratic*7^2)*(0.1718192)+(0.2935109), (intercept+linear*7+quadratic*7^2)*(0.2410034)+(-0.06421845)))%>%
-  mutate(yr_final=ifelse(variable=='mean', (intercept+linear*alt_length+quadratic*alt_length^2)*(0.1718192)+(0.2935109),
-                         (intercept+linear*alt_length+quadratic*alt_length^2)*(0.2410034)+(-0.06421845)))%>%
+  mutate(yr9=ifelse(variable=='mean', (intercept+linear*7+quadratic*7^2)*(0.165778)+(0.3160571), (intercept+linear*7+quadratic*7^2)*(0.2407859)+(-0.06393594)))%>%
+  mutate(yr_final=ifelse(variable=='mean', (intercept+linear*alt_length+quadratic*alt_length^2)*(0.165778)+(0.3160571),
+                         (intercept+linear*alt_length+quadratic*alt_length^2)*(0.2407859)+(-0.06393594)))%>%
   mutate(color=ifelse(rrich<31, '#1104DC44', ifelse(rrich<51&rrich>30, '#4403AE55', ifelse(rrich<71&rrich>50, '#77038166', ifelse(rrich>70, '#DD032688', 'grey')))))%>%
   mutate(curve1='stat_function(fun=function(x){(',
          curve2=' + ',
          curve3='*x + ',
-         curve4=ifelse(variable=='mean', '*x^2)*(0.1718192)+(0.2935109)}, size=2, xlim=c(0,',
-                       '*x^2)*(0.2410034)+(-0.06421845)}, size=2, xlim=c(0,'),
+         curve4=ifelse(variable=='mean', '*x^2)*(0.165778)+(0.3160571)}, size=2, xlim=c(0,',
+                       '*x^2)*(0.2407859)+(-0.06393594)}, size=2, xlim=c(0,'),
          curve5='), colour=',
          curve6=') +',
          curve=paste(curve1, intercept, curve2, linear, curve3, quadratic, curve4, alt_length, curve5, color, curve6, sep=''))%>%
   mutate(trt_overall=ifelse(trt_type=='CO2'|trt_type=='N'|trt_type=='P'|trt_type=='drought'|trt_type=='irr'|trt_type=='precip_vari', 'single_resource', ifelse(trt_type=='burn'|trt_type=='mow_clip'|trt_type=='herb_rem'|trt_type=='temp'|trt_type=='plant_mani', 'single_nonresource', ifelse(trt_type=='all_resource'|trt_type=='both', 'three_way', 'two_way'))))
 #need to export this, put quotes around the colors, and copy and paste the curve column back into the ggplot code below
-# write.csv(chainsEquations,'plot mani_equations_expinteractions_20yr_anderson method_01102019.csv', row.names=F)
+# write.csv(chainsEquations,'plot mani_equations_expinteractions_20yr_03192019.csv', row.names=F)
 
 #summary lines
 chainsEquationsSummary <- chainsEquations%>%
@@ -279,7 +274,7 @@ meanPlot <- meanPlot +
   #below are the individual treatment lines
 
   #overall lines (average across all datapoints)
-  stat_function(fun=function(x){(-0.414873500 + 0.157096000*x + -0.008082855*x^2)*(0.1653158)+(0.3825084)}, size=5, xlim=c(0,19), colour='black')
+  stat_function(fun=function(x){(-0.46965050 + 0.19335400*x + -0.01199835*x^2)*(0.165778)+(0.3160571)}, size=5, xlim=c(0,19), colour='black')
 
 # print(meanPlot) #export at 1200x1000
 
@@ -298,7 +293,7 @@ richnessPlot <- richnessPlot +
   #below are the individual treatment lines
 
   #overall line
-  stat_function(fun=function(x){(0.28517600 + 0*x + 0*x^2)*0.2410034 + -0.06421845}, size=5, xlim=c(0,19), colour='black')
+  stat_function(fun=function(x){(0.24736400 + 0*x + 0*x^2)*0.2407859 + -0.06393594}, size=5, xlim=c(0,19), colour='black')
 
 # print(richnessPlot) #export at 1200x1000
 
@@ -314,54 +309,33 @@ print(meanPlot, vp=viewport(layout.pos.row=2, layout.pos.col=1))
 #gather summary stats needed and relabel them
 chainsCommunitySummary <- chainsCommunity%>%
   select(
-         # #trt_type intercepts: center digit refers to trts and interactions with anpp and gamma diversity
-         # U.1.1.1, U.2.1.1, U.1.2.1, U.2.2.1, U.1.3.1, U.2.3.1, U.1.4.1, U.2.4.1, U.1.5.1, U.2.5.1,
-         # U.1.6.1, U.2.6.1, U.1.7.1, U.2.7.1, U.1.8.1, U.2.8.1, U.1.9.1, U.2.9.1, U.1.10.1, U.2.10.1,
-         # U.1.11.1, U.2.11.1, U.1.12.1, U.2.12.1, U.1.13.1, U.2.13.1, U.1.14.1, U.2.14.1, U.1.15.1, U.2.15.1,
-         # U.1.16.1, U.2.16.1, U.1.17.1, U.2.17.1, U.1.18.1, U.2.18.1, U.1.19.1, U.2.19.1, U.1.20.1, U.2.20.1,
-         # U.1.21.1, U.2.21.1, U.1.22.1, U.2.22.1, U.1.23.1, U.2.23.1, U.1.24.1, U.2.24.1, U.1.25.1, U.2.25.1,
-         # U.1.26.1, U.2.26.1, U.1.27.1, U.2.27.1, U.1.28.1, U.2.28.1, U.1.29.1, U.2.29.1, U.1.30.1, U.2.30.1,
-         # U.1.31.1, U.2.31.1, U.1.32.1, U.2.32.1, U.1.33.1, U.2.33.1, U.1.34.1, U.2.34.1, U.1.35.1, U.2.35.1,
-         # U.1.36.1, U.2.36.1, U.1.37.1, U.2.37.1, U.1.38.1, U.2.38.1, U.1.39.1, U.2.39.1, U.1.40.1, U.2.40.1,
-         # U.1.41.1, U.2.41.1, U.1.42.1, U.2.42.1, U.1.43.1, U.2.43.1, U.1.44.1, U.2.44.1, U.1.45.1, U.2.45.1,
-         # U.1.46.1, U.2.46.1, U.1.47.1, U.2.47.1, U.1.48.1, U.2.48.1, U.1.49.1, U.2.49.1, U.1.50.1, U.2.50.1,
-         # U.1.51.1, U.2.51.1, U.1.52.1, U.2.52.1, U.1.53.1, U.2.53.1, U.1.54.1, U.2.54.1,
-         # #trt_type linear slopes: center digit refers to trts and interactions with anpp and gamma diversity
-         # U.1.1.2, U.2.1.2, U.1.2.2, U.2.2.2, U.1.3.2, U.2.3.2, U.1.4.2, U.2.4.2, U.1.5.2, U.2.5.2,
-         # U.1.6.2, U.2.6.2, U.1.7.2, U.2.7.2, U.1.8.2, U.2.8.2, U.1.9.2, U.2.9.2, U.1.10.2, U.2.10.2,
-         # U.1.11.2, U.2.11.2, U.1.12.2, U.2.12.2, U.1.13.2, U.2.13.2, U.1.14.2, U.2.14.2, U.1.15.2, U.2.15.2,
-         # U.1.16.2, U.2.16.2, U.1.17.2, U.2.17.2, U.1.18.2, U.2.18.2, U.1.19.2, U.2.19.2, U.1.20.2, U.2.20.2,
-         # U.1.21.2, U.2.21.2, U.1.22.2, U.2.22.2, U.1.23.2, U.2.23.2, U.1.24.2, U.2.24.2, U.1.25.2, U.2.25.2,
-         # U.1.26.2, U.2.26.2, U.1.27.2, U.2.27.2, U.1.28.2, U.2.28.2, U.1.29.2, U.2.29.2, U.1.30.2, U.2.30.2,
-         # U.1.31.2, U.2.31.2, U.1.32.2, U.2.32.2, U.1.33.2, U.2.33.2, U.1.34.2, U.2.34.2, U.1.35.2, U.2.35.2,
-         # U.1.36.2, U.2.36.2, U.1.37.2, U.2.37.2, U.1.38.2, U.2.38.2, U.1.39.2, U.2.39.2, U.1.40.2, U.2.40.2,
-         # U.1.41.2, U.2.41.2, U.1.42.2, U.2.42.2, U.1.43.2, U.2.43.2, U.1.44.2, U.2.44.2, U.1.45.2, U.2.45.2,
-         # U.1.46.2, U.2.46.2, U.1.47.2, U.2.47.2, U.1.48.2, U.2.48.2, U.1.49.2, U.2.49.2, U.1.50.2, U.2.50.2,
-         # U.1.51.2, U.2.51.2, U.1.52.2, U.2.52.2, U.1.53.2, U.2.53.2, U.1.54.2, U.2.54.2,
-         # #trt_type quadratic slopes: center digit refers to trts and interactions with anpp and gamma diversity
-         # U.1.1.3, U.2.1.3, U.1.2.3, U.2.2.3, U.1.3.3, U.2.3.3, U.1.4.3, U.2.4.3, U.1.5.3, U.2.5.3,
-         # U.1.6.3, U.2.6.3, U.1.7.3, U.2.7.3, U.1.8.3, U.2.8.3, U.1.9.3, U.2.9.3, U.1.10.3, U.2.10.3,
-         # U.1.11.3, U.2.11.3, U.1.12.3, U.2.12.3, U.1.13.3, U.2.13.3, U.1.14.3, U.2.14.3, U.1.15.3, U.2.15.3,
-         # U.1.16.3, U.2.16.3, U.1.17.3, U.2.17.3, U.1.18.3, U.2.18.3, U.1.19.3, U.2.19.3, U.1.20.3, U.2.20.3,
-         # U.1.21.3, U.2.21.3, U.1.22.3, U.2.22.3, U.1.23.3, U.2.23.3, U.1.24.3, U.2.24.3, U.1.25.3, U.2.25.3,
-         # U.1.26.3, U.2.26.3, U.1.27.3, U.2.27.3, U.1.28.3, U.2.28.3, U.1.29.3, U.2.29.3, U.1.30.3, U.2.30.3,
-         # U.1.31.3, U.2.31.3, U.1.32.3, U.2.32.3, U.1.33.3, U.2.33.3, U.1.34.3, U.2.34.3, U.1.35.3, U.2.35.3,
-         # U.1.36.3, U.2.36.3, U.1.37.3, U.2.37.3, U.1.38.3, U.2.38.3, U.1.39.3, U.2.39.3, U.1.40.3, U.2.40.3,
-         # U.1.41.3, U.2.41.3, U.1.42.3, U.2.42.3, U.1.43.3, U.2.43.3, U.1.44.3, U.2.44.3, U.1.45.3, U.2.45.3,
-         # U.1.46.3, U.2.46.3, U.1.47.3, U.2.47.3, U.1.48.3, U.2.48.3, U.1.49.3, U.2.49.3, U.1.50.3, U.2.50.3,
-         # U.1.51.3, U.2.51.3, U.1.52.3, U.2.52.3, U.1.53.3, U.2.53.3, U.1.54.3, U.2.54.3,
-         #ANPP intercept, linear, and quad slopes (center digit): 2=anpp
-         D.1.2.1, D.2.2.1,
-         D.1.2.2, D.2.2.2,
-         D.1.2.3, D.2.2.3,
-         #richness intercept, linear, and quad slopes (center digit): 3=gamma diversity
-         D.1.3.1, D.2.3.1,
-         D.1.3.2, D.2.3.2,
-         D.1.3.3, D.2.3.3,
-         #overall intercept, linear, and quad slopes (center digit): 1=overall
-         D.1.1.1, D.2.1.1,
-         D.1.1.2, D.2.1.2,
-         D.1.1.3, D.2.1.3)
+        #trt_type intercepts: center digit refers to trts
+        E.1.1.1, E.2.1.1, E.1.2.1, E.2.2.1, E.1.3.1, E.2.3.1, E.1.4.1, E.2.4.1, E.1.5.1, E.2.5.1,
+        E.1.6.1, E.2.6.1, E.1.7.1, E.2.7.1, E.1.8.1, E.2.8.1, E.1.9.1, E.2.9.1, E.1.10.1, E.2.10.1,
+        E.1.11.1, E.2.11.1, E.1.12.1, E.2.12.1, E.1.13.1, E.2.13.1, E.1.14.1, E.2.14.1, E.1.15.1, E.2.15.1,
+        E.1.16.1, E.2.16.1, E.1.17.1, E.2.17.1, E.1.18.1, E.2.18.1,
+        #trt_type linear slopes: center digit refers to trts
+        E.1.1.2, E.2.1.2, E.1.2.2, E.2.2.2, E.1.3.2, E.2.3.2, E.1.4.2, E.2.4.2, E.1.5.2, E.2.5.2,
+        E.1.6.2, E.2.6.2, E.1.7.2, E.2.7.2, E.1.8.2, E.2.8.2, E.1.9.2, E.2.9.2, E.1.10.2, E.2.10.2,
+        E.1.11.2, E.2.11.2, E.1.12.2, E.2.12.2, E.1.13.2, E.2.13.2, E.1.14.2, E.2.14.2, E.1.15.2, E.2.15.2,
+        E.1.16.2, E.2.16.2, E.1.17.2, E.2.17.2, E.1.18.2, E.2.18.2,
+        #trt_type quadratic slopes: center digit refers to trts and interactions with anpp and gamma diversity
+        E.1.1.3, E.2.1.3, E.1.2.3, E.2.2.3, E.1.3.3, E.2.3.3, E.1.4.3, E.2.4.3, E.1.5.3, E.2.5.3,
+        E.1.6.3, E.2.6.3, E.1.7.3, E.2.7.3, E.1.8.3, E.2.8.3, E.1.9.3, E.2.9.3, E.1.10.3, E.2.10.3,
+        E.1.11.3, E.2.11.3, E.1.12.3, E.2.12.3, E.1.13.3, E.2.13.3, E.1.14.3, E.2.14.3, E.1.15.3, E.2.15.3,
+        E.1.16.3, E.2.16.3, E.1.17.3, E.2.17.3, E.1.18.3, E.2.18.3,
+        #ANPP intercept, linear, and quad slopes (center digit): 2=anpp
+        D.1.2.1, D.2.2.1,
+        D.1.2.2, D.2.2.2,
+        D.1.2.3, D.2.2.3,
+        #richness intercept, linear, and quad slopes (center digit): 3=gamma diversity
+        D.1.3.1, D.2.3.1,
+        D.1.3.2, D.2.3.2,
+        D.1.3.3, D.2.3.3,
+        #overall intercept, linear, and quad slopes (center digit): 1=overall
+        D.1.1.1, D.2.1.1,
+        D.1.1.2, D.2.1.2,
+        D.1.1.3, D.2.1.3)
 
 chainsCommunitySummary <- chainsCommunitySummary%>%
   gather(key=parameter, value=value, D.1.2.1:D.2.1.3)%>%
@@ -376,9 +350,9 @@ chainsCommunitySummary <- chainsCommunitySummary%>%
          predictor2=ifelse(predictor==2, 'ANPP', ifelse(predictor==3, 'rrich', 'overall')))%>%
   select(variable, parameter, predictor2, median, sd, CI)
 
-# write.csv(chainsCommunitySummary, 'bayesian_output_summary_final plots_expinteraction_20yr_anderson method_01102019.csv')
+# write.csv(chainsCommunitySummary, 'bayesian_output_summary_final plots_expinteraction_20yr_03192019.csv')
 
-chainsCommunitySummary <- read.csv('bayesian_output_summary_final plots_expinteraction_20yr_anderson method_01102019.csv')
+chainsCommunitySummary <- read.csv('bayesian_output_summary_final plots_expinteraction_20yr_03192019.csv')
 
 chainsCommunityOverall <- chainsCommunitySummary%>%
   mutate(type=paste(predictor2, parameter, sep='_'))
@@ -389,30 +363,28 @@ chainsCommunityOverall <- chainsCommunitySummary%>%
 meanOverallPlot <- ggplot(data=subset(chainsCommunityOverall, variable=='mean' & predictor2!='trt_type'), aes(x=type, y=median)) +
   geom_point(size=4) +
   geom_errorbar(aes(ymin=median-CI, ymax=median+CI, width=0.4)) +
-  scale_y_continuous(limits=c(-0.8, 0.5), breaks=seq(-0.5, 0.5, 0.5)) +
-  scale_x_discrete(limits=c('rrich_quadratic', 'ANPP_quadratic', 'overall_quadratic', 'rrich_linear', 'ANPP_linear', 'overall_linear', 'rrich_intercept', 'ANPP_intercept', 'overall_intercept'),
-                   labels=c('Gamma', 'ANPP', 'Overall', 'Gamma', 'ANPP', 'Overall', 'Gamma', 'ANPP', 'Overall')) +
+  scale_y_continuous(limits=c(-0.15, 0.25), breaks=seq(-0.1, 0.2, 0.1)) +
+  scale_x_discrete(limits=c('rrich_quadratic', 'ANPP_quadratic', 'overall_quadratic', 'rrich_linear', 'ANPP_linear', 'overall_linear'),
+                   labels=c('Gamma', 'ANPP', 'Overall', 'Gamma', 'ANPP', 'Overall')) +
   theme(axis.title.x=element_blank(), axis.title.y=element_blank(), plot.title=element_text(size=40, vjust=2, margin=margin(b=15))) +
   geom_hline(aes(yintercept=0)) +
   geom_vline(aes(xintercept=3.5), linetype='dashed') +
-  geom_vline(aes(xintercept=6.5), linetype='dashed') +
   coord_flip() +
-  ggtitle('Community Difference') +
-  annotate('text', x=9.2, y=-0.8, label='(b)', size=10, hjust='left')
+  ggtitle('Compositional Difference') +
+  annotate('text', x=6.3, y=-0.15, label='(b)', size=10, hjust='left')
 
 richnessOverallPlot <- ggplot(data=subset(chainsCommunityOverall, variable=='richness' & predictor2!='trt_type'), aes(x=type, y=median)) +
   geom_point(size=4) +
   geom_errorbar(aes(ymin=median-CI, ymax=median+CI, width=0.4)) +
-  scale_y_continuous(limits=c(-0.8, 0.5), breaks=seq(-0.5, 0.5, 0.5)) +
-  scale_x_discrete(limits=c('rrich_quadratic', 'ANPP_quadratic', 'overall_quadratic', 'rrich_linear', 'ANPP_linear', 'overall_linear', 'rrich_intercept', 'ANPP_intercept', 'overall_intercept'),
-                   labels=c('Gamma', 'ANPP', 'Overall', 'Gamma', 'ANPP', 'Overall', 'Gamma', 'ANPP', 'Overall')) +
+  scale_y_continuous(limits=c(-0.15, 0.25), breaks=seq(-0.1, 0.2, 0.1)) +
+  scale_x_discrete(limits=c('rrich_quadratic', 'ANPP_quadratic', 'overall_quadratic', 'rrich_linear', 'ANPP_linear', 'overall_linear'),
+                   labels=c('Gamma', 'ANPP', 'Overall', 'Gamma', 'ANPP', 'Overall')) +
   theme(axis.title.x=element_blank(), axis.title.y=element_blank(), plot.title=element_text(size=40, vjust=2, margin=margin(b=15))) +
   geom_hline(aes(yintercept=0)) +
   geom_vline(aes(xintercept=3.5), linetype='dashed') +
-  geom_vline(aes(xintercept=6.5), linetype='dashed') +
   coord_flip() +
   ggtitle('Richness Difference') +
-  annotate('text', x=9.2, y=-0.8, label='(a)', size=10, hjust='left')
+  annotate('text', x=6.3, y=-0.15, label='(a)', size=10, hjust='left')
 
 pushViewport(viewport(layout=grid.layout(1,2)))
 print(richnessOverallPlot, vp=viewport(layout.pos.row = 1, layout.pos.col = 1))
