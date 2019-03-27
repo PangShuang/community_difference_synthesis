@@ -225,9 +225,15 @@ trtID <- read.csv('bayesian_trt_index.csv')%>%
   select(site_code, project_name, community_type, treatment, treat_INT)%>%
   unique()%>%
   rename(id=treat_INT)
+timeStd <- read.csv('bayesian_trt_index.csv')%>%
+  group_by(comm_INT, treat_INT)%>%
+  summarise(time_mean=mean(time), time_std=sd(time))%>%
+  ungroup()%>%
+  rename(id=treat_INT)
 chainsExperiment <- chainsFinal%>%
   left_join(trtID, by='id')%>%
-  left_join(trtInfo)
+  left_join(trtInfo)%>%
+  left_join(timeStd)
 
 #generate equations for main figure of richness and compositional responses through time
 chainsEquations <- chainsExperiment%>%
@@ -240,14 +246,18 @@ chainsEquations <- chainsExperiment%>%
   mutate(color=ifelse(rrich<31, '#1104DC44', ifelse(rrich<51&rrich>30, '#4403AE55', ifelse(rrich<71&rrich>50, '#77038166', ifelse(rrich>70, '#DD032688', 'grey')))))%>%
   mutate(curve1='stat_function(fun=function(x){(',
          curve2=' + ',
-         curve3='*x + ',
-         curve4=ifelse(variable=='mean', '*x^2)*(0.165778)+(0.3160571)}, size=2, xlim=c(0,',
-                       '*x^2)*(0.2407859)+(-0.06393594)}, size=2, xlim=c(0,'),
-         curve5='), colour=',
-         curve6=') +',
-         curve=paste(curve1, intercept, curve2, linear, curve3, quadratic, curve4, alt_length, curve5, color, curve6, sep=''))%>%
-  mutate(trt_overall=ifelse(trt_type=='CO2'|trt_type=='N'|trt_type=='P'|trt_type=='drought'|trt_type=='irr'|trt_type=='precip_vari', 'single_resource', ifelse(trt_type=='burn'|trt_type=='mow_clip'|trt_type=='herb_rem'|trt_type=='temp'|trt_type=='plant_mani', 'single_nonresource', ifelse(trt_type=='all_resource'|trt_type=='both', 'three_way', 'two_way'))))
-#need to export this, put quotes around the colors, and copy and paste the curve column back into the ggplot code below
+         curve3='*(x*',
+         curve4='+',
+         curve5=') + ',
+         curve6='*(x*',
+         curve7='+',
+         curve8=ifelse(variable=='mean', ')^2)*(0.165778)+(0.3160571)}, size=2, xlim=c(0,',
+                       ')^2)*(0.2407859)+(-0.06393594)}, size=2, xlim=c(0,'),
+         curve9=')) +',
+         curve=paste(curve1, intercept, curve2, linear, curve3, time_std, curve4, time_mean, curve5, quadratic, curve6, time_std, curve7, time_mean, curve8, alt_length, curve9, sep=''))%>%
+  mutate(trt_overall=ifelse(trt_type=='CO2'|trt_type=='N'|trt_type=='P'|trt_type=='drought'|trt_type=='irr'|trt_type=='precip_vari', 'single_resource', ifelse(trt_type=='burn'|trt_type=='mow_clip'|trt_type=='herb_rem'|trt_type=='temp'|trt_type=='plant_mani', 'single_nonresource', ifelse(trt_type=='all_resource'|trt_type=='both', 'three_way', 'two_way'))))%>%
+  left_join(read.csv('treatment_response_shape_classification_stdtimebytrt_03192019.csv'))
+#export, group by shape type, and paste lines below
 # write.csv(chainsEquations,'plot mani_equations_expinteractions_20yr_stdtimebytrt_03192019.csv', row.names=F)
 
 #summary lines by treatment type
@@ -306,49 +316,49 @@ print(meanPlot, vp=viewport(layout.pos.row=2, layout.pos.col=1))
 
 
 #summary stats from bayesian output --------------------------------------------------------
-#gather summary stats needed and relabel them
-chainsCommunitySummary <- chainsCommunity%>%
-  select(
-        #trt_type intercepts: center digit refers to trts
-        E.1.1.1, E.2.1.1, E.1.2.1, E.2.2.1, E.1.3.1, E.2.3.1, E.1.4.1, E.2.4.1, E.1.5.1, E.2.5.1,
-        E.1.6.1, E.2.6.1, E.1.7.1, E.2.7.1, E.1.8.1, E.2.8.1, E.1.9.1, E.2.9.1, E.1.10.1, E.2.10.1,
-        E.1.11.1, E.2.11.1, E.1.12.1, E.2.12.1, E.1.13.1, E.2.13.1, E.1.14.1, E.2.14.1, E.1.15.1, E.2.15.1,
-        E.1.16.1, E.2.16.1, E.1.17.1, E.2.17.1, E.1.18.1, E.2.18.1,
-        #trt_type linear slopes: center digit refers to trts
-        E.1.1.2, E.2.1.2, E.1.2.2, E.2.2.2, E.1.3.2, E.2.3.2, E.1.4.2, E.2.4.2, E.1.5.2, E.2.5.2,
-        E.1.6.2, E.2.6.2, E.1.7.2, E.2.7.2, E.1.8.2, E.2.8.2, E.1.9.2, E.2.9.2, E.1.10.2, E.2.10.2,
-        E.1.11.2, E.2.11.2, E.1.12.2, E.2.12.2, E.1.13.2, E.2.13.2, E.1.14.2, E.2.14.2, E.1.15.2, E.2.15.2,
-        E.1.16.2, E.2.16.2, E.1.17.2, E.2.17.2, E.1.18.2, E.2.18.2,
-        #trt_type quadratic slopes: center digit refers to trts and interactions with anpp and gamma diversity
-        E.1.1.3, E.2.1.3, E.1.2.3, E.2.2.3, E.1.3.3, E.2.3.3, E.1.4.3, E.2.4.3, E.1.5.3, E.2.5.3,
-        E.1.6.3, E.2.6.3, E.1.7.3, E.2.7.3, E.1.8.3, E.2.8.3, E.1.9.3, E.2.9.3, E.1.10.3, E.2.10.3,
-        E.1.11.3, E.2.11.3, E.1.12.3, E.2.12.3, E.1.13.3, E.2.13.3, E.1.14.3, E.2.14.3, E.1.15.3, E.2.15.3,
-        E.1.16.3, E.2.16.3, E.1.17.3, E.2.17.3, E.1.18.3, E.2.18.3,
-        #ANPP intercept, linear, and quad slopes (center digit): 2=anpp
-        D.1.2.1, D.2.2.1,
-        D.1.2.2, D.2.2.2,
-        D.1.2.3, D.2.2.3,
-        #richness intercept, linear, and quad slopes (center digit): 3=gamma diversity
-        D.1.3.1, D.2.3.1,
-        D.1.3.2, D.2.3.2,
-        D.1.3.3, D.2.3.3,
-        #overall intercept, linear, and quad slopes (center digit): 1=overall
-        D.1.1.1, D.2.1.1,
-        D.1.1.2, D.2.1.2,
-        D.1.1.3, D.2.1.3)
-
-chainsCommunitySummary <- chainsCommunitySummary%>%
-  gather(key=parameter, value=value, D.1.2.1:D.2.1.3)%>%
-  group_by(parameter)%>%
-  summarise(median=median(value), sd=sd(value))%>%
-  ungroup()%>%
-  mutate(CI=sd*2)%>%
-  separate(parameter, c('level', 'variable', 'predictor', 'parameter'))%>%
-  #rename parts to be more clear
-  mutate(variable=ifelse(variable==1, 'mean', 'richness'),
-         parameter=ifelse(parameter==1, 'intercept', ifelse(parameter==2, 'linear', 'quadratic')),
-         predictor2=ifelse(predictor==2, 'ANPP', ifelse(predictor==3, 'rrich', 'overall')))%>%
-  select(variable, parameter, predictor2, median, sd, CI)
+# #gather summary stats needed and relabel them
+# chainsCommunitySummary <- chainsCommunity%>%
+#   select(
+#         #trt_type intercepts: center digit refers to trts
+#         E.1.1.1, E.2.1.1, E.1.2.1, E.2.2.1, E.1.3.1, E.2.3.1, E.1.4.1, E.2.4.1, E.1.5.1, E.2.5.1,
+#         E.1.6.1, E.2.6.1, E.1.7.1, E.2.7.1, E.1.8.1, E.2.8.1, E.1.9.1, E.2.9.1, E.1.10.1, E.2.10.1,
+#         E.1.11.1, E.2.11.1, E.1.12.1, E.2.12.1, E.1.13.1, E.2.13.1, E.1.14.1, E.2.14.1, E.1.15.1, E.2.15.1,
+#         E.1.16.1, E.2.16.1, E.1.17.1, E.2.17.1, E.1.18.1, E.2.18.1,
+#         #trt_type linear slopes: center digit refers to trts
+#         E.1.1.2, E.2.1.2, E.1.2.2, E.2.2.2, E.1.3.2, E.2.3.2, E.1.4.2, E.2.4.2, E.1.5.2, E.2.5.2,
+#         E.1.6.2, E.2.6.2, E.1.7.2, E.2.7.2, E.1.8.2, E.2.8.2, E.1.9.2, E.2.9.2, E.1.10.2, E.2.10.2,
+#         E.1.11.2, E.2.11.2, E.1.12.2, E.2.12.2, E.1.13.2, E.2.13.2, E.1.14.2, E.2.14.2, E.1.15.2, E.2.15.2,
+#         E.1.16.2, E.2.16.2, E.1.17.2, E.2.17.2, E.1.18.2, E.2.18.2,
+#         #trt_type quadratic slopes: center digit refers to trts and interactions with anpp and gamma diversity
+#         E.1.1.3, E.2.1.3, E.1.2.3, E.2.2.3, E.1.3.3, E.2.3.3, E.1.4.3, E.2.4.3, E.1.5.3, E.2.5.3,
+#         E.1.6.3, E.2.6.3, E.1.7.3, E.2.7.3, E.1.8.3, E.2.8.3, E.1.9.3, E.2.9.3, E.1.10.3, E.2.10.3,
+#         E.1.11.3, E.2.11.3, E.1.12.3, E.2.12.3, E.1.13.3, E.2.13.3, E.1.14.3, E.2.14.3, E.1.15.3, E.2.15.3,
+#         E.1.16.3, E.2.16.3, E.1.17.3, E.2.17.3, E.1.18.3, E.2.18.3,
+#         #ANPP intercept, linear, and quad slopes (center digit): 2=anpp
+#         D.1.2.1, D.2.2.1,
+#         D.1.2.2, D.2.2.2,
+#         D.1.2.3, D.2.2.3,
+#         #richness intercept, linear, and quad slopes (center digit): 3=gamma diversity
+#         D.1.3.1, D.2.3.1,
+#         D.1.3.2, D.2.3.2,
+#         D.1.3.3, D.2.3.3,
+#         #overall intercept, linear, and quad slopes (center digit): 1=overall
+#         D.1.1.1, D.2.1.1,
+#         D.1.1.2, D.2.1.2,
+#         D.1.1.3, D.2.1.3)
+# 
+# chainsCommunitySummary <- chainsCommunitySummary%>%
+#   gather(key=parameter, value=value, D.1.2.1:D.2.1.3)%>%
+#   group_by(parameter)%>%
+#   summarise(median=median(value), sd=sd(value))%>%
+#   ungroup()%>%
+#   mutate(CI=sd*2)%>%
+#   separate(parameter, c('level', 'variable', 'predictor', 'parameter'))%>%
+#   #rename parts to be more clear
+#   mutate(variable=ifelse(variable==1, 'mean', 'richness'),
+#          parameter=ifelse(parameter==1, 'intercept', ifelse(parameter==2, 'linear', 'quadratic')),
+#          predictor2=ifelse(predictor==2, 'ANPP', ifelse(predictor==3, 'rrich', 'overall')))%>%
+#   select(variable, parameter, predictor2, median, sd, CI)
 
 # write.csv(chainsCommunitySummary, 'bayesian_output_summary_final plots_expinteraction_20yr_stdtimebytrt_03192019.csv')
 
@@ -363,7 +373,7 @@ chainsCommunityOverall <- chainsCommunitySummary%>%
 meanOverallPlot <- ggplot(data=subset(chainsCommunityOverall, variable=='mean' & predictor2!='trt_type'), aes(x=type, y=median)) +
   geom_point(size=4) +
   geom_errorbar(aes(ymin=median-CI, ymax=median+CI, width=0.4)) +
-  scale_y_continuous(limits=c(-0.15, 0.25), breaks=seq(-0.1, 0.2, 0.1)) +
+  # scale_y_continuous(limits=c(-0.15, 0.25), breaks=seq(-0.1, 0.2, 0.1)) +
   scale_x_discrete(limits=c('rrich_quadratic', 'ANPP_quadratic', 'overall_quadratic', 'rrich_linear', 'ANPP_linear', 'overall_linear'),
                    labels=c('Gamma', 'ANPP', 'Overall', 'Gamma', 'ANPP', 'Overall')) +
   theme(axis.title.x=element_blank(), axis.title.y=element_blank(), plot.title=element_text(size=40, vjust=2, margin=margin(b=15))) +
@@ -376,7 +386,7 @@ meanOverallPlot <- ggplot(data=subset(chainsCommunityOverall, variable=='mean' &
 richnessOverallPlot <- ggplot(data=subset(chainsCommunityOverall, variable=='richness' & predictor2!='trt_type'), aes(x=type, y=median)) +
   geom_point(size=4) +
   geom_errorbar(aes(ymin=median-CI, ymax=median+CI, width=0.4)) +
-  scale_y_continuous(limits=c(-0.15, 0.25), breaks=seq(-0.1, 0.2, 0.1)) +
+  # scale_y_continuous(limits=c(-0.15, 0.25), breaks=seq(-0.1, 0.2, 0.1)) +
   scale_x_discrete(limits=c('rrich_quadratic', 'ANPP_quadratic', 'overall_quadratic', 'rrich_linear', 'ANPP_linear', 'overall_linear'),
                    labels=c('Gamma', 'ANPP', 'Overall', 'Gamma', 'ANPP', 'Overall')) +
   theme(axis.title.x=element_blank(), axis.title.y=element_blank(), plot.title=element_text(size=40, vjust=2, margin=margin(b=15))) +

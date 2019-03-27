@@ -113,8 +113,8 @@ studyInfo <- rawData%>%
 
 ################################################################################
 ################################################################################
-###Bayesian output processing
-
+# ###Bayesian output processing
+# 
 # #only run to generate initial chains files
 # #raw chains data --------------------------------------------------------
 # memory.limit(size=50000)
@@ -172,9 +172,9 @@ studyInfo <- rawData%>%
 #   summarise(median=median(value), sd=sd(value))%>%
 #   mutate(lower=median-2*sd, upper=median+2*sd, lower_sign=sign(lower), upper_sign=sign(upper), diff=lower_sign-upper_sign, median=ifelse(diff==-2, 0, median))
 # 
-# # write.csv(chainsCommunity2, 'bayesian_output_summary_expinteraction_20yr_03192019.csv')
+# # write.csv(chainsCommunity2, 'bayesian_output_summary_expinteraction_20yr_timestdbyall_03192019.csv')
 
-chainsCommunity2 <- read.csv('bayesian_output_summary_expinteraction_20yr_03192019.csv')
+chainsCommunity2 <- read.csv('bayesian_output_summary_expinteraction_20yr_timestdbyall_03192019.csv')
 
 # #gather the intercepts, linear slopes, and quadratic slopes for all treatments ---------------------------------------------
 # #numbers are B.variable.number.parameter (e.g., B.mean.87.slope)
@@ -204,9 +204,9 @@ chainsCommunity2 <- read.csv('bayesian_output_summary_expinteraction_20yr_031920
 #   select(variable, id, parameter, mean)%>%
 #   spread(key=parameter, value=mean)
 
-# write.csv(chainsFinal, 'bayesian_output_mean sd_expinteractions_20yr_03192019_noninf.csv')
+# write.csv(chainsFinal, 'bayesian_output_mean sd_expinteractions_20yr_timestdbyall_03192019_noninf.csv')
 
-chainsFinal <- read.csv('bayesian_output_mean sd_expinteractions_20yr_03192019_noninf.csv')
+chainsFinal <- read.csv('bayesian_output_mean sd_expinteractions_20yr_timestdbyall_03192019_noninf.csv')
 
 # chainsFinal2 <- cbind(chainsFinalMean, chainsFinalSD)%>%
 #   #split names into parts
@@ -248,7 +248,7 @@ chainsEquations <- chainsExperiment%>%
          curve=paste(curve1, intercept, curve2, linear, curve3, quadratic, curve4, alt_length, curve5, color, curve6, sep=''))%>%
   mutate(trt_overall=ifelse(trt_type=='CO2'|trt_type=='N'|trt_type=='P'|trt_type=='drought'|trt_type=='irr'|trt_type=='precip_vari', 'single_resource', ifelse(trt_type=='burn'|trt_type=='mow_clip'|trt_type=='herb_rem'|trt_type=='temp'|trt_type=='plant_mani', 'single_nonresource', ifelse(trt_type=='all_resource'|trt_type=='both', 'three_way', 'two_way'))))
 #need to export this, put quotes around the colors, and copy and paste the curve column back into the ggplot code below
-# write.csv(chainsEquations,'plot mani_equations_expinteractions_20yr_03192019.csv', row.names=F)
+# write.csv(chainsEquations,'plot mani_equations_expinteractions_20yr_timestdbyall_03192019.csv', row.names=F)
 
 #summary lines
 chainsEquationsSummary <- chainsEquations%>%
@@ -350,9 +350,9 @@ chainsCommunitySummary <- chainsCommunitySummary%>%
          predictor2=ifelse(predictor==2, 'ANPP', ifelse(predictor==3, 'rrich', 'overall')))%>%
   select(variable, parameter, predictor2, median, sd, CI)
 
-# write.csv(chainsCommunitySummary, 'bayesian_output_summary_final plots_expinteraction_20yr_03192019.csv')
+# write.csv(chainsCommunitySummary, 'bayesian_output_summary_final plots_expinteraction_20yr_timestdbyall_03192019.csv')
 
-chainsCommunitySummary <- read.csv('bayesian_output_summary_final plots_expinteraction_20yr_03192019.csv')
+chainsCommunitySummary <- read.csv('bayesian_output_summary_final plots_expinteraction_20yr_timestdbyall_03192019.csv')
 
 chainsCommunityOverall <- chainsCommunitySummary%>%
   mutate(type=paste(predictor2, parameter, sep='_'))
