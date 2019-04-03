@@ -623,7 +623,7 @@ face<-read.delim("GVN_FACE.txt")%>%
   mutate(max_trt=1)%>%
   mutate(public=0)%>%
   mutate(factorial=0)%>%
-  mutate(trt_type=ifelse(treatment=='A', 'CO2', 'control'))%>%
+  mutate(trt_type=ifelse(treatment=='E', 'CO2', 'control'))%>%
   unique()
 
 nde<-read.csv("IMGERS_NDE.csv")%>%
@@ -1516,7 +1516,7 @@ lucero<-read.csv("SCL_Lucero.csv")%>%
   mutate(max_trt=1)%>%
   mutate(public=0)%>%
   mutate(factorial=0)%>%
-  mutate(trt_type=ifelse(treatment=='N1', 'control', 'N'))%>%
+  mutate(trt_type=ifelse(treatment=='N1', 'N', 'control'))%>%
   unique()
 
 ter<-read.csv("SCL_TER.csv")%>%
