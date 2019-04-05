@@ -14,7 +14,7 @@ library(codyn)
 
 
 #kim
-setwd('C:\\Users\\la pierrek\\Dropbox (Smithsonian)\\working groups\\converge diverge working group\\converge_diverge\\datasets\\LongForm')
+setwd('C:\\Users\\lapie\\Dropbox (Smithsonian)\\working groups\\converge diverge working group\\converge_diverge\\datasets\\LongForm')
 
 #meghan
 setwd("~/Dropbox/converge_diverge/datasets/LongForm")
@@ -22,12 +22,12 @@ setwd("~/Dropbox/converge_diverge/datasets/LongForm")
 
 
 #import relative species abundance data
-alldata<-read.csv("SpeciesRelativeAbundance_Oct2017.csv")%>%
+alldata<-read.csv("SpeciesRelativeAbundance_March2019.csv")%>%
   select(site_code, project_name, community_type, calendar_year, treatment, block, plot_id, genus_species, relcov)%>%
   mutate(exp_year=paste(site_code, project_name, community_type, calendar_year, sep="::"))
 
 #import treatment information and subset to get number of factors manipulated (i.e., plot_mani) for each plot
-expinfo<-read.csv("ExperimentInformation_Nov2017.csv")%>%
+expinfo<-read.csv("ExperimentInformation_March2019.csv")%>%
   mutate(exp_year=paste(site_code, project_name, community_type, calendar_year, sep="::"))%>%
   select(exp_year, plot_mani, treatment)
 
@@ -99,9 +99,8 @@ rm(list=setdiff(ls(), "for.analysis"))
 ###formatting data for Bayesian analysis in python
 
 #import treatment information
-expInfo <- read.csv('ExperimentInformation_Nov2017.csv')%>%
+expInfo <- read.csv('ExperimentInformation_March2019.csv')%>%
   mutate(exp_year=paste(site_code, project_name, community_type, sep='::'))%>%
-  select(-X)%>%
   mutate(site_project_comm=paste(site_code, project_name, community_type, sep='_'))
 
 #diversity data
@@ -110,7 +109,7 @@ div <- for.analysis%>%
   filter(treatment_year!=0)
 
 #import site and project level data (MAP, MAT, ANPP of controls, and rarefied gamma diversity)
-SiteExp<-read.csv("SiteExperimentDetails_09062018.csv")%>%
+SiteExp<-read.csv("SiteExperimentDetails_March2019.csv")%>%
   select(-X)
 
 ###calculate difference in dispersion, H, S, and evenness between treatment and control plots for each year
@@ -141,8 +140,11 @@ divCompare <- divControls%>%
   mutate(expH_PC=(exp_H-ctl_expH)/ctl_expH, 
          S_PC=(S-ctl_S)/ctl_S,  
          expH_lnRR=log(exp_H/ctl_expH), 
-         S_lnRR=log(S/ctl_S))%>%
-  select(exp_year, treatment_year, treatment, plot_mani, composition_diff, expH_PC, expH_lnRR, S_PC, S_lnRR, site_code, project_name, community_type, calendar_year)
+         S_lnRR=log(S/ctl_S),
+         S_lnRR_abs=abs(S_lnRR))%>%
+  #filter out current rainfall pattern treatment from NGBER gb experiment, as they also have an ambient (unsheltered control)
+  filter(trt_type!='control')%>%
+  select(exp_year, treatment_year, treatment, plot_mani, composition_diff, expH_PC, expH_lnRR, S_PC, S_lnRR, S_lnRR_abs, site_code, project_name, community_type, calendar_year)
 
 #some preliminary histograms
 theme_set(theme_bw(16))
@@ -170,82 +172,28 @@ grid.arrange(m, s1, e2, s2, e3, ncol=3)
 
 
 ###merging with treatment information
-SiteExp<-read.csv("SiteExperimentDetails_Dec2016.csv")%>%
+SiteExp<-read.csv("SiteExperimentDetails_March2019.csv")%>%
   select(-X)
 
-ForAnalysis<-merge(divCompare, SiteExp, by=c("site_code","project_name","community_type"))
+ForAnalysis<-merge(divCompare, SiteExp, by=c("site_code","project_name","community_type"))%>%
+  left_join(read.csv('ExperimentInformation_March2019.csv'))
 
 # full dataset
-# write.csv(ForAnalysis, "ForBayesianAnalysis_Nov2018_2.csv")
+# write.csv(ForAnalysis, "ForBayesianAnalysis_March2019.csv")
 
 
 ###generating treatment categories (resource, non-resource, and interactions)
-###4 steps: (1) single resource, (2) single non-resource, (3) 2-way interactions, (4) 3+ way interactions
-#step 1: single resource
-singleResource <- ForAnalysis%>%
+allAnalysis <- ForAnalysis%>%
   select(-plot_mani)%>%
   left_join(expInfo)%>%
   #filter pretrt data
   filter(treatment_year!=0)%>%
-  #filter just single resource manipulations
-  filter(resource_mani==1, plot_mani==1)%>%
-  #set CEH Megarich nutrient values to 0 (added to all megaliths, not a treatment)
-  mutate(n2=ifelse(site_code=='CEH', 0, n), p2=ifelse(site_code=='CEH', 0, p), k2=ifelse(site_code=='CEH', 0, k))%>%
-  #drop lime added, as only one trt does this
-  filter(other_trt!='lime added')%>%
-  #create categorical treatment type column
-  mutate(trt_type=ifelse(n2>0, 'N', ifelse(p2>0, 'P', ifelse(k2>0, 'K', ifelse(precip<0, 'drought', ifelse(precip>0, 'irr', ifelse(CO2>0, 'CO2', 'precip_vari')))))))%>%
+  #modify categorical treatment column
+  mutate(trt_type2=ifelse(trt_type=='CO2', 'CO2', ifelse(trt_type=='drought', 'drought', ifelse(trt_type=='irr', 'irr', ifelse(trt_type=='N', 'N', ifelse(trt_type=='P', 'P', ifelse(trt_type=='precip_vari', 'precip_vari', ifelse(trt_type %in% c('light','lime'), 'other_resource', ifelse(trt_type=='burn', 'burn', ifelse(trt_type=='herb_removal', 'herb_removal', ifelse(trt_type=='mow_clip', 'mow_clip', ifelse(trt_type=='temp', 'temp', ifelse(trt_type %in% c('fungicide','other','plant_mani','stone','till'), 'other_nonresource', ifelse(trt_type %in% c('irr*CO2','N*CO2','N*drought','N*irr','N*P'), 'RxR', ifelse(trt_type %in% c('burn*graze','burn*mow_clip','herb_removal*mow_clip','plant_mani*herb_removal','plant_mani*other','temp*mow_clip'), 'NxN', ifelse(trt_type %in% c('CO2*temp','drought*mow_clip','drought*temp','irr*mow_clip','irr*plant_mani','irr*temp','N*burn','N*mow_clip','N*other','N*plant_mani','N*stone','N*temp','N*till','P*burn','P*mow_clip','precip_vari*temp'), 'RxN', ifelse(trt_type %in% c('mult_nutrient','N*irr*CO2'), 'RxRxR', 'threeway')))))))))))))))))%>%
   #keep just relevent column names for this analysis
-  select(site_code, project_name, community_type, exp_year, treatment_year, calendar_year, treatment, trt_type, composition_diff, expH_PC, expH_lnRR, S_PC, S_lnRR, experiment_length, rrich, anpp, MAT, MAP)
+  select(site_code, project_name, community_type, exp_year, treatment_year, calendar_year, treatment, trt_type2, composition_diff, expH_PC, expH_lnRR, S_PC, S_lnRR, S_lnRR_abs, experiment_length, rrich, anpp, MAT, MAP)%>%
+    rename(trt_type=trt_type2)
 
-#step 2: single non-resource
-singleNonresource <- ForAnalysis%>%
-  left_join(expInfo)%>%
-  #filter pretrt data
-  filter(treatment_year!=0)%>%
-  #filter just single resource manipulations
-  filter(resource_mani==0, plot_mani==1)%>%
-  #drop tilled, stone, and fungicide as only one trt each do these; drop 'current pattern' of rainfall, as this is basically a control
-  filter(other_trt!='tilled', other_trt!='shallow soil', other_trt!='fungicide added', other_trt!='current pattern')%>%
-  #create categorical treatment type column
-  mutate(trt_type=ifelse(burn==1, 'burn', ifelse(mow_clip==1, 'mow_clip', ifelse(herb_removal==1, 'herb_rem', ifelse(temp>0, 'temp', ifelse(plant_trt==1, 'plant_mani', 'other'))))))%>%
-  #keep just relevent column names for this analysis
-  select(site_code, project_name, community_type, exp_year, treatment_year, calendar_year, treatment, trt_type, composition_diff, expH_PC, expH_lnRR, S_PC, S_lnRR, experiment_length, rrich, anpp, MAT, MAP)
-
-#step 3: 2-way interactions
-twoWay <- ForAnalysis%>%
-  left_join(expInfo)%>%
-  #filter pretrt data
-  filter(treatment_year!=0)%>%
-  #filter just single resource manipulations
-  filter(plot_mani==2)%>%
-  #drop tilled, stone, and fungicide as only one trt each do these; drop 'current pattern' of rainfall, as this is basically a control
-  filter(other_trt!='tilled', other_trt!='shallow soil', other_trt!='fungicide added', other_trt!='current pattern')%>%
-  #create categorical treatment type column
-  mutate(trt_type=ifelse(resource_mani==1&burn==1, 'R*burn', ifelse(resource_mani==1&mow_clip==1, 'R*mow_clip', ifelse(resource_mani==1&herb_removal==1, 'R*herb_rem', ifelse(resource_mani==1&temp>0, 'R*temp', ifelse(resource_mani==1&plant_trt==1, 'R*plant_mani', ifelse(resource_mani==1&other_trt!=0, 'R*other', ifelse(n>0&p>0, 'R*R', ifelse(n>0&CO2>0, 'R*R', ifelse(n>0&precip!=0, 'R*R', ifelse(p>0&k>0, 'R*R', ifelse(CO2>0&precip!=0, 'R*R', 'N*N'))))))))))))%>%
-  #drop R*herb_removal (single rep)
-  filter(trt_type!='R*herb_rem')%>%
-  #keep just relevent column names for this analysis
-  select(site_code, project_name, community_type, exp_year, treatment_year, calendar_year, treatment, trt_type, composition_diff, expH_PC, expH_lnRR, S_PC, S_lnRR, experiment_length, rrich, anpp, MAT, MAP)
-
-#step 4: 3+ way interactions
-threeWay <- ForAnalysis%>%
-  left_join(expInfo)%>%
-  #filter pretrt data
-  filter(treatment_year!=0)%>%
-  #filter just single resource manipulations
-  filter(plot_mani>2, plot_mani<6)%>%
-  #drop tilled, stone, and fungicide as only one trt each do these; drop 'current pattern' of rainfall, as this is basically a control
-  filter(other_trt!='tilled', other_trt!='shallow soil', other_trt!='fungicide added', other_trt!='current pattern')%>%
-  #create categorical treatment type column
-  mutate(trt_type=ifelse(burn==0&mow_clip==0&herb_removal==0&temp==0&plant_trt==0, 'all_resource', ifelse(n==0&p==0&k==0&CO2==0&precip==0, 'all_nonresource', 'both')))%>%
-  #drop single all-nonresource treatment (NIN herbdiv 5NF)
-  filter(trt_type!='all_nonresource')%>%
-  #keep just relevent column names for this analysis
-  select(site_code, project_name, community_type, exp_year, treatment_year, calendar_year, treatment, trt_type, composition_diff, expH_PC, expH_lnRR, S_PC, S_lnRR, experiment_length, rrich, anpp, MAT, MAP)
-
-#combine for analysis - one big model, 19 trt types
-allAnalysis <- rbind(singleResource, singleNonresource, twoWay, threeWay)
 
 #subset out datasets with less than 3 temporal data points;  drops GVN FACE
 numPoints <- allAnalysis%>%
@@ -271,7 +219,7 @@ numPoints <- allAnalysis20yr%>%
   group_by(site_code, project_name, community_type, treatment)%>%
   summarise(num_datapoints=length(treatment_year))%>%
   ungroup()
-# write.csv(allAnalysis20yr, 'ForAnalysis_allAnalysis20yr_pairwise_03132019.csv')
+# write.csv(allAnalysis20yr, 'ForAnalysis_allAnalysis20yr_pairwise_04032019.csv')
 
 
 #subset out treatment years 10 or less (i.e., cut off datasets at 10 years)
@@ -285,7 +233,6 @@ numPoints <- allAnalysis10yr%>%
   unique()%>%
   group_by(site_code, project_name, community_type, treatment)%>%
   summarise(num_datapoints=length(treatment_year))
-
 # write.csv(allAnalysis10yr, 'ForAnalysis_allAnalysis10yr_pairwise_03132019.csv')
 
 #subset out 20th or final year of all data
