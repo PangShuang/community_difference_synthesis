@@ -9,15 +9,18 @@
 library(tidyverse)
 library(vegan)
 
-#kim
-setwd('C:\\Users\\lapie\\Dropbox (Smithsonian)\\working groups\\converge diverge working group\\converge_diverge\\datasets\\LongForm')
+#kim's laptop
+setwd('C:\\Users\\Kim\\Dropbox\\working groups\\converge diverge working group\\converge_diverge\\datasets\\LongForm')
+
+#kim's desktop
+setwd('C:\\Users\\la pierrek\\Dropbox (Smithsonian)\\working groups\\converge diverge working group\\converge_diverge\\datasets\\LongForm')
 
 #meghan
 setwd("~/Dropbox/converge_diverge/datasets/LongForm")
 
 
 #import the list of all experiment's site information from datafile
-expInfo <- read.csv("SpeciesRelativeAbundance_Oct2017.csv")%>%
+expInfo <- read.csv("SpeciesRelativeAbundance_March2019.csv")%>%
   select(-X)
 
 #generate a list of each site, project (i.e., experiment), and community type
@@ -31,7 +34,7 @@ expList<-expInfo%>%
 ANPP<-read.csv("ANPP_Oct2017.csv")
 
 #import data to get number of treatment manipulations (i.e., plot_mani) for each treatment
-plotMani<-read.csv("ExperimentInformation_Nov2017.csv")%>%
+plotMani<-read.csv("ExperimentInformation_March2019.csv")%>%
   select(site_code, project_name, community_type, treatment, plot_mani)%>%
   unique()
 
@@ -65,7 +68,7 @@ expANPP<-merge(allANPP, expList2, by=c("site_code","project_name","community_typ
 ###calculate rarefied richness for each site
 
 #import species abundance data
-species <- read.csv("SpeciesRawAbundance_Oct2017.csv")%>%
+species <- read.csv("SpeciesRawAbundance_March2019.csv")%>%
   select(site_code, project_name, community_type, plot_id, calendar_year, genus_species, abundance)%>%
   mutate(exp=paste(site_code, project_name, community_type, sep='::'))%>%
   tbl_df()
@@ -132,7 +135,7 @@ expDetails<-rarefiedRichness34%>%
 
 
 #import climate data for each site by coordinates
-siteClimate<-read.csv("siteList_climate_Feb2016.csv")%>%
+siteClimate<-read.csv("siteList_climate_March2019.csv")%>%
   mutate(MAP=ifelse(site_code=="Finse", 1030, MAP))%>%
   select(site_code, MAP, MAT)
 #for Finse_WarmNut there is a big differnce between this and what they published, and their coordinates were VERY vauge. Replacing with their value: 1030 mm.
