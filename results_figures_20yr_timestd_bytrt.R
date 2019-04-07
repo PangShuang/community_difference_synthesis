@@ -45,7 +45,7 @@ colSd <- function (x, na.rm=FALSE) apply(X=x, MARGIN=2, FUN=sd, na.rm=na.rm)
 ##################################################################################
 ##################################################################################
 #import experiment information --------------------------------------------------------
-expRaw <- read.csv('ExperimentInformation_Nov2017.csv')
+expRaw <- read.csv('ExperimentInformation_March2019.csv')
 
 
 expInfo <- expRaw%>%
@@ -58,11 +58,10 @@ expInfo <- expRaw%>%
   summarise(min_year=min(treatment_year), nutrients=mean(nutrients), water=mean(water), carbon=mean(carbon), irrigation=mean(irrigation), drought=mean(drought))
 
 #import treatment data
-trtInfo <- read.csv('ExperimentInformation_Nov2017.csv')%>%
-  select(-X)
+trtInfo <- read.csv('ExperimentInformation_March2019.csv')
 
 #import diversity metrics that went into Bayesian analysis
-rawData <- read.csv('ForAnalysis_allAnalysis20yr_pairwise_03132019.csv')
+rawData <- read.csv('ForAnalysis_allAnalysis20yr_pairwise_04032019.csv')
 
 #calculate means and standard deviations across all data for richness and compositonal differences to backtransform
 rawData2<- rawData%>%
@@ -115,16 +114,16 @@ studyInfo <- rawData%>%
 ################################################################################
 ###Bayesian output processing
 
-# #only run to generate initial chains files
+#only run to generate initial chains files
 # #raw chains data --------------------------------------------------------
 # memory.limit(size=50000)
-# chains1 <- read.csv('C:\\Users\\la pierrek\\Dropbox (Smithsonian)\\working groups\\converge diverge working group\\converge_diverge\\La Pierre_comm difference_final model results_01122018\\final models_03162019\\noninformative_timestdbytrt\\noninformative_timestdbytrt_20yr_lnRR_0.csv', comment.char='#')
+# chains1 <- read.csv('C:\\Users\\lapie\\Dropbox (Smithsonian)\\working groups\\converge diverge working group\\converge_diverge\\La Pierre_comm difference_final model results_01122018\\final models_04062019\\noninf_lnRR\\noninf_timestdbytrt_20yr_lnRR_0.csv', comment.char='#')
 # chains1 <- chains1[-1:-5000,]
-# chains2 <- read.csv('C:\\Users\\la pierrek\\Dropbox (Smithsonian)\\working groups\\converge diverge working group\\converge_diverge\\La Pierre_comm difference_final model results_01122018\\final models_03162019\\noninformative_timestdbytrt\\noninformative_timestdbytrt_20yr_lnRR_1.csv', comment.char='#')
+# chains2 <- read.csv('C:\\Users\\lapie\\Dropbox (Smithsonian)\\working groups\\converge diverge working group\\converge_diverge\\La Pierre_comm difference_final model results_01122018\\final models_04062019\\noninf_lnRR\\noninf_timestdbytrt_20yr_lnRR_1.csv', comment.char='#')
 # chains2 <- chains2[-1:-5000,]
-# chains3 <- read.csv('C:\\Users\\la pierrek\\Dropbox (Smithsonian)\\working groups\\converge diverge working group\\converge_diverge\\La Pierre_comm difference_final model results_01122018\\final models_03162019\\noninformative_timestdbytrt\\noninformative_timestdbytrt_20yr_lnRR_2.csv', comment.char='#')
+# chains3 <- read.csv('C:\\Users\\lapie\\Dropbox (Smithsonian)\\working groups\\converge diverge working group\\converge_diverge\\La Pierre_comm difference_final model results_01122018\\final models_04062019\\noninf_lnRR\\noninf_timestdbytrt_20yr_lnRR_2.csv', comment.char='#')
 # chains3 <- chains3[-1:-5000,]
-# chains4 <- read.csv('C:\\Users\\la pierrek\\Dropbox (Smithsonian)\\working groups\\converge diverge working group\\converge_diverge\\La Pierre_comm difference_final model results_01122018\\final models_03162019\\noninformative_timestdbytrt\\noninformative_timestdbytrt_20yr_lnRR_3.csv', comment.char='#')
+# chains4 <- read.csv('C:\\Users\\lapie\\Dropbox (Smithsonian)\\working groups\\converge diverge working group\\converge_diverge\\La Pierre_comm difference_final model results_01122018\\final models_04062019\\noninf_lnRR\\noninf_timestdbytrt_20yr_lnRR_3.csv', comment.char='#')
 # chains4 <- chains4[-1:-5000,]
 # 
 # chainsCommunity <- rbind(chains1, chains2, chains3, chains4)
@@ -144,17 +143,17 @@ studyInfo <- rawData%>%
 #          E.1.1.1, E.2.1.1, E.1.2.1, E.2.2.1, E.1.3.1, E.2.3.1, E.1.4.1, E.2.4.1, E.1.5.1, E.2.5.1,
 #          E.1.6.1, E.2.6.1, E.1.7.1, E.2.7.1, E.1.8.1, E.2.8.1, E.1.9.1, E.2.9.1, E.1.10.1, E.2.10.1,
 #          E.1.11.1, E.2.11.1, E.1.12.1, E.2.12.1, E.1.13.1, E.2.13.1, E.1.14.1, E.2.14.1, E.1.15.1, E.2.15.1,
-#          E.1.16.1, E.2.16.1, E.1.17.1, E.2.17.1, E.1.18.1, E.2.18.1,
+#          E.1.16.1, E.2.16.1,
 #          #trt_type linear slopes: center digit refers to trts
 #          E.1.1.2, E.2.1.2, E.1.2.2, E.2.2.2, E.1.3.2, E.2.3.2, E.1.4.2, E.2.4.2, E.1.5.2, E.2.5.2,
 #          E.1.6.2, E.2.6.2, E.1.7.2, E.2.7.2, E.1.8.2, E.2.8.2, E.1.9.2, E.2.9.2, E.1.10.2, E.2.10.2,
 #          E.1.11.2, E.2.11.2, E.1.12.2, E.2.12.2, E.1.13.2, E.2.13.2, E.1.14.2, E.2.14.2, E.1.15.2, E.2.15.2,
-#          E.1.16.2, E.2.16.2, E.1.17.2, E.2.17.2, E.1.18.2, E.2.18.2,
+#          E.1.16.2, E.2.16.2,
 #          #trt_type quadratic slopes: center digit refers to trts and interactions with anpp and gamma diversity
 #          E.1.1.3, E.2.1.3, E.1.2.3, E.2.2.3, E.1.3.3, E.2.3.3, E.1.4.3, E.2.4.3, E.1.5.3, E.2.5.3,
 #          E.1.6.3, E.2.6.3, E.1.7.3, E.2.7.3, E.1.8.3, E.2.8.3, E.1.9.3, E.2.9.3, E.1.10.3, E.2.10.3,
 #          E.1.11.3, E.2.11.3, E.1.12.3, E.2.12.3, E.1.13.3, E.2.13.3, E.1.14.3, E.2.14.3, E.1.15.3, E.2.15.3,
-#          E.1.16.3, E.2.16.3, E.1.17.3, E.2.17.3, E.1.18.3, E.2.18.3,
+#          E.1.16.3, E.2.16.3,
 #          #ANPP intercept, linear, and quad slopes (center digit): 2=anpp
 #          D.1.2.1, D.2.2.1,
 #          D.1.2.2, D.2.2.2,
@@ -172,23 +171,23 @@ studyInfo <- rawData%>%
 #   summarise(median=median(value), sd=sd(value))%>%
 #   mutate(lower=median-2*sd, upper=median+2*sd, lower_sign=sign(lower), upper_sign=sign(upper), diff=lower_sign-upper_sign, median=ifelse(diff==-2, 0, median))
 # 
-# # write.csv(chainsCommunity2, 'bayesian_output_summary_expinteraction_20yr_stdtimebytrt_03192019.csv')
+# # write.csv(chainsCommunity2, 'bayesian_output_summary_expinteraction_20yr_stdtimebytrt_04072019.csv')
 
-chainsCommunity2 <- read.csv('bayesian_output_summary_expinteraction_20yr_stdtimebytrt_03192019.csv')
+chainsCommunity2 <- read.csv('bayesian_output_summary_expinteraction_20yr_stdtimebytrt_04072019.csv')
 
-# #gather the intercepts, linear slopes, and quadratic slopes for all treatments ---------------------------------------------
-# #numbers are B.variable.number.parameter (e.g., B.mean.87.slope)
-# #variable (second place): 1=mean change, 2=richness change
-# #parameter (final digit): 1=intercept, 2=linear slope, 3=quad slope
-# #set any that are not significant (CI overlaps 0) as 0
-# 
+#gather the intercepts, linear slopes, and quadratic slopes for all treatments ---------------------------------------------
+#numbers are B.variable.number.parameter (e.g., B.mean.87.slope)
+#variable (second place): 1=mean change, 2=richness change
+#parameter (final digit): 1=intercept, 2=linear slope, 3=quad slope
+#set any that are not significant (CI overlaps 0) as 0
+
 # #get mean parameter values across all runs for each experiment, treatment, etc
-# chainsFinalMean <- as.data.frame(colMeans(chainsCommunity[,8220:10691]))%>% #may need to delete original four chains dataframes to get this to work
+# chainsFinalMean <- as.data.frame(colMeans(chainsCommunity[,8470:11025]))%>% #may need to delete original four chains dataframes to get this to work
 #   add_rownames('parameter')
-# names(chainsFinalMean)[names(chainsFinalMean) == 'colMeans(chainsCommunity[, 8220:10691])'] <- 'mean'
+# names(chainsFinalMean)[names(chainsFinalMean) == 'colMeans(chainsCommunity[, 8470:11025])'] <- 'mean'
 # #get sd of parameter values across all runs for each experiment, treatment, etc
-# chainsFinalSD <- as.data.frame(colSd(chainsCommunity[,8220:10691]))
-# names(chainsFinalSD)[names(chainsFinalSD) == 'colSd(chainsCommunity[, 8220:10691])'] <- 'sd'
+# chainsFinalSD <- as.data.frame(colSd(chainsCommunity[,8470:11025]))
+# names(chainsFinalSD)[names(chainsFinalSD) == 'colSd(chainsCommunity[, 8470:11025])'] <- 'sd'
 # 
 # chainsFinal <- cbind(chainsFinalMean, chainsFinalSD)%>%
 #   #split names into parts
@@ -204,21 +203,10 @@ chainsCommunity2 <- read.csv('bayesian_output_summary_expinteraction_20yr_stdtim
 #   select(variable, id, parameter, mean)%>%
 #   spread(key=parameter, value=mean)
 # 
-# # write.csv(chainsFinal, 'bayesian_output_mean sd_expinteractions_20yr_stdtimebytrt_03192019_noninf.csv')
+# # write.csv(chainsFinal, 'bayesian_output_mean sd_expinteractions_20yr_stdtimebytrt_04072019_noninf.csv')
 
-chainsFinal <- read.csv('bayesian_output_mean sd_expinteractions_20yr_stdtimebytrt_03192019_noninf.csv')
+chainsFinal <- read.csv('bayesian_output_mean sd_expinteractions_20yr_stdtimebytrt_04072019_noninf.csv')
 
-# chainsFinal2 <- cbind(chainsFinalMean, chainsFinalSD)%>%
-#   #split names into parts
-#   separate(parameter, c('B', 'variable', 'id', 'parameter'))%>%
-#   select(-B)%>%
-#   #rename parts to be more clear
-#   mutate(variable=ifelse(variable==1, 'mean', 'richness'),
-#          parameter=ifelse(parameter==1, 'intercept', ifelse(parameter==2, 'linear', 'quadratic')),
-#          id=as.integer(id))%>%
-#   #spread by variable
-#   select(variable, id, parameter, mean)%>%
-#   spread(key=parameter, value=mean)
 
 #merge together with experiment list
 trtID <- read.csv('bayesian_trt_index.csv')%>%
@@ -240,9 +228,9 @@ chainsEquations <- chainsExperiment%>%
   #get standardized experiment length
   mutate(alt_length=experiment_length - min_year)%>%
   mutate(alt_length=ifelse(alt_length>=20, 19, alt_length))%>%
-  mutate(yr9=ifelse(variable=='mean', (intercept+linear*7+quadratic*7^2)*(0.165778)+(0.3160571), (intercept+linear*7+quadratic*7^2)*(0.2407859)+(-0.06393594)))%>%
-  mutate(yr_final=ifelse(variable=='mean', (intercept+linear*alt_length+quadratic*alt_length^2)*(0.165778)+(0.3160571),
-                         (intercept+linear*alt_length+quadratic*alt_length^2)*(0.2407859)+(-0.06393594)))%>%
+  mutate(yr9=ifelse(variable=='mean', (intercept+linear*7+quadratic*7^2)*(0.1218158)+(0.2366542), (intercept+linear*7+quadratic*7^2)*(0.1821148)+(-0.02788138)))%>%
+  mutate(yr_final=ifelse(variable=='mean', (intercept+linear*alt_length+quadratic*alt_length^2)*(0.1218158)+(0.2366542),
+                         (intercept+linear*alt_length+quadratic*alt_length^2)*(0.1821148)+(-0.02788138)))%>%
   mutate(color=ifelse(rrich<31, '#1104DC44', ifelse(rrich<51&rrich>30, '#4403AE55', ifelse(rrich<71&rrich>50, '#77038166', ifelse(rrich>70, '#DD032688', 'grey')))))%>%
   mutate(curve1='stat_function(fun=function(x){(',
          curve2=' + ',
@@ -251,11 +239,11 @@ chainsEquations <- chainsExperiment%>%
          curve5=') + ',
          curve6='*(x*',
          curve7='+',
-         curve8=ifelse(variable=='mean', ')^2)*(0.165778)+(0.3160571)}, size=2, xlim=c(0,',
-                       ')^2)*(0.2407859)+(-0.06393594)}, size=2, xlim=c(0,'),
+         curve8=ifelse(variable=='mean', ')^2)*(0.1218158)+(0.2366542)}, size=2, xlim=c(0,',
+                       ')^2)*(0.1821148)+(-0.02788138)}, size=2, xlim=c(0,'),
          curve9=')) +',
          curve=paste(curve1, intercept, curve2, linear, curve3, time_std, curve4, time_mean, curve5, quadratic, curve6, time_std, curve7, time_mean, curve8, alt_length, curve9, sep=''))%>%
-  mutate(trt_overall=ifelse(trt_type=='CO2'|trt_type=='N'|trt_type=='P'|trt_type=='drought'|trt_type=='irr'|trt_type=='precip_vari', 'single_resource', ifelse(trt_type=='burn'|trt_type=='mow_clip'|trt_type=='herb_rem'|trt_type=='temp'|trt_type=='plant_mani', 'single_nonresource', ifelse(trt_type=='all_resource'|trt_type=='both', 'three_way', 'two_way'))))%>%
+  # mutate(trt_overall=ifelse(trt_type=='CO2'|trt_type=='N'|trt_type=='P'|trt_type=='drought'|trt_type=='irr'|trt_type=='precip_vari', 'single_resource', ifelse(trt_type=='burn'|trt_type=='mow_clip'|trt_type=='herb_rem'|trt_type=='temp'|trt_type=='plant_mani', 'single_nonresource', ifelse(trt_type=='all_resource'|trt_type=='both', 'three_way', 'two_way'))))%>%
   left_join(read.csv('treatment_response_shape_classification_stdtimebytrt_03192019.csv'))
 #export, group by shape type, and paste lines below
 # write.csv(chainsEquations,'plot mani_equations_expinteractions_20yr_stdtimebytrt_03192019.csv', row.names=F)
@@ -315,7 +303,7 @@ print(meanPlot, vp=viewport(layout.pos.row=2, layout.pos.col=1))
 
 
 
-#summary stats from bayesian output --------------------------------------------------------
+# #summary stats from bayesian output --------------------------------------------------------
 # #gather summary stats needed and relabel them
 # chainsCommunitySummary <- chainsCommunity%>%
 #   select(
@@ -323,17 +311,17 @@ print(meanPlot, vp=viewport(layout.pos.row=2, layout.pos.col=1))
 #         E.1.1.1, E.2.1.1, E.1.2.1, E.2.2.1, E.1.3.1, E.2.3.1, E.1.4.1, E.2.4.1, E.1.5.1, E.2.5.1,
 #         E.1.6.1, E.2.6.1, E.1.7.1, E.2.7.1, E.1.8.1, E.2.8.1, E.1.9.1, E.2.9.1, E.1.10.1, E.2.10.1,
 #         E.1.11.1, E.2.11.1, E.1.12.1, E.2.12.1, E.1.13.1, E.2.13.1, E.1.14.1, E.2.14.1, E.1.15.1, E.2.15.1,
-#         E.1.16.1, E.2.16.1, E.1.17.1, E.2.17.1, E.1.18.1, E.2.18.1,
+#         E.1.16.1, E.2.16.1, 
 #         #trt_type linear slopes: center digit refers to trts
 #         E.1.1.2, E.2.1.2, E.1.2.2, E.2.2.2, E.1.3.2, E.2.3.2, E.1.4.2, E.2.4.2, E.1.5.2, E.2.5.2,
 #         E.1.6.2, E.2.6.2, E.1.7.2, E.2.7.2, E.1.8.2, E.2.8.2, E.1.9.2, E.2.9.2, E.1.10.2, E.2.10.2,
 #         E.1.11.2, E.2.11.2, E.1.12.2, E.2.12.2, E.1.13.2, E.2.13.2, E.1.14.2, E.2.14.2, E.1.15.2, E.2.15.2,
-#         E.1.16.2, E.2.16.2, E.1.17.2, E.2.17.2, E.1.18.2, E.2.18.2,
+#         E.1.16.2, E.2.16.2, 
 #         #trt_type quadratic slopes: center digit refers to trts and interactions with anpp and gamma diversity
 #         E.1.1.3, E.2.1.3, E.1.2.3, E.2.2.3, E.1.3.3, E.2.3.3, E.1.4.3, E.2.4.3, E.1.5.3, E.2.5.3,
 #         E.1.6.3, E.2.6.3, E.1.7.3, E.2.7.3, E.1.8.3, E.2.8.3, E.1.9.3, E.2.9.3, E.1.10.3, E.2.10.3,
 #         E.1.11.3, E.2.11.3, E.1.12.3, E.2.12.3, E.1.13.3, E.2.13.3, E.1.14.3, E.2.14.3, E.1.15.3, E.2.15.3,
-#         E.1.16.3, E.2.16.3, E.1.17.3, E.2.17.3, E.1.18.3, E.2.18.3,
+#         E.1.16.3, E.2.16.3, 
 #         #ANPP intercept, linear, and quad slopes (center digit): 2=anpp
 #         D.1.2.1, D.2.2.1,
 #         D.1.2.2, D.2.2.2,
@@ -360,9 +348,9 @@ print(meanPlot, vp=viewport(layout.pos.row=2, layout.pos.col=1))
 #          predictor2=ifelse(predictor==2, 'ANPP', ifelse(predictor==3, 'rrich', 'overall')))%>%
 #   select(variable, parameter, predictor2, median, sd, CI)
 
-# write.csv(chainsCommunitySummary, 'bayesian_output_summary_final plots_expinteraction_20yr_stdtimebytrt_03192019.csv')
+# write.csv(chainsCommunitySummary, 'bayesian_output_summary_final plots_expinteraction_20yr_stdtimebytrt_04072019.csv')
 
-chainsCommunitySummary <- read.csv('bayesian_output_summary_final plots_expinteraction_20yr_stdtimebytrt_03192019.csv')
+chainsCommunitySummary <- read.csv('bayesian_output_summary_final plots_expinteraction_20yr_stdtimebytrt_04072019.csv')
 
 chainsCommunityOverall <- chainsCommunitySummary%>%
   mutate(type=paste(predictor2, parameter, sep='_'))
