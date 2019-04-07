@@ -244,3 +244,17 @@ allAnalysisFinalYear <- allAnalysis20yr%>%
   filter(treatment_year==max(treatment_year))%>%
   ungroup()
 # write.csv(allAnalysisFinalYear, 'ForAnalysis_allAnalysisFinalYear_03132019.csv')
+
+
+###treatment magnitude data
+nMag <- allAnalysis20yr%>%
+  filter(trt_type=='N')
+# write.csv(nMag, 'ForAnalysis_allAnalysisNmag.csv', row.names=F)
+
+irrMag <- allAnalysis20yr%>%
+  filter(trt_type=='irr')
+# write.csv(irrMag, 'ForAnalysis_allAnalysisH2Omag_irr.csv', row.names=F)
+
+droughtMag <- allAnalysis20yr%>%
+  filter(trt_type=='drought')
+# write.csv(droughtMag, 'ForAnalysis_allAnalysisH2Omag_drought.csv', row.names=F)
