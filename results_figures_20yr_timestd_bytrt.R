@@ -9,8 +9,11 @@
 library(grid)
 library(tidyverse)
 
-#kim
+#kim laptop
 setwd("C:\\Users\\lapie\\Dropbox (Smithsonian)\\working groups\\converge diverge working group\\converge_diverge\\datasets\\LongForm")
+
+#kim desktop
+setwd("C:\\Users\\la pierrek\\Dropbox (Smithsonian)\\working groups\\converge diverge working group\\converge_diverge\\datasets\\LongForm")
 
 theme_set(theme_bw())
 theme_update(axis.title.x=element_text(size=40, vjust=-0.35, margin=margin(t=15)), axis.text.x=element_text(size=34, color='black'),
@@ -55,10 +58,10 @@ expInfo <- expRaw%>%
   group_by(site_code, project_name, community_type, treatment)%>%
   mutate(irrigation=ifelse(precip>0, 1, 0), drought=ifelse(precip<0, 1, 0))%>%
   #calcualte minumum years for each project
-  summarise(min_year=min(treatment_year), nutrients=mean(nutrients), water=mean(water), carbon=mean(carbon), irrigation=mean(irrigation), drought=mean(drought))
+  summarise(min_year=min(treatment_year), nutrients=mean(nutrients), water=mean(water), carbon=mean(carbon), irrigation=mean(irrigation), drought=mean(drought), experiment_length=max(treatment_year))
 
 #import treatment data
-trtInfo <- read.csv('ExperimentInformation_March2019.csv')
+trtInfo1 <- read.csv('ExperimentInformation_March2019.csv')
 
 #import diversity metrics that went into Bayesian analysis
 rawData <- read.csv('ForAnalysis_allAnalysis20yr_pairwise_04032019.csv')
@@ -92,22 +95,14 @@ expInfoSummary <- rawData%>%
   gather(variable, estimate)
 
 #treatment info
-trtInfo <- rawData%>%
-  left_join(trtInfo)%>%
-  filter(plot_mani<6, anpp!='NA', treatment_year!=0)%>%
-  group_by(site_code, project_name, community_type, treatment, trt_type)%>%
-  summarise(experiment_length=mean(experiment_length), plot_mani=mean(plot_mani), rrich=mean(rrich),
-            anpp=mean(anpp), MAT=mean(MAT), MAP=mean(MAP))%>%
-  ungroup()%>%
-  left_join(expInfo)%>%
-  mutate(resource_mani=(nutrients+carbon+irrigation+drought))
-
-#list of all treatments
-studyInfo <- rawData%>%
-  left_join(trtInfo)%>%
-  filter(plot_mani<6, anpp!='NA', treatment_year!=0)%>%
-  select(site_code, community_type, project_name, treatment)%>%
+trtInfo2 <- trtInfo1%>%
+  select(site_code, project_name, community_type, treatment, plot_mani, trt_type)%>%
   unique()
+  
+trtInfo <- rawData%>%
+  select(site_code, project_name, community_type, treatment, trt_type, experiment_length, rrich, anpp, MAT, MAP)%>%
+  unique()%>%
+  left_join(expInfo)
 
 
 ################################################################################
@@ -219,7 +214,7 @@ timeStd <- read.csv('bayesian_trt_index.csv')%>%
   ungroup()%>%
   rename(id=treat_INT)
 chainsExperiment <- chainsFinal%>%
-  left_join(trtID, by='id')%>%
+  left_join(trtID)%>%
   left_join(trtInfo)%>%
   left_join(timeStd)
 
@@ -242,11 +237,14 @@ chainsEquations <- chainsExperiment%>%
          curve8=ifelse(variable=='mean', ')^2)*(0.1218158)+(0.2366542)}, size=2, xlim=c(0,',
                        ')^2)*(0.1821148)+(-0.02788138)}, size=2, xlim=c(0,'),
          curve9=')) +',
-         curve=paste(curve1, intercept, curve2, linear, curve3, time_std, curve4, time_mean, curve5, quadratic, curve6, time_std, curve7, time_mean, curve8, alt_length, curve9, sep=''))%>%
-  # mutate(trt_overall=ifelse(trt_type=='CO2'|trt_type=='N'|trt_type=='P'|trt_type=='drought'|trt_type=='irr'|trt_type=='precip_vari', 'single_resource', ifelse(trt_type=='burn'|trt_type=='mow_clip'|trt_type=='herb_rem'|trt_type=='temp'|trt_type=='plant_mani', 'single_nonresource', ifelse(trt_type=='all_resource'|trt_type=='both', 'three_way', 'two_way'))))%>%
-  left_join(read.csv('treatment_response_shape_classification_stdtimebytrt_03192019.csv'))
+         curve=paste(curve1, intercept, curve2, linear, curve3, time_std, curve4, time_mean, curve5, quadratic, curve6, time_std, curve7, time_mean, curve8, alt_length, curve9, sep=''))
+  # mutate(trt_overall=ifelse(trt_type=='CO2'|trt_type=='N'|trt_type=='P'|trt_type=='drought'|trt_type=='irr'|trt_type=='precip_vari', 'single_resource', ifelse(trt_type=='burn'|trt_type=='mow_clip'|trt_type=='herb_rem'|trt_type=='temp'|trt_type=='plant_mani', 'single_nonresource', ifelse(trt_type=='all_resource'|trt_type=='both', 'three_way', 'two_way'))))
+
 #export, group by shape type, and paste lines below
-# write.csv(chainsEquations,'plot mani_equations_expinteractions_20yr_stdtimebytrt_03192019.csv', row.names=F)
+# write.csv(chainsEquations,'plot mani_equations_expinteractions_20yr_stdtimebytrt_04072019.csv', row.names=F)
+
+
+trtShape <- read.csv('treatment_response_shape_classification_stdtimebytrt_04072019.csv')
 
 #summary lines by treatment type
 chainsEquationsSummary <- chainsEquations%>%
