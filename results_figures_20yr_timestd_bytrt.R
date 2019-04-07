@@ -246,57 +246,222 @@ chainsEquations <- chainsExperiment%>%
 
 trtShape <- read.csv('treatment_response_shape_classification_stdtimebytrt_04072019.csv')
 
-#summary lines by treatment type
-chainsEquationsSummary <- chainsEquations%>%
-  group_by(variable, trt_overall)%>%
-  summarise(intercept_mean=mean(intercept), intercept_sd=sd(intercept), linear_mean=mean(linear), linear_sd=sd(linear), quadratic_mean=mean(quadratic), quadratic_sd=sd(quadratic))%>%
-  ungroup()%>%
-  mutate(intercept_high=intercept_mean+1.96*intercept_sd, intercept_low=intercept_mean-1.96*intercept_sd, linear_high=linear_mean+1.96*linear_sd, linear_low=linear_mean-1.96*linear_sd, quadratic_high=quadratic_mean+1.96*quadratic_sd, quadratic_low=quadratic_mean-1.96*quadratic_sd)%>%
-  mutate(intercept_high2=ifelse(intercept_high>0, 1, 0), intercept_low2=ifelse(intercept_low<0, 1, 0), linear_high2=ifelse(linear_high>0, 1, 0), linear_low2=ifelse(linear_low<0, 1, 0), quadratic_high2=ifelse(quadratic_high>0, 1, 0), quadratic_low2=ifelse(quadratic_low<0, 1, 0))%>%
-  mutate(intercept_cross=intercept_high2+intercept_low2, linear_cross=linear_high2+linear_low2, quadratic_cross=quadratic_high2+quadratic_low2)%>%
-  mutate(intercept_final=ifelse(intercept_cross==2, 0, intercept), linear_final=ifelse(linear_cross==2, 0, linear), quadratic_final=ifelse(quadratic_cross==2, 0, quadratic))
+# #summary lines by treatment type
+# chainsEquationsSummary <- chainsEquations%>%
+#   group_by(variable, trt_overall)%>%
+#   summarise(intercept_mean=mean(intercept), intercept_sd=sd(intercept), linear_mean=mean(linear), linear_sd=sd(linear), quadratic_mean=mean(quadratic), quadratic_sd=sd(quadratic))%>%
+#   ungroup()%>%
+#   mutate(intercept_high=intercept_mean+1.96*intercept_sd, intercept_low=intercept_mean-1.96*intercept_sd, linear_high=linear_mean+1.96*linear_sd, linear_low=linear_mean-1.96*linear_sd, quadratic_high=quadratic_mean+1.96*quadratic_sd, quadratic_low=quadratic_mean-1.96*quadratic_sd)%>%
+#   mutate(intercept_high2=ifelse(intercept_high>0, 1, 0), intercept_low2=ifelse(intercept_low<0, 1, 0), linear_high2=ifelse(linear_high>0, 1, 0), linear_low2=ifelse(linear_low<0, 1, 0), quadratic_high2=ifelse(quadratic_high>0, 1, 0), quadratic_low2=ifelse(quadratic_low<0, 1, 0))%>%
+#   mutate(intercept_cross=intercept_high2+intercept_low2, linear_cross=linear_high2+linear_low2, quadratic_cross=quadratic_high2+quadratic_low2)%>%
+#   mutate(intercept_final=ifelse(intercept_cross==2, 0, intercept), linear_final=ifelse(linear_cross==2, 0, linear), quadratic_final=ifelse(quadratic_cross==2, 0, quadratic))
 
 ###main figure (Figure 1)
 # compositional response panel --------------------------------------------------------
-meanPlot <- ggplot(data=data.frame(x=c(0,0))) + 
+meanPlot0 <- ggplot(data=data.frame(x=c(0,0))) + 
   coord_cartesian(ylim=c(0,1))  +
   scale_x_continuous(limits=c(0,19), breaks=seq(4,19,5), labels=seq(5,20,5)) +
   ylim(-10,10) +
-xlab('Standardized Experiment Year') +
-  ylab('Overall Community Difference') +
-  annotate('text', x=0, y=1, label='(b)', size=10, hjust='left')
+  xlab('') +
+  ylab('') +
+  annotate('text', x=0, y=1, label='(b)', size=10, hjust='left') +
+  #below are the individual treatment lines
+  
 
-meanPlot <- meanPlot + 
+meanPlot1 <- ggplot(data=data.frame(x=c(0,0))) + 
+  coord_cartesian(ylim=c(0,1))  +
+  scale_x_continuous(limits=c(0,19), breaks=seq(4,19,5), labels=seq(5,20,5)) +
+  ylim(-10,10) +
+  xlab('') +
+  ylab('') +
+  annotate('text', x=0, y=1, label='(d)', size=10, hjust='left') +
   #below are the individual treatment lines
 
-  #overall lines (average across all datapoints)
-  stat_function(fun=function(x){(0 + 0.2301080*x + -0.1112255*x^2)*(0.165778)+(0.3160571)}, size=5, xlim=c(0,19), colour='black')
+  
+meanPlot2 <- ggplot(data=data.frame(x=c(0,0))) + 
+  coord_cartesian(ylim=c(0,1))  +
+  scale_x_continuous(limits=c(0,19), breaks=seq(4,19,5), labels=seq(5,20,5)) +
+  ylim(-10,10) +
+  xlab('') +
+  ylab('') +
+  annotate('text', x=0, y=1, label='(f)', size=10, hjust='left') +
+  #below are the individual treatment lines
+  
+  
+meanPlot3 <- ggplot(data=data.frame(x=c(0,0))) + 
+  coord_cartesian(ylim=c(0,1))  +
+  scale_x_continuous(limits=c(0,19), breaks=seq(4,19,5), labels=seq(5,20,5)) +
+  ylim(-10,10) +
+  xlab('') +
+  ylab('') +
+  annotate('text', x=0, y=1, label='(h)', size=10, hjust='left') +
+  #below are the individual treatment lines
+  
+  
+meanPlot4 <- ggplot(data=data.frame(x=c(0,0))) + 
+  coord_cartesian(ylim=c(0,1))  +
+  scale_x_continuous(limits=c(0,19), breaks=seq(4,19,5), labels=seq(5,20,5)) +
+  ylim(-10,10) +
+  xlab('') +
+  ylab('') +
+  annotate('text', x=0, y=1, label='(j)', size=10, hjust='left') +
+  #below are the individual treatment lines
+  
+  
+meanPlot5 <- ggplot(data=data.frame(x=c(0,0))) + 
+  coord_cartesian(ylim=c(0,1))  +
+  scale_x_continuous(limits=c(0,19), breaks=seq(4,19,5), labels=seq(5,20,5)) +
+  ylim(-10,10) +
+  xlab('') +
+  ylab('') +
+  annotate('text', x=0, y=1, label='(l)', size=10, hjust='left') +
+  #below are the individual treatment lines
+  
+  
+meanPlot6 <- ggplot(data=data.frame(x=c(0,0))) + 
+  coord_cartesian(ylim=c(0,1))  +
+  scale_x_continuous(limits=c(0,19), breaks=seq(4,19,5), labels=seq(5,20,5)) +
+  ylim(-10,10) +
+  xlab('') +
+  ylab('') +
+  annotate('text', x=0, y=1, label='(n)', size=10, hjust='left') +
+  #below are the individual treatment lines
+  
+  
+meanPlot7 <- ggplot(data=data.frame(x=c(0,0))) + 
+  coord_cartesian(ylim=c(0,1))  +
+  scale_x_continuous(limits=c(0,19), breaks=seq(4,19,5), labels=seq(5,20,5)) +
+  ylim(-10,10) +
+  xlab('') +
+  ylab('') +
+  annotate('text', x=0, y=1, label='(p)', size=10, hjust='left') +
+  #below are the individual treatment lines  
+  
+  
+meanPlot8 <- ggplot(data=data.frame(x=c(0,0))) + 
+  coord_cartesian(ylim=c(0,1))  +
+  scale_x_continuous(limits=c(0,19), breaks=seq(4,19,5), labels=seq(5,20,5)) +
+  ylim(-10,10) +
+  xlab('') +
+  ylab('') +
+  annotate('text', x=0, y=1, label='(r)', size=10, hjust='left') +
+  #below are the individual treatment lines
 
-# print(meanPlot) #export at 1200x1000
-
+  
+  
 
 
 #richness response panel --------------------------------------------------------
-richnessPlot <- ggplot(data=data.frame(x=c(0,0))) +
+richnessPlot0 <- ggplot(data=data.frame(x=c(0,0))) +
   coord_cartesian(ylim=c(-1.0,2.0))  +
   scale_x_continuous(limits=c(0,19), breaks=seq(4,19,5), labels=seq(5,20,5)) +
   scale_y_continuous(limits=c(-2,2), breaks=seq(-2,2,1)) +
   xlab('') +
-  ylab('Richness Difference') +
-  annotate('text', x=0, y=2.0, label='(a)', size=10, hjust='left')
-
-richnessPlot <- richnessPlot + 
+  ylab('') +
+  annotate('text', x=0, y=2.0, label='(a)', size=10, hjust='left') +
   #below are the individual treatment lines
 
-  #overall line
-  stat_function(fun=function(x){(0.24736400 + 0*x + 0*x^2)*0.2407859 + -0.06393594}, size=5, xlim=c(0,19), colour='black')
 
-# print(richnessPlot) #export at 1200x1000
+richnessPlot1 <- ggplot(data=data.frame(x=c(0,0))) +
+  coord_cartesian(ylim=c(-1.0,2.0))  +
+  scale_x_continuous(limits=c(0,19), breaks=seq(4,19,5), labels=seq(5,20,5)) +
+  scale_y_continuous(limits=c(-2,2), breaks=seq(-2,2,1)) +
+  xlab('') +
+  ylab('') +
+  annotate('text', x=0, y=2.0, label='(c)', size=10, hjust='left') +
+  #below are the individual treatment lines
+  
+  
+richnessPlot2 <- ggplot(data=data.frame(x=c(0,0))) +
+  coord_cartesian(ylim=c(-1.0,2.0))  +
+  scale_x_continuous(limits=c(0,19), breaks=seq(4,19,5), labels=seq(5,20,5)) +
+  scale_y_continuous(limits=c(-2,2), breaks=seq(-2,2,1)) +
+  xlab('') +
+  ylab('') +
+  annotate('text', x=0, y=2.0, label='(e)', size=10, hjust='left') +
+  #below are the individual treatment lines
+  
+  
+richnessPlot3 <- ggplot(data=data.frame(x=c(0,0))) +
+  coord_cartesian(ylim=c(-1.0,2.0))  +
+  scale_x_continuous(limits=c(0,19), breaks=seq(4,19,5), labels=seq(5,20,5)) +
+  scale_y_continuous(limits=c(-2,2), breaks=seq(-2,2,1)) +
+  xlab('') +
+  ylab('') +
+  annotate('text', x=0, y=2.0, label='(g)', size=10, hjust='left') +
+  #below are the individual treatment lines
+  
+  
+richnessPlot4 <- ggplot(data=data.frame(x=c(0,0))) +
+  coord_cartesian(ylim=c(-1.0,2.0))  +
+  scale_x_continuous(limits=c(0,19), breaks=seq(4,19,5), labels=seq(5,20,5)) +
+  scale_y_continuous(limits=c(-2,2), breaks=seq(-2,2,1)) +
+  xlab('') +
+  ylab('') +
+  annotate('text', x=0, y=2.0, label='(i)', size=10, hjust='left') +
+  #below are the individual treatment lines
+  
+  
+richnessPlot5 <- ggplot(data=data.frame(x=c(0,0))) +
+  coord_cartesian(ylim=c(-1.0,2.0))  +
+  scale_x_continuous(limits=c(0,19), breaks=seq(4,19,5), labels=seq(5,20,5)) +
+  scale_y_continuous(limits=c(-2,2), breaks=seq(-2,2,1)) +
+  xlab('') +
+  ylab('') +
+  annotate('text', x=0, y=2.0, label='(k)', size=10, hjust='left') +
+  #below are the individual treatment lines
+  
+  
+richnessPlot6 <- ggplot(data=data.frame(x=c(0,0))) +
+  coord_cartesian(ylim=c(-1.0,2.0))  +
+  scale_x_continuous(limits=c(0,19), breaks=seq(4,19,5), labels=seq(5,20,5)) +
+  scale_y_continuous(limits=c(-2,2), breaks=seq(-2,2,1)) +
+  xlab('') +
+  ylab('') +
+  annotate('text', x=0, y=2.0, label='(m)', size=10, hjust='left') +
+  #below are the individual treatment lines
+  
+  
+richnessPlot7 <- ggplot(data=data.frame(x=c(0,0))) +
+  coord_cartesian(ylim=c(-1.0,2.0))  +
+  scale_x_continuous(limits=c(0,19), breaks=seq(4,19,5), labels=seq(5,20,5)) +
+  scale_y_continuous(limits=c(-2,2), breaks=seq(-2,2,1)) +
+  xlab('') +
+  ylab('') +
+  annotate('text', x=0, y=2.0, label='(o)', size=10, hjust='left') +
+  #below are the individual treatment lines
+  
+  
+richnessPlot8 <- ggplot(data=data.frame(x=c(0,0))) +
+  coord_cartesian(ylim=c(-1.0,2.0))  +
+  scale_x_continuous(limits=c(0,19), breaks=seq(4,19,5), labels=seq(5,20,5)) +
+  scale_y_continuous(limits=c(-2,2), breaks=seq(-2,2,1)) +
+  xlab('') +
+  ylab('') +
+  annotate('text', x=0, y=2.0, label='(q)', size=10, hjust='left') +
+  #below are the individual treatment lines
 
+  
 #print all plots together --------------------------------------------------------
-pushViewport(viewport(layout=grid.layout(2,1)))
-print(richnessPlot, vp=viewport(layout.pos.row=1, layout.pos.col=1))
-print(meanPlot, vp=viewport(layout.pos.row=2, layout.pos.col=1))
+pushViewport(viewport(layout=grid.layout(9,2)))
+print(richnessPlot0, vp=viewport(layout.pos.row=1, layout.pos.col=1))
+print(richnessPlot1, vp=viewport(layout.pos.row=2, layout.pos.col=1))
+print(richnessPlot2, vp=viewport(layout.pos.row=3, layout.pos.col=1))
+print(richnessPlot3, vp=viewport(layout.pos.row=4, layout.pos.col=1))
+print(richnessPlot4, vp=viewport(layout.pos.row=5, layout.pos.col=1))
+print(richnessPlot5, vp=viewport(layout.pos.row=6, layout.pos.col=1))
+print(richnessPlot6, vp=viewport(layout.pos.row=7, layout.pos.col=1))
+print(richnessPlot7, vp=viewport(layout.pos.row=8, layout.pos.col=1))
+print(richnessPlot8, vp=viewport(layout.pos.row=9, layout.pos.col=1))
+print(meanPlot0, vp=viewport(layout.pos.row=1, layout.pos.col=2))
+print(meanPlot1, vp=viewport(layout.pos.row=2, layout.pos.col=2))
+print(meanPlot2, vp=viewport(layout.pos.row=3, layout.pos.col=2))
+print(meanPlot3, vp=viewport(layout.pos.row=4, layout.pos.col=2))
+print(meanPlot4, vp=viewport(layout.pos.row=5, layout.pos.col=2))
+print(meanPlot5, vp=viewport(layout.pos.row=6, layout.pos.col=2))
+print(meanPlot6, vp=viewport(layout.pos.row=7, layout.pos.col=2))
+print(meanPlot7, vp=viewport(layout.pos.row=8, layout.pos.col=2))
+print(meanPlot8, vp=viewport(layout.pos.row=9, layout.pos.col=2))
 #export at 1200 x 2400
 
 
@@ -501,139 +666,3 @@ print(meanDroPlotFinal, vp=viewport(layout.pos.row = 2, layout.pos.col = 2))
 print(richnessIrrPlotFinal, vp=viewport(layout.pos.row = 1, layout.pos.col = 3))
 print(meanIrrPlotFinal, vp=viewport(layout.pos.row = 2, layout.pos.col = 3))
 #export at 2700 x 1600
-
-
-
-
-
-
-
-
-
-####testing lines  ---  mean change
-BGP <- ggplot(data=subset(rawData, project_name=='BGP'&treatment=='b_u_n'), aes(x=treatment_year, y=mean_change)) + 
-  # coord_cartesian(ylim=c(0,1))  +
-  # scale_x_continuous(limits=c(0,19), breaks=seq(4,19,5), labels=seq(5,20,5)) +
-  # ylim(-10,10) +
-  xlab('Standardized Experiment Year') +
-  ylab('Overall Community Difference') +
-  geom_point(color='red', size=5) +
-  stat_function(fun=function(x){(-0 + 0.449065262*x + -0.065372924*x^2)*(0.1718192)+(0.2935109)}, size=1, xlim=c(1,20), colour='black')
-
-BGP2 <- ggplot(data=subset(rawData, project_name=='BGP'&treatment=='b_u_p'), aes(x=treatment_year, y=mean_change)) + 
-  # coord_cartesian(ylim=c(0,1))  +
-  # scale_x_continuous(limits=c(0,19), breaks=seq(4,19,5), labels=seq(5,20,5)) +
-  # ylim(-10,10) +
-  xlab('Standardized Experiment Year') +
-  ylab('Overall Community Difference') +
-  geom_point(color='red', size=5) +
-  stat_function(fun=function(x){(-1.04788779 + 0.480665506*x + -0.06235107*x^2)*(0.1718192)+(0.2935109)}, size=1, xlim=c(1,20), colour='black')
-
-nfert <- ggplot(data=subset(rawData, project_name=='Nfert'&treatment=='F'), aes(x=treatment_year, y=mean_change)) + 
-  # coord_cartesian(ylim=c(0,1))  +
-  # scale_x_continuous(limits=c(0,19), breaks=seq(4,19,5), labels=seq(5,20,5)) +
-  # ylim(-10,10) +
-  xlab('Standardized Experiment Year') +
-  ylab('Overall Community Difference') +
-  geom_point(color='red', size=5) +
-  stat_function(fun=function(x){(0.822832418 + 0.699235591*x + -0.04209497*x^2)*(0.1718192)+(0.2935109)}, size=1, xlim=c(1,18), colour='black')
-
-wenndex <- ggplot(data=subset(rawData, project_name=='WENNDEx'&treatment=='PN'), aes(x=treatment_year, y=mean_change)) + 
-  # coord_cartesian(ylim=c(0,1))  +
-  # scale_x_continuous(limits=c(0,19), breaks=seq(4,19,5), labels=seq(5,20,5)) +
-  # ylim(-10,10) +
-  xlab('Standardized Experiment Year') +
-  ylab('Overall Community Difference') +
-  geom_point(color='red', size=5) +
-  stat_function(fun=function(x){(-0 + 0.693766164*x + -0.038141653*x^2)*(0.1718192)+(0.2935109)}, size=1, xlim=c(1,7), colour='black')
-
-fireplots <- ggplot(data=subset(rawData, project_name=='fireplots'&treatment=='wnug'), aes(x=treatment_year, y=mean_change)) + 
-  # coord_cartesian(ylim=c(0,1))  +
-  # scale_x_continuous(limits=c(0,19), breaks=seq(4,19,5), labels=seq(5,20,5)) +
-  # ylim(-10,10) +
-  xlab('Standardized Experiment Year') +
-  ylab('Overall Community Difference') +
-  geom_point(color='red', size=5) +
-  stat_function(fun=function(x){(-0 + 0.520600303*x + -0.0378649*x^2)*(0.1718192)+(0.2935109)}, size=1, xlim=c(1,9), colour='black')
-
-tmece <- ggplot(data=subset(rawData, project_name=='TMECE'&community_type=='SP'&treatment=='E'), aes(x=treatment_year, y=mean_change)) + 
-  # coord_cartesian(ylim=c(0,1))  +
-  # scale_x_continuous(limits=c(0,19), breaks=seq(4,19,5), labels=seq(5,20,5)) +
-  # ylim(-10,10) +
-  xlab('Standardized Experiment Year') +
-  ylab('Overall Community Difference') +
-  geom_point(color='red', size=5) +
-  stat_function(fun=function(x){(-0 + 0.711655574*x + -0.036138435*x^2)*(0.1718192)+(0.2935109)}, size=1, xlim=c(1,20), colour='black')
-
-pushViewport(viewport(layout=grid.layout(2,3)))
-print(BGP, vp=viewport(layout.pos.row = 1, layout.pos.col = 1))
-print(BGP2, vp=viewport(layout.pos.row = 2, layout.pos.col = 1))
-print(nfert, vp=viewport(layout.pos.row = 1, layout.pos.col = 2))
-print(wenndex, vp=viewport(layout.pos.row = 2, layout.pos.col = 2))
-print(fireplots, vp=viewport(layout.pos.row = 1, layout.pos.col = 3))
-print(tmece, vp=viewport(layout.pos.row = 2, layout.pos.col = 3))
-
-
-
-####testing lines  --  richness change
-BGP <- ggplot(data=subset(rawData, project_name=='BGP'&treatment=='b_u_n'), aes(x=treatment_year, y=mean_change)) + 
-  # coord_cartesian(ylim=c(0,1))  +
-  # scale_x_continuous(limits=c(0,19), breaks=seq(4,19,5), labels=seq(5,20,5)) +
-  # ylim(-10,10) +
-  xlab('Standardized Experiment Year') +
-  ylab('Overall Community Difference') +
-  geom_point(color='red', size=5) +
-  stat_function(fun=function(x){(-0 + 0.449065262*x + -0.065372924*x^2)*(0.1718192)+(0.2935109)}, size=1, xlim=c(1,20), colour='black')
-
-BGP2 <- ggplot(data=subset(rawData, project_name=='BGP'&treatment=='b_u_p'), aes(x=treatment_year, y=mean_change)) + 
-  # coord_cartesian(ylim=c(0,1))  +
-  # scale_x_continuous(limits=c(0,19), breaks=seq(4,19,5), labels=seq(5,20,5)) +
-  # ylim(-10,10) +
-  xlab('Standardized Experiment Year') +
-  ylab('Overall Community Difference') +
-  geom_point(color='red', size=5) +
-  stat_function(fun=function(x){(-1.04788779 + 0.480665506*x + -0.06235107*x^2)*(0.1718192)+(0.2935109)}, size=1, xlim=c(1,20), colour='black')
-
-nfert <- ggplot(data=subset(rawData, project_name=='Nfert'&treatment=='F'), aes(x=treatment_year, y=mean_change)) + 
-  # coord_cartesian(ylim=c(0,1))  +
-  # scale_x_continuous(limits=c(0,19), breaks=seq(4,19,5), labels=seq(5,20,5)) +
-  # ylim(-10,10) +
-  xlab('Standardized Experiment Year') +
-  ylab('Overall Community Difference') +
-  geom_point(color='red', size=5) +
-  stat_function(fun=function(x){(0.822832418 + 0.699235591*x + -0.04209497*x^2)*(0.1718192)+(0.2935109)}, size=1, xlim=c(1,18), colour='black')
-
-wenndex <- ggplot(data=subset(rawData, project_name=='WENNDEx'&treatment=='PN'), aes(x=treatment_year, y=mean_change)) + 
-  # coord_cartesian(ylim=c(0,1))  +
-  # scale_x_continuous(limits=c(0,19), breaks=seq(4,19,5), labels=seq(5,20,5)) +
-  # ylim(-10,10) +
-  xlab('Standardized Experiment Year') +
-  ylab('Overall Community Difference') +
-  geom_point(color='red', size=5) +
-  stat_function(fun=function(x){(-0 + 0.693766164*x + -0.038141653*x^2)*(0.1718192)+(0.2935109)}, size=1, xlim=c(1,7), colour='black')
-
-fireplots <- ggplot(data=subset(rawData, project_name=='fireplots'&treatment=='wnug'), aes(x=treatment_year, y=mean_change)) + 
-  # coord_cartesian(ylim=c(0,1))  +
-  # scale_x_continuous(limits=c(0,19), breaks=seq(4,19,5), labels=seq(5,20,5)) +
-  # ylim(-10,10) +
-  xlab('Standardized Experiment Year') +
-  ylab('Overall Community Difference') +
-  geom_point(color='red', size=5) +
-  stat_function(fun=function(x){(-0 + 0.520600303*x + -0.0378649*x^2)*(0.1718192)+(0.2935109)}, size=1, xlim=c(1,9), colour='black')
-
-tmece <- ggplot(data=subset(rawData, project_name=='TMECE'&community_type=='SP'&treatment=='E'), aes(x=treatment_year, y=mean_change)) + 
-  # coord_cartesian(ylim=c(0,1))  +
-  # scale_x_continuous(limits=c(0,19), breaks=seq(4,19,5), labels=seq(5,20,5)) +
-  # ylim(-10,10) +
-  xlab('Standardized Experiment Year') +
-  ylab('Overall Community Difference') +
-  geom_point(color='red', size=5) +
-  stat_function(fun=function(x){(-0 + 0.711655574*x + -0.036138435*x^2)*(0.1718192)+(0.2935109)}, size=1, xlim=c(1,20), colour='black')
-
-pushViewport(viewport(layout=grid.layout(2,3)))
-print(BGP, vp=viewport(layout.pos.row = 1, layout.pos.col = 1))
-print(BGP2, vp=viewport(layout.pos.row = 2, layout.pos.col = 1))
-print(nfert, vp=viewport(layout.pos.row = 1, layout.pos.col = 2))
-print(wenndex, vp=viewport(layout.pos.row = 2, layout.pos.col = 2))
-print(fireplots, vp=viewport(layout.pos.row = 1, layout.pos.col = 3))
-print(tmece, vp=viewport(layout.pos.row = 2, layout.pos.col = 3))
