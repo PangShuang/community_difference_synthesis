@@ -145,8 +145,6 @@ divCompare <- divControls%>%
          expH_lnRR=log(exp_H/ctl_expH), 
          S_lnRR=log(S/ctl_S),
          S_lnRR_abs=abs(S_lnRR))%>%
-  #filter out current rainfall pattern treatment from NGBER gb experiment, as they also have an ambient (unsheltered control)
-  filter(trt_type!='control')%>%
   select(exp_year, treatment_year, treatment, plot_mani, composition_diff, expH_PC, expH_lnRR, S_PC, S_lnRR, S_lnRR_abs, site_code, project_name, community_type, calendar_year)
 
 #some preliminary histograms
@@ -192,7 +190,7 @@ allAnalysis <- ForAnalysis%>%
   #filter pretrt data
   filter(treatment_year!=0)%>%
   #modify categorical treatment column
-  mutate(trt_type2=ifelse(trt_type=='CO2', 'CO2', ifelse(trt_type=='drought', 'drought', ifelse(trt_type=='irr', 'irr', ifelse(trt_type=='N', 'N', ifelse(trt_type=='P', 'P', ifelse(trt_type=='precip_vari', 'precip_vari', ifelse(trt_type %in% c('light','lime'), 'other_resource', ifelse(trt_type=='burn', 'burn', ifelse(trt_type=='herb_removal', 'herb_removal', ifelse(trt_type=='mow_clip', 'mow_clip', ifelse(trt_type=='temp', 'temp', ifelse(trt_type %in% c('fungicide','other','plant_mani','stone','till'), 'other_nonresource', ifelse(trt_type %in% c('irr*CO2','N*CO2','N*drought','N*irr','N*P'), 'RxR', ifelse(trt_type %in% c('burn*graze','burn*mow_clip','herb_removal*mow_clip','plant_mani*herb_removal','plant_mani*other','temp*mow_clip'), 'NxN', ifelse(trt_type %in% c('CO2*temp','drought*mow_clip','drought*temp','irr*mow_clip','irr*plant_mani','irr*temp','N*burn','N*mow_clip','N*other','N*plant_mani','N*stone','N*temp','N*till','P*burn','P*mow_clip','precip_vari*temp'), 'RxN', ifelse(trt_type %in% c('mult_nutrient','N*irr*CO2'), 'RxRxR', 'threeway')))))))))))))))))%>%
+  mutate(trt_type2=ifelse(trt_type=='CO2', 'CO2', ifelse(trt_type=='drought', 'drought', ifelse(trt_type=='irr', 'irr', ifelse(trt_type=='N', 'N', ifelse(trt_type=='P', 'P', ifelse(trt_type=='precip_vari', 'precip_vari', ifelse(trt_type %in% c('light','lime'), 'other_resource', ifelse(trt_type=='herb_removal', 'herb_removal', ifelse(trt_type=='plant_mani', 'plant_mani', ifelse(trt_type=='mow_clip', 'mow_clip', ifelse(trt_type=='temp', 'temp', ifelse(trt_type %in% c('burn','fungicide','disturbance','stone','till'), 'other_nonresource', ifelse(trt_type %in% c('irr*CO2','N*CO2','N*drought','N*irr','N*P'), 'RxR', ifelse(trt_type %in% c('burn*graze','burn*mow_clip','herb_removal*mow_clip','plant_mani*herb_removal','plant_mani*other','temp*mow_clip'), 'NxN', ifelse(trt_type %in% c('CO2*temp','drought*mow_clip','drought*temp','irr*mow_clip','irr*plant_mani','irr*temp','N*burn','N*mow_clip','N*other','N*plant_mani','N*stone','N*temp','N*till','P*burn','P*mow_clip','precip_vari*temp'), 'RxN', ifelse(trt_type %in% c('mult_nutrient','N*irr*CO2'), 'RxRxR', 'threeway')))))))))))))))))%>%
   #keep just relevent column names for this analysis
   select(site_code, project_name, community_type, exp_year, treatment_year, calendar_year, treatment, trt_type2, composition_diff, expH_PC, expH_lnRR, S_PC, S_lnRR, S_lnRR_abs, experiment_length, rrich, anpp, MAT, MAP)%>%
     rename(trt_type=trt_type2)
@@ -206,55 +204,62 @@ numPoints <- allAnalysis%>%
   summarise(num_datapoints=length(treatment_year))
 allAnalysisAllDatasets <- allAnalysis%>%
   left_join(numPoints)%>%
-  filter(num_datapoints>2)
-# write.csv(allAnalysisAllDatasets, 'ForAnalysis_allAnalysisAllDatasets.csv')
+  filter(num_datapoints>2)%>%
+  #filter datasets with NA for comp diff (imaginary axis problem)
+  filter(!is.na(composition_diff))
+# write.csv(allAnalysisAllDatasets, 'ForAnalysis_allAnalysisAllDatasets_04082019.csv')
 
 
-#subset out treatment years 20 or less (i.e., cut off datasets at 20 years)
-allAnalysis20yr <- allAnalysisAllDatasets%>%
-  filter(treatment_year<21)%>%
-  select(-num_datapoints)%>%
-  filter(!is.na(composition_diff))%>%
-  rename(mean_change=composition_diff)
-numPoints <- allAnalysis20yr%>%
-  select(site_code, project_name, community_type, treatment, treatment_year)%>%
-  unique()%>%
-  group_by(site_code, project_name, community_type, treatment)%>%
-  summarise(num_datapoints=length(treatment_year))%>%
-  ungroup()
-# write.csv(allAnalysis20yr, 'ForAnalysis_allAnalysis20yr_pairwise_04032019.csv')
+# #subset out treatment years 20 or less (i.e., cut off datasets at 20 years)
+# allAnalysis20yr <- allAnalysisAllDatasets%>%
+#   filter(treatment_year<21)%>%
+#   select(-num_datapoints)%>%
+#   rename(mean_change=composition_diff)
+# numPoints <- allAnalysis20yr%>%
+#   select(site_code, project_name, community_type, treatment, treatment_year)%>%
+#   unique()%>%
+#   group_by(site_code, project_name, community_type, treatment)%>%
+#   summarise(num_datapoints=length(treatment_year))%>%
+#   ungroup()
+# # write.csv(allAnalysis20yr, 'ForAnalysis_allAnalysis20yr_pairwise_04082019.csv')
+# 
+# 
+# #subset out treatment years 10 or less (i.e., cut off datasets at 10 years)
+# allAnalysis10yr <- allAnalysisAllDatasets%>%
+#   filter(treatment_year<11)%>%
+#   select(-num_datapoints)%>%
+#   filter(!is.na(composition_diff))%>%
+#   rename(mean_change=composition_diff)
+# numPoints <- allAnalysis10yr%>%
+#   select(site_code, project_name, community_type, treatment, treatment_year)%>%
+#   unique()%>%
+#   group_by(site_code, project_name, community_type, treatment)%>%
+#   summarise(num_datapoints=length(treatment_year))
+# # write.csv(allAnalysis10yr, 'ForAnalysis_allAnalysis10yr_pairwise_04082019.csv')
 
-
-#subset out treatment years 10 or less (i.e., cut off datasets at 10 years)
-allAnalysis10yr <- allAnalysisAllDatasets%>%
-  filter(treatment_year<11)%>%
-  select(-num_datapoints)%>%
-  filter(!is.na(composition_diff))%>%
-  rename(mean_change=composition_diff)
-numPoints <- allAnalysis10yr%>%
-  select(site_code, project_name, community_type, treatment, treatment_year)%>%
-  unique()%>%
-  group_by(site_code, project_name, community_type, treatment)%>%
-  summarise(num_datapoints=length(treatment_year))
-# write.csv(allAnalysis10yr, 'ForAnalysis_allAnalysis10yr_pairwise_03132019.csv')
-
-#subset out 20th or final year of all data
-allAnalysisFinalYear <- allAnalysis20yr%>%
+#subset out final year of all data
+allAnalysisFinalYear <- allAnalysis%>%
   group_by(site_code, project_name, community_type, treatment)%>%
   filter(treatment_year==max(treatment_year))%>%
   ungroup()
-# write.csv(allAnalysisFinalYear, 'ForAnalysis_allAnalysisFinalYear_03132019.csv')
+# write.csv(allAnalysisFinalYear, 'ForAnalysis_allAnalysisFinalYear_04082019.csv')
 
 
 ###treatment magnitude data
-nMag <- allAnalysis20yr%>%
-  filter(trt_type=='N')
+nMag <- allAnalysisFinalYear%>%
+  filter(trt_type=='N')%>%
+  left_join(expInfo)%>%
+  select(site_code, project_name, community_type, exp_year, treatment_year, calendar_year, treatment, trt_type, composition_diff, expH_PC, expH_lnRR, S_PC, S_lnRR, S_lnRR_abs, experiment_length, rrich, anpp, MAT, MAP, n)
 # write.csv(nMag, 'ForAnalysis_allAnalysisNmag.csv', row.names=F)
 
-irrMag <- allAnalysis20yr%>%
-  filter(trt_type=='irr')
+irrMag <- allAnalysisFinalYear%>%
+  filter(trt_type=='irr')%>%
+  left_join(expInfo)%>%
+  select(site_code, project_name, community_type, exp_year, treatment_year, calendar_year, treatment, trt_type, composition_diff, expH_PC, expH_lnRR, S_PC, S_lnRR, S_lnRR_abs, experiment_length, rrich, anpp, MAT, MAP, precip)
 # write.csv(irrMag, 'ForAnalysis_allAnalysisH2Omag_irr.csv', row.names=F)
 
-droughtMag <- allAnalysis20yr%>%
-  filter(trt_type=='drought')
+droughtMag <- allAnalysisFinalYear%>%
+  filter(trt_type=='drought')%>%
+  left_join(expInfo)%>%
+  select(site_code, project_name, community_type, exp_year, treatment_year, calendar_year, treatment, trt_type, composition_diff, expH_PC, expH_lnRR, S_PC, S_lnRR, S_lnRR_abs, experiment_length, rrich, anpp, MAT, MAP, precip)
 # write.csv(droughtMag, 'ForAnalysis_allAnalysisH2Omag_drought.csv', row.names=F)
