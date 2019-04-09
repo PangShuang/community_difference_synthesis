@@ -172,7 +172,7 @@ chainsCommunity2 <- chainsCommunity%>%
   summarise(median=median(value), sd=sd(value))%>%
   mutate(lower=median-2*sd, upper=median+2*sd, lower_sign=sign(lower), upper_sign=sign(upper), diff=lower_sign-upper_sign, median=ifelse(diff==-2, 0, median))
 
-# write.csv(chainsCommunity2, 'bayesian_output_summary_expinteraction_20yr_stdtimebytrt_N01_04092019.csv')
+# write.csv(chainsCommunity2, 'stdtimebytrt_N01_summary_04092019.csv')
 
 
 #gather the intercepts, linear slopes, and quadratic slopes for all treatments
@@ -203,7 +203,7 @@ chainsFinal <- cbind(chainsFinalMean, chainsFinalSD)%>%
   select(variable, id, parameter, mean)%>%
   spread(key=parameter, value=mean)
 
-# write.csv(chainsFinal, 'bayesian_output_mean sd_expinteractions_20yr_stdtimebytrt_N01_04092019.csv')
+# write.csv(chainsFinal, 'stdtimebytrt_N01_means_04092019.csv')
 
 
 #merge together with experiment list
@@ -241,7 +241,7 @@ chainsEquations <- chainsExperiment%>%
   # mutate(trt_overall=ifelse(trt_type=='CO2'|trt_type=='N'|trt_type=='P'|trt_type=='drought'|trt_type=='irr'|trt_type=='precip_vari', 'single_resource', ifelse(trt_type=='burn'|trt_type=='mow_clip'|trt_type=='herb_rem'|trt_type=='temp'|trt_type=='plant_mani', 'single_nonresource', ifelse(trt_type=='all_resource'|trt_type=='both', 'three_way', 'two_way'))))
 
 #export, group by shape type, and paste lines below
-# write.csv(chainsEquations,'plot mani_equations_expinteractions_20yr_stdtimebytrt_N01_04092019.csv', row.names=F)
+# write.csv(chainsEquations,'stdtimebytrt_N01_equations_04092019.csv', row.names=F)
 
 
 
@@ -303,7 +303,7 @@ chainsCommunity2 <- chainsCommunity%>%
   summarise(median=median(value), sd=sd(value))%>%
   mutate(lower=median-2*sd, upper=median+2*sd, lower_sign=sign(lower), upper_sign=sign(upper), diff=lower_sign-upper_sign, median=ifelse(diff==-2, 0, median))
 
-# write.csv(chainsCommunity2, 'bayesian_output_summary_expinteraction_20yr_stdtimebytrt_noninf_04092019.csv')
+# write.csv(chainsCommunity2, 'stdtimebytrt_noninf_summary_04092019.csv')
 
 
 #gather the intercepts, linear slopes, and quadratic slopes for all treatments
@@ -334,7 +334,7 @@ chainsFinal <- cbind(chainsFinalMean, chainsFinalSD)%>%
   select(variable, id, parameter, mean)%>%
   spread(key=parameter, value=mean)
 
-# write.csv(chainsFinal, 'bayesian_output_mean sd_expinteractions_20yr_stdtimebytrt_noninf_04092019.csv')
+# write.csv(chainsFinal, 'stdtimebytrt_noninf_means_04092019.csv')
 
 
 #merge together with experiment list
@@ -372,7 +372,7 @@ chainsEquations <- chainsExperiment%>%
 # mutate(trt_overall=ifelse(trt_type=='CO2'|trt_type=='N'|trt_type=='P'|trt_type=='drought'|trt_type=='irr'|trt_type=='precip_vari', 'single_resource', ifelse(trt_type=='burn'|trt_type=='mow_clip'|trt_type=='herb_rem'|trt_type=='temp'|trt_type=='plant_mani', 'single_nonresource', ifelse(trt_type=='all_resource'|trt_type=='both', 'three_way', 'two_way'))))
 
 #export, group by shape type, and paste lines below
-# write.csv(chainsEquations,'plot mani_equations_expinteractions_20yr_stdtimebytrt_noninf_04092019.csv', row.names=F)
+# write.csv(chainsEquations,'stdtimebytrt_noninf_equations_04092019.csv', row.names=F)
 
 
 
@@ -435,7 +435,7 @@ chainsCommunity2 <- chainsCommunity%>%
   summarise(median=median(value), sd=sd(value))%>%
   mutate(lower=median-2*sd, upper=median+2*sd, lower_sign=sign(lower), upper_sign=sign(upper), diff=lower_sign-upper_sign, median=ifelse(diff==-2, 0, median))
 
-# write.csv(chainsCommunity2, 'bayesian_output_summary_expinteraction_20yr_stdtimebytrt_eH_04092019.csv')
+# write.csv(chainsCommunity2, 'stdtimebytrt_eH_summary_04092019.csv')
 
 
 #gather the intercepts, linear slopes, and quadratic slopes for all treatments
@@ -466,7 +466,7 @@ chainsFinal <- cbind(chainsFinalMean, chainsFinalSD)%>%
   select(variable, id, parameter, mean)%>%
   spread(key=parameter, value=mean)
 
-# write.csv(chainsFinal, 'bayesian_output_mean sd_expinteractions_20yr_stdtimebytrt_eH_04092019.csv')
+# write.csv(chainsFinal, 'stdtimebytrt_eH_means_04092019.csv')
 
 
 #merge together with experiment list
@@ -504,7 +504,7 @@ chainsEquations <- chainsExperiment%>%
 # mutate(trt_overall=ifelse(trt_type=='CO2'|trt_type=='N'|trt_type=='P'|trt_type=='drought'|trt_type=='irr'|trt_type=='precip_vari', 'single_resource', ifelse(trt_type=='burn'|trt_type=='mow_clip'|trt_type=='herb_rem'|trt_type=='temp'|trt_type=='plant_mani', 'single_nonresource', ifelse(trt_type=='all_resource'|trt_type=='both', 'three_way', 'two_way'))))
 
 #export, group by shape type, and paste lines below
-# write.csv(chainsEquations,'plot mani_equations_expinteractions_20yr_stdtimebytrt_eH_04092019.csv', row.names=F)
+# write.csv(chainsEquations,'stdtimebytrt_eH_equations_04092019.csv', row.names=F)
 
 
 
@@ -570,7 +570,7 @@ chainsCommunity2 <- chainsCommunity%>%
   summarise(median=median(value), sd=sd(value))%>%
   mutate(lower=median-2*sd, upper=median+2*sd, lower_sign=sign(lower), upper_sign=sign(upper), diff=lower_sign-upper_sign, median=ifelse(diff==-2, 0, median))
 
-# write.csv(chainsCommunity2, 'bayesian_output_summary_expinteraction_20yr_stdtimebytrt_PC_04092019.csv')
+# write.csv(chainsCommunity2, 'stdtimebytrt_PC_summary_04092019.csv')
 
 
 #gather the intercepts, linear slopes, and quadratic slopes for all treatments
@@ -601,7 +601,7 @@ chainsFinal <- cbind(chainsFinalMean, chainsFinalSD)%>%
   select(variable, id, parameter, mean)%>%
   spread(key=parameter, value=mean)
 
-# write.csv(chainsFinal, 'bayesian_output_mean sd_expinteractions_20yr_stdtimebytrt_PC_04092019.csv')
+# write.csv(chainsFinal, 'stdtimebytrt_PC_means_04092019.csv')
 
 
 #merge together with experiment list
@@ -639,7 +639,7 @@ chainsEquations <- chainsExperiment%>%
 # mutate(trt_overall=ifelse(trt_type=='CO2'|trt_type=='N'|trt_type=='P'|trt_type=='drought'|trt_type=='irr'|trt_type=='precip_vari', 'single_resource', ifelse(trt_type=='burn'|trt_type=='mow_clip'|trt_type=='herb_rem'|trt_type=='temp'|trt_type=='plant_mani', 'single_nonresource', ifelse(trt_type=='all_resource'|trt_type=='both', 'three_way', 'two_way'))))
 
 #export, group by shape type, and paste lines below
-# write.csv(chainsEquations,'plot mani_equations_expinteractions_20yr_stdtimebytrt_PC_04092019.csv', row.names=F)
+# write.csv(chainsEquations,'stdtimebytrt_PC_equations_04092019.csv', row.names=F)
 
 
 
