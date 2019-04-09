@@ -10,7 +10,7 @@ library(tidyverse)
 
 
 #kim
-setwd('C:\\Users\\lapie\\Dropbox (Smithsonian)\\working groups\\converge diverge working group\\converge_diverge\\datasets\\LongForm')
+setwd('C:\\Users\\lapie\\Dropbox (Smithsonian)\\working groups\\CoRRE\\converge_diverge\\datasets\\LongForm')
 
 #significant lines
 correTotal <- read.csv('treatment_response_shape_classification_stdtimebytrt_04072019.csv')%>%

@@ -10,10 +10,10 @@ library(tidyverse)
 library(vegan)
 
 #kim's laptop
-setwd('C:\\Users\\lapie\\Dropbox (Smithsonian)\\working groups\\converge diverge working group\\converge_diverge\\datasets\\LongForm')
+setwd('C:\\Users\\lapie\\Dropbox (Smithsonian)\\working groups\\CoRRE\\converge_diverge\\datasets\\LongForm')
 
 #kim's desktop
-setwd('C:\\Users\\la pierrek\\Dropbox (Smithsonian)\\working groups\\converge diverge working group\\converge_diverge\\datasets\\LongForm')
+setwd('C:\\Users\\la pierrek\\Dropbox (Smithsonian)\\working groups\\CoRRE\\converge_diverge\\datasets\\LongForm')
 
 #meghan
 setwd("~/Dropbox/converge_diverge/datasets/LongForm")
@@ -147,6 +147,6 @@ siteClimate<-read.csv("siteList_climate_March2019.csv")%>%
 siteExpDetails<-merge(siteClimate, expDetails, by="site_code")
 
 # #kim
-# write.csv(siteExpDetails, 'C:\\Users\\lapie\\Dropbox (Smithsonian)\\working groups\\converge diverge working group\\converge_diverge\\datasets\\LongForm\\SiteExperimentDetails_March2019.csv')
+# write.csv(siteExpDetails, 'C:\\Users\\lapie\\Dropbox (Smithsonian)\\working groups\\CoRRE\\converge_diverge\\datasets\\LongForm\\SiteExperimentDetails_March2019.csv')
 
 rm(list=setdiff(ls(), "siteExpDetails"))

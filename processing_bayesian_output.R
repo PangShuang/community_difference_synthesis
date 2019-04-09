@@ -10,10 +10,10 @@ library(grid)
 library(tidyverse)
 
 #kim laptop
-setwd("C:\\Users\\lapie\\Dropbox (Smithsonian)\\working groups\\converge diverge working group\\converge_diverge\\datasets\\LongForm")
+setwd("C:\\Users\\lapie\\Dropbox (Smithsonian)\\working groups\\CoRRE\\converge_diverge\\datasets\\LongForm")
 
 #kim desktop
-setwd("C:\\Users\\la pierrek\\Dropbox (Smithsonian)\\working groups\\converge diverge working group\\converge_diverge\\datasets\\LongForm")
+setwd("C:\\Users\\la pierrek\\Dropbox (Smithsonian)\\working groups\\CoRRE\\converge_diverge\\datasets\\LongForm")
 
 theme_set(theme_bw())
 theme_update(axis.title.x=element_text(size=40, vjust=-0.35, margin=margin(t=15)), axis.text.x=element_text(size=34, color='black'),
@@ -118,13 +118,13 @@ median(expInfo$experiment_length) #7
 ###N(0,1) priors---------------------------------------
 #raw chains data
 memory.limit(size=50000)
-chains1 <- read.csv('C:\\Users\\lapie\\Dropbox (Smithsonian)\\working groups\\converge diverge working group\\converge_diverge\\La Pierre_comm difference_final model results_01122018\\final models_all years_04082019\\N01_lnRR_all years\\N01-timestdbytrt_lnRR_0.csv', comment.char='#')
+chains1 <- read.csv('C:\\Users\\lapie\\Dropbox (Smithsonian)\\working groups\\CoRRE\\converge_diverge\\La Pierre_comm difference_final model results_01122018\\final models_all years_04082019\\N01_lnRR_all years\\N01-timestdbytrt_lnRR_0.csv', comment.char='#')
 chains1 <- chains1[-1:-5000,]
-chains2 <- read.csv('C:\\Users\\lapie\\Dropbox (Smithsonian)\\working groups\\converge diverge working group\\converge_diverge\\La Pierre_comm difference_final model results_01122018\\final models_all years_04082019\\N01_lnRR_all years\\N01-timestdbytrt_lnRR_1.csv', comment.char='#')
+chains2 <- read.csv('C:\\Users\\lapie\\Dropbox (Smithsonian)\\working groups\\CoRRE\\converge_diverge\\La Pierre_comm difference_final model results_01122018\\final models_all years_04082019\\N01_lnRR_all years\\N01-timestdbytrt_lnRR_1.csv', comment.char='#')
 chains2 <- chains2[-1:-5000,]
-chains3 <- read.csv('C:\\Users\\lapie\\Dropbox (Smithsonian)\\working groups\\converge diverge working group\\converge_diverge\\La Pierre_comm difference_final model results_01122018\\final models_all years_04082019\\N01_lnRR_all years\\N01-timestdbytrt_lnRR_2.csv', comment.char='#')
+chains3 <- read.csv('C:\\Users\\lapie\\Dropbox (Smithsonian)\\working groups\\CoRRE\\converge_diverge\\La Pierre_comm difference_final model results_01122018\\final models_all years_04082019\\N01_lnRR_all years\\N01-timestdbytrt_lnRR_2.csv', comment.char='#')
 chains3 <- chains3[-1:-5000,]
-chains4 <- read.csv('C:\\Users\\lapie\\Dropbox (Smithsonian)\\working groups\\converge diverge working group\\converge_diverge\\La Pierre_comm difference_final model results_01122018\\final models_all years_04082019\\N01_lnRR_all years\\N01-timestdbytrt_lnRR_3.csv', comment.char='#')
+chains4 <- read.csv('C:\\Users\\lapie\\Dropbox (Smithsonian)\\working groups\\CoRRE\\converge_diverge\\La Pierre_comm difference_final model results_01122018\\final models_all years_04082019\\N01_lnRR_all years\\N01-timestdbytrt_lnRR_3.csv', comment.char='#')
 chains4 <- chains4[-1:-5000,]
 
 chainsCommunity <- rbind(chains1, chains2, chains3, chains4)
@@ -249,13 +249,13 @@ chainsEquations <- chainsExperiment%>%
 ###noninformative priors------------------------------------------
 #raw chains data
 memory.limit(size=50000)
-chains1 <- read.csv('C:\\Users\\lapie\\Dropbox (Smithsonian)\\working groups\\converge diverge working group\\converge_diverge\\La Pierre_comm difference_final model results_01122018\\final models_all years_04082019\\noninf_lnRR_all years\\noninf-timestdbytrt_lnRR_0.csv', comment.char='#')
+chains1 <- read.csv('C:\\Users\\lapie\\Dropbox (Smithsonian)\\working groups\\CoRRE\\converge_diverge\\La Pierre_comm difference_final model results_01122018\\final models_all years_04082019\\noninf_lnRR_all years\\noninf-timestdbytrt_lnRR_0.csv', comment.char='#')
 chains1 <- chains1[-1:-5000,]
-chains2 <- read.csv('C:\\Users\\lapie\\Dropbox (Smithsonian)\\working groups\\converge diverge working group\\converge_diverge\\La Pierre_comm difference_final model results_01122018\\final models_all years_04082019\\noninf_lnRR_all years\\noninf-timestdbytrt_lnRR_1.csv', comment.char='#')
+chains2 <- read.csv('C:\\Users\\lapie\\Dropbox (Smithsonian)\\working groups\\CoRRE\\converge_diverge\\La Pierre_comm difference_final model results_01122018\\final models_all years_04082019\\noninf_lnRR_all years\\noninf-timestdbytrt_lnRR_1.csv', comment.char='#')
 chains2 <- chains2[-1:-5000,]
-chains3 <- read.csv('C:\\Users\\lapie\\Dropbox (Smithsonian)\\working groups\\converge diverge working group\\converge_diverge\\La Pierre_comm difference_final model results_01122018\\final models_all years_04082019\\noninf_lnRR_all years\\noninf-timestdbytrt_lnRR_2.csv', comment.char='#')
+chains3 <- read.csv('C:\\Users\\lapie\\Dropbox (Smithsonian)\\working groups\\CoRRE\\converge_diverge\\La Pierre_comm difference_final model results_01122018\\final models_all years_04082019\\noninf_lnRR_all years\\noninf-timestdbytrt_lnRR_2.csv', comment.char='#')
 chains3 <- chains3[-1:-5000,]
-chains4 <- read.csv('C:\\Users\\lapie\\Dropbox (Smithsonian)\\working groups\\converge diverge working group\\converge_diverge\\La Pierre_comm difference_final model results_01122018\\final models_all years_04082019\\noninf_lnRR_all years\\noninf-timestdbytrt_lnRR_3.csv', comment.char='#')
+chains4 <- read.csv('C:\\Users\\lapie\\Dropbox (Smithsonian)\\working groups\\CoRRE\\converge_diverge\\La Pierre_comm difference_final model results_01122018\\final models_all years_04082019\\noninf_lnRR_all years\\noninf-timestdbytrt_lnRR_3.csv', comment.char='#')
 chains4 <- chains4[-1:-5000,]
 
 chainsCommunity <- rbind(chains1, chains2, chains3, chains4)
@@ -381,13 +381,13 @@ chainsEquations <- chainsExperiment%>%
 ###eH as richness metric, N(0,1) priors------------------------------------------
 #raw chains data
 memory.limit(size=50000)
-chains1 <- read.csv('C:\\Users\\lapie\\Dropbox (Smithsonian)\\working groups\\converge diverge working group\\converge_diverge\\La Pierre_comm difference_final model results_01122018\\final models_all years_04082019\\eH_lnRR_all years\\eH-timestdbytrt_lnRR_0.csv', comment.char='#')
+chains1 <- read.csv('C:\\Users\\lapie\\Dropbox (Smithsonian)\\working groups\\CoRRE\\converge_diverge\\La Pierre_comm difference_final model results_01122018\\final models_all years_04082019\\eH_lnRR_all years\\eH-timestdbytrt_lnRR_0.csv', comment.char='#')
 chains1 <- chains1[-1:-5000,]
-chains2 <- read.csv('C:\\Users\\lapie\\Dropbox (Smithsonian)\\working groups\\converge diverge working group\\converge_diverge\\La Pierre_comm difference_final model results_01122018\\final models_all years_04082019\\eH_lnRR_all years\\eH-timestdbytrt_lnRR_1.csv', comment.char='#')
+chains2 <- read.csv('C:\\Users\\lapie\\Dropbox (Smithsonian)\\working groups\\CoRRE\\converge_diverge\\La Pierre_comm difference_final model results_01122018\\final models_all years_04082019\\eH_lnRR_all years\\eH-timestdbytrt_lnRR_1.csv', comment.char='#')
 chains2 <- chains2[-1:-5000,]
-chains3 <- read.csv('C:\\Users\\lapie\\Dropbox (Smithsonian)\\working groups\\converge diverge working group\\converge_diverge\\La Pierre_comm difference_final model results_01122018\\final models_all years_04082019\\eH_lnRR_all years\\eH-timestdbytrt_lnRR_2.csv', comment.char='#')
+chains3 <- read.csv('C:\\Users\\lapie\\Dropbox (Smithsonian)\\working groups\\CoRRE\\converge_diverge\\La Pierre_comm difference_final model results_01122018\\final models_all years_04082019\\eH_lnRR_all years\\eH-timestdbytrt_lnRR_2.csv', comment.char='#')
 chains3 <- chains3[-1:-5000,]
-chains4 <- read.csv('C:\\Users\\lapie\\Dropbox (Smithsonian)\\working groups\\converge diverge working group\\converge_diverge\\La Pierre_comm difference_final model results_01122018\\final models_all years_04082019\\eH_lnRR_all years\\eH-timestdbytrt_lnRR_3.csv', comment.char='#')
+chains4 <- read.csv('C:\\Users\\lapie\\Dropbox (Smithsonian)\\working groups\\CoRRE\\converge_diverge\\La Pierre_comm difference_final model results_01122018\\final models_all years_04082019\\eH_lnRR_all years\\eH-timestdbytrt_lnRR_3.csv', comment.char='#')
 chains4 <- chains4[-1:-5000,]
 
 chainsCommunity <- rbind(chains1, chains2, chains3, chains4)
@@ -516,13 +516,13 @@ chainsEquations <- chainsExperiment%>%
 ###percent change as richness metric, N(0,1) priors------------------------------------------
 #raw chains data
 memory.limit(size=50000)
-chains1 <- read.csv('C:\\Users\\lapie\\Dropbox (Smithsonian)\\working groups\\converge diverge working group\\converge_diverge\\La Pierre_comm difference_final model results_01122018\\final models_all years_04082019\\PC_lnRR_all years\\PC-timestdbytrt_lnRR_0.csv', comment.char='#')
+chains1 <- read.csv('C:\\Users\\lapie\\Dropbox (Smithsonian)\\working groups\\CoRRE\\converge_diverge\\La Pierre_comm difference_final model results_01122018\\final models_all years_04082019\\PC_lnRR_all years\\PC-timestdbytrt_lnRR_0.csv', comment.char='#')
 chains1 <- chains1[-1:-5000,]
-chains2 <- read.csv('C:\\Users\\lapie\\Dropbox (Smithsonian)\\working groups\\converge diverge working group\\converge_diverge\\La Pierre_comm difference_final model results_01122018\\final models_all years_04082019\\PC_lnRR_all years\\PC-timestdbytrt_lnRR_1.csv', comment.char='#')
+chains2 <- read.csv('C:\\Users\\lapie\\Dropbox (Smithsonian)\\working groups\\CoRRE\\converge_diverge\\La Pierre_comm difference_final model results_01122018\\final models_all years_04082019\\PC_lnRR_all years\\PC-timestdbytrt_lnRR_1.csv', comment.char='#')
 chains2 <- chains2[-1:-5000,]
-chains3 <- read.csv('C:\\Users\\lapie\\Dropbox (Smithsonian)\\working groups\\converge diverge working group\\converge_diverge\\La Pierre_comm difference_final model results_01122018\\final models_all years_04082019\\PC_lnRR_all years\\PC-timestdbytrt_lnRR_2.csv', comment.char='#')
+chains3 <- read.csv('C:\\Users\\lapie\\Dropbox (Smithsonian)\\working groups\\CoRRE\\converge_diverge\\La Pierre_comm difference_final model results_01122018\\final models_all years_04082019\\PC_lnRR_all years\\PC-timestdbytrt_lnRR_2.csv', comment.char='#')
 chains3 <- chains3[-1:-5000,]
-chains4 <- read.csv('C:\\Users\\lapie\\Dropbox (Smithsonian)\\working groups\\converge diverge working group\\converge_diverge\\La Pierre_comm difference_final model results_01122018\\final models_all years_04082019\\PC_lnRR_all years\\PC-timestdbytrt_lnRR_3.csv', comment.char='#')
+chains4 <- read.csv('C:\\Users\\lapie\\Dropbox (Smithsonian)\\working groups\\CoRRE\\converge_diverge\\La Pierre_comm difference_final model results_01122018\\final models_all years_04082019\\PC_lnRR_all years\\PC-timestdbytrt_lnRR_3.csv', comment.char='#')
 chains4 <- chains4[-1:-5000,]
 
 chainsCommunity <- rbind(chains1, chains2, chains3, chains4)
@@ -654,7 +654,7 @@ nDataMean <- nData%>%
   summarise(mean_mean_change=mean(composition_diff), sd_mean_change=sd(composition_diff), mean_S_PC=mean(S_PC), sd_S_PC=sd(S_PC))
 
 #mean change
-Nmean <- read.csv('C:\\Users\\lapie\\Dropbox (Smithsonian)\\working groups\\converge diverge working group\\converge_diverge\\La Pierre_comm difference_final model results_01122018\\magnitude_042019\\posteriors_N_MeanChange.csv', comment.char='#')
+Nmean <- read.csv('C:\\Users\\lapie\\Dropbox (Smithsonian)\\working groups\\CoRRE\\converge_diverge\\La Pierre_comm difference_final model results_01122018\\magnitude_042019\\posteriors_N_MeanChange.csv', comment.char='#')
 NmeanMean <- as.data.frame(colMeans(Nmean))%>%
   add_rownames('parameter')
 names(NmeanMean)[names(NmeanMean) == 'colMeans(Nmean)'] <- 'mean'
@@ -692,7 +692,7 @@ meanNPlotFinal <- ggplot(data=subset(nData), aes(x=n, y=composition_diff, color=
 
 
 #richness difference
-Nrichness <- read.csv('C:\\Users\\lapie\\Dropbox (Smithsonian)\\working groups\\converge diverge working group\\converge_diverge\\nate_results\\manipulation\\posteriors_N_Richness.csv', comment.char='#')
+Nrichness <- read.csv('C:\\Users\\lapie\\Dropbox (Smithsonian)\\working groups\\CoRRE\\converge_diverge\\nate_results\\manipulation\\posteriors_N_Richness.csv', comment.char='#')
 NrichnessMean <- as.data.frame(colMeans(Nrichness))%>%
   add_rownames('parameter')
 names(NrichnessMean)[names(NrichnessMean) == 'colMeans(Nrichness)'] <- 'mean'
