@@ -10,7 +10,7 @@ library(tidyverse)
 library(vegan)
 
 #kim's laptop
-setwd('C:\\Users\\Kim\\Dropbox\\working groups\\converge diverge working group\\converge_diverge\\datasets\\LongForm')
+setwd('C:\\Users\\lapie\\Dropbox (Smithsonian)\\working groups\\converge diverge working group\\converge_diverge\\datasets\\LongForm')
 
 #kim's desktop
 setwd('C:\\Users\\la pierrek\\Dropbox (Smithsonian)\\working groups\\converge diverge working group\\converge_diverge\\datasets\\LongForm')
@@ -69,12 +69,14 @@ expANPP<-merge(allANPP, expList2, by=c("site_code","project_name","community_typ
 
 #import species abundance data
 species <- read.csv("SpeciesRawAbundance_March2019.csv")%>%
-  select(site_code, project_name, community_type, plot_id, calendar_year, genus_species, abundance)%>%
+  select(site_code, project_name, community_type, treatment, plot_id, calendar_year, genus_species, abundance)%>%
   mutate(exp=paste(site_code, project_name, community_type, sep='::'))%>%
   tbl_df()
 
 #determine sampling intensity for each project
 sampleIntensity<-species%>%
+  left_join(read.csv('ExperimentInformation_March2019.csv'))%>%
+  filter(plot_mani==0)%>%
   group_by(exp, plot_id, calendar_year)%>%
   summarize(sample_intensity=length(abundance))%>%
   ungroup()%>%
@@ -112,12 +114,12 @@ for(i in 1:length(set$exp)) {
 
 #visualize species accumulations curves for each site
 ggplot(data=rarefiedRichness, aes(x=as.integer(n), y=V1, color=exp)) +
-  geom_smooth() + theme(legend.position='none') + coord_cartesian(xlim=c(0,34))
+  geom_smooth() + theme(legend.position='none') + coord_cartesian(xlim=c(0,12))
 
 
-#generate a list of estimated richness for each project
-rarefiedRichness34<-rarefiedRichness%>%
-  filter(n==34)%>%#the lowest sampling intensity
+#generate a list of estimated richness for each  in only control plots
+rarefiedRichness12<-rarefiedRichness%>%
+  filter(n==12)%>%#the lowest sampling intensity
   separate(exp, c("site_code", "project_name", "community_type"), sep="::")%>%
   mutate(rrich=V1)%>%
   select(-n, -V1)
@@ -129,7 +131,7 @@ expLength<-expInfo%>%
   summarize(experiment_length=max(treatment_year))
 
 #merge estimated richness with project length and ANPP
-expDetails<-rarefiedRichness34%>%
+expDetails<-rarefiedRichness12%>%
   left_join(expLength)%>%
   left_join(expANPP)
 
