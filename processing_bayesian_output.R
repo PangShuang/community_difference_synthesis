@@ -247,7 +247,6 @@ chainsEquations <- chainsExperiment%>%
 
 
 ###noninformative priors------------------------------------------
-###N01---------------------------------------
 #raw chains data
 memory.limit(size=50000)
 chains1 <- read.csv('C:\\Users\\lapie\\Dropbox (Smithsonian)\\working groups\\converge diverge working group\\converge_diverge\\La Pierre_comm difference_final model results_01122018\\final models_all years_04082019\\noninf_lnRR_all years\\noninf-timestdbytrt_lnRR_0.csv', comment.char='#')
