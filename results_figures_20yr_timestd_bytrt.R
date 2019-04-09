@@ -64,13 +64,13 @@ expInfo <- expRaw%>%
 trtInfo1 <- read.csv('ExperimentInformation_March2019.csv')
 
 #import diversity metrics that went into Bayesian analysis
-rawData <- read.csv('ForAnalysis_allAnalysis20yr_pairwise_04032019.csv')
+rawData <- read.csv('ForAnalysis_allAnalysisAllDatasets_04082019.csv')
 
 #calculate means and standard deviations across all data for richness and compositonal differences to backtransform
 rawData2<- rawData%>%
   left_join(trtInfo1)%>%
   filter(anpp!='NA', treatment_year!=0)%>%
-  summarise(mean_mean=mean(mean_change), std_mean=sd(mean_change), mean_rich=mean(S_lnRR), std_rich=sd(S_lnRR)) #to backtransform
+  summarise(mean_mean=mean(composition_diff), std_mean=sd(composition_diff), mean_rich=mean(S_lnRR), std_rich=sd(S_lnRR)) #to backtransform
 
 #select just data in this analysis
 expInfo2 <- rawData%>%
@@ -109,16 +109,16 @@ trtInfo <- rawData%>%
 ################################################################################
 # ###Bayesian output processing
 # 
-# only run to generate initial chains files
+# #only run to generate initial chains files
 # #raw chains data --------------------------------------------------------
 # memory.limit(size=50000)
-# chains1 <- read.csv('C:\\Users\\lapie\\Dropbox (Smithsonian)\\working groups\\converge diverge working group\\converge_diverge\\La Pierre_comm difference_final model results_01122018\\final models_04062019\\noninf_lnRR\\noninf_timestdbytrt_20yr_lnRR_0.csv', comment.char='#')
+# chains1 <- read.csv('C:\\Users\\lapie\\Dropbox (Smithsonian)\\working groups\\converge diverge working group\\converge_diverge\\La Pierre_comm difference_final model results_01122018\\final models_all years_04082019\\N01_lnRR_all years\\N01-timestdbytrt_lnRR_0.csv', comment.char='#')
 # chains1 <- chains1[-1:-5000,]
-# chains2 <- read.csv('C:\\Users\\lapie\\Dropbox (Smithsonian)\\working groups\\converge diverge working group\\converge_diverge\\La Pierre_comm difference_final model results_01122018\\final models_04062019\\noninf_lnRR\\noninf_timestdbytrt_20yr_lnRR_1.csv', comment.char='#')
+# chains2 <- read.csv('C:\\Users\\lapie\\Dropbox (Smithsonian)\\working groups\\converge diverge working group\\converge_diverge\\La Pierre_comm difference_final model results_01122018\\final models_all years_04082019\\N01_lnRR_all years\\N01-timestdbytrt_lnRR_1.csv', comment.char='#')
 # chains2 <- chains2[-1:-5000,]
-# chains3 <- read.csv('C:\\Users\\lapie\\Dropbox (Smithsonian)\\working groups\\converge diverge working group\\converge_diverge\\La Pierre_comm difference_final model results_01122018\\final models_04062019\\noninf_lnRR\\noninf_timestdbytrt_20yr_lnRR_2.csv', comment.char='#')
+# chains3 <- read.csv('C:\\Users\\lapie\\Dropbox (Smithsonian)\\working groups\\converge diverge working group\\converge_diverge\\La Pierre_comm difference_final model results_01122018\\final models_all years_04082019\\N01_lnRR_all years\\N01-timestdbytrt_lnRR_2.csv', comment.char='#')
 # chains3 <- chains3[-1:-5000,]
-# chains4 <- read.csv('C:\\Users\\lapie\\Dropbox (Smithsonian)\\working groups\\converge diverge working group\\converge_diverge\\La Pierre_comm difference_final model results_01122018\\final models_04062019\\noninf_lnRR\\noninf_timestdbytrt_20yr_lnRR_3.csv', comment.char='#')
+# chains4 <- read.csv('C:\\Users\\lapie\\Dropbox (Smithsonian)\\working groups\\converge diverge working group\\converge_diverge\\La Pierre_comm difference_final model results_01122018\\final models_all years_04082019\\N01_lnRR_all years\\N01-timestdbytrt_lnRR_3.csv', comment.char='#')
 # chains4 <- chains4[-1:-5000,]
 # 
 # chainsCommunity <- rbind(chains1, chains2, chains3, chains4)
@@ -171,18 +171,18 @@ trtInfo <- rawData%>%
 chainsCommunity2 <- read.csv('bayesian_output_summary_expinteraction_20yr_stdtimebytrt_04072019.csv')
 
 #gather the intercepts, linear slopes, and quadratic slopes for all treatments ---------------------------------------------
-#numbers are B.variable.number.parameter (e.g., B.mean.87.slope)
-#variable (second place): 1=mean change, 2=richness change
-#parameter (final digit): 1=intercept, 2=linear slope, 3=quad slope
-#set any that are not significant (CI overlaps 0) as 0
-
+# #numbers are B.variable.number.parameter (e.g., B.mean.87.slope)
+# #variable (second place): 1=mean change, 2=richness change
+# #parameter (final digit): 1=intercept, 2=linear slope, 3=quad slope
+# #set any that are not significant (CI overlaps 0) as 0
+# 
 # #get mean parameter values across all runs for each experiment, treatment, etc
-# chainsFinalMean <- as.data.frame(colMeans(chainsCommunity[,8696:11323]))%>% #may need to delete original four chains dataframes to get this to work
+# chainsFinalMean <- as.data.frame(colMeans(chainsCommunity[,8918:11545]))%>% #may need to delete original four chains dataframes to get this to work
 #   add_rownames('parameter')
-# names(chainsFinalMean)[names(chainsFinalMean) == 'colMeans(chainsCommunity[, 8696:11323])'] <- 'mean'
+# names(chainsFinalMean)[names(chainsFinalMean) == 'colMeans(chainsCommunity[, 8918:11545])'] <- 'mean'
 # #get sd of parameter values across all runs for each experiment, treatment, etc
-# chainsFinalSD <- as.data.frame(colSd(chainsCommunity[,8696:11323]))
-# names(chainsFinalSD)[names(chainsFinalSD) == 'colSd(chainsCommunity[, 8696:11323])'] <- 'sd'
+# chainsFinalSD <- as.data.frame(colSd(chainsCommunity[,8918:11545]))
+# names(chainsFinalSD)[names(chainsFinalSD) == 'colSd(chainsCommunity[, 8918:11545])'] <- 'sd'
 # 
 # chainsFinal <- cbind(chainsFinalMean, chainsFinalSD)%>%
 #   #split names into parts
@@ -222,11 +222,8 @@ chainsExperiment <- chainsFinal%>%
 chainsEquations <- chainsExperiment%>%
   #get standardized experiment length
   mutate(alt_length=experiment_length - min_year)%>%
-  mutate(alt_length=ifelse(alt_length>=20, 19, alt_length))%>%
-  mutate(yr9=ifelse(variable=='mean', (intercept+linear*7+quadratic*7^2)*(0.1725573)+(0.3215148), (intercept+linear*7+quadratic*7^2)*(0.3294397)+(-0.1075646)))%>%
-  mutate(yr_final=ifelse(variable=='mean', (intercept+linear*alt_length+quadratic*alt_length^2)*(0.1725573)+(0.3215148),
-                         (intercept+linear*alt_length+quadratic*alt_length^2)*(0.3294397)+(-0.1075646)))%>%
-  mutate(color=ifelse(rrich<31, '#1104DC44', ifelse(rrich<51&rrich>30, '#4403AE55', ifelse(rrich<71&rrich>50, '#77038166', ifelse(rrich>70, '#DD032688', 'grey')))))%>%
+  # mutate(alt_length=ifelse(alt_length>=20, 19, alt_length))%>%
+  # mutate(color=ifelse(rrich<31, '#1104DC44', ifelse(rrich<51&rrich>30, '#4403AE55', ifelse(rrich<71&rrich>50, '#77038166', ifelse(rrich>70, '#DD032688', 'grey')))))%>%
   mutate(curve1='stat_function(fun=function(x){(',
          curve2=' + ',
          curve3='*((x-',
@@ -234,8 +231,8 @@ chainsEquations <- chainsExperiment%>%
          curve5=') + ',
          curve6='*((x-',
          curve7=')/',
-         curve8=ifelse(variable=='mean', ')^2)*(0.1725573)+(0.3215148)}, size=2, xlim=c(0,',
-                       ')^2)*(0.3294397)+(-0.1075646)}, size=2, xlim=c(0,'),
+         curve8=ifelse(variable=='mean', ')^2)*(0.1860342)+(0.3070874)}, size=2, xlim=c(0,',
+                       ')^2)*(0.340217)+(-0.1183477)}, size=2, xlim=c(0,'),
          curve9=')) +',
          curve=paste(curve1, intercept, curve2, linear, curve3, time_mean, curve4, time_std, curve5, quadratic, curve6, time_mean, curve7, time_std, curve8, alt_length, curve9, sep=''))
   # mutate(trt_overall=ifelse(trt_type=='CO2'|trt_type=='N'|trt_type=='P'|trt_type=='drought'|trt_type=='irr'|trt_type=='precip_vari', 'single_resource', ifelse(trt_type=='burn'|trt_type=='mow_clip'|trt_type=='herb_rem'|trt_type=='temp'|trt_type=='plant_mani', 'single_nonresource', ifelse(trt_type=='all_resource'|trt_type=='both', 'three_way', 'two_way'))))
@@ -1347,92 +1344,92 @@ print(meanPlot8, vp=viewport(layout.pos.row=9, layout.pos.col=2))
 #export at 1200 x 3600
 
 
-
+#remove because we're not comparing across the output anymore due to standardizing time
 # #summary stats from bayesian output --------------------------------------------------------
-# #gather summary stats needed and relabel them
-# chainsCommunitySummary <- chainsCommunity%>%
-#   select(
-#         #trt_type intercepts: center digit refers to trts
-#         E.1.1.1, E.2.1.1, E.1.2.1, E.2.2.1, E.1.3.1, E.2.3.1, E.1.4.1, E.2.4.1, E.1.5.1, E.2.5.1,
-#         E.1.6.1, E.2.6.1, E.1.7.1, E.2.7.1, E.1.8.1, E.2.8.1, E.1.9.1, E.2.9.1, E.1.10.1, E.2.10.1,
-#         E.1.11.1, E.2.11.1, E.1.12.1, E.2.12.1, E.1.13.1, E.2.13.1, E.1.14.1, E.2.14.1, E.1.15.1, E.2.15.1,
-#         E.1.16.1, E.2.16.1,
-#         #trt_type linear slopes: center digit refers to trts
-#         E.1.1.2, E.2.1.2, E.1.2.2, E.2.2.2, E.1.3.2, E.2.3.2, E.1.4.2, E.2.4.2, E.1.5.2, E.2.5.2,
-#         E.1.6.2, E.2.6.2, E.1.7.2, E.2.7.2, E.1.8.2, E.2.8.2, E.1.9.2, E.2.9.2, E.1.10.2, E.2.10.2,
-#         E.1.11.2, E.2.11.2, E.1.12.2, E.2.12.2, E.1.13.2, E.2.13.2, E.1.14.2, E.2.14.2, E.1.15.2, E.2.15.2,
-#         E.1.16.2, E.2.16.2,
-#         #trt_type quadratic slopes: center digit refers to trts and interactions with anpp and gamma diversity
-#         E.1.1.3, E.2.1.3, E.1.2.3, E.2.2.3, E.1.3.3, E.2.3.3, E.1.4.3, E.2.4.3, E.1.5.3, E.2.5.3,
-#         E.1.6.3, E.2.6.3, E.1.7.3, E.2.7.3, E.1.8.3, E.2.8.3, E.1.9.3, E.2.9.3, E.1.10.3, E.2.10.3,
-#         E.1.11.3, E.2.11.3, E.1.12.3, E.2.12.3, E.1.13.3, E.2.13.3, E.1.14.3, E.2.14.3, E.1.15.3, E.2.15.3,
-#         E.1.16.3, E.2.16.3,
-#         #ANPP intercept, linear, and quad slopes (center digit): 2=anpp
-#         D.1.2.1, D.2.2.1,
-#         D.1.2.2, D.2.2.2,
-#         D.1.2.3, D.2.2.3,
-#         #richness intercept, linear, and quad slopes (center digit): 3=gamma diversity
-#         D.1.3.1, D.2.3.1,
-#         D.1.3.2, D.2.3.2,
-#         D.1.3.3, D.2.3.3,
-#         #overall intercept, linear, and quad slopes (center digit): 1=overall
-#         D.1.1.1, D.2.1.1,
-#         D.1.1.2, D.2.1.2,
-#         D.1.1.3, D.2.1.3)
+# # #gather summary stats needed and relabel them
+# # chainsCommunitySummary <- chainsCommunity%>%
+# #   select(
+# #         #trt_type intercepts: center digit refers to trts
+# #         E.1.1.1, E.2.1.1, E.1.2.1, E.2.2.1, E.1.3.1, E.2.3.1, E.1.4.1, E.2.4.1, E.1.5.1, E.2.5.1,
+# #         E.1.6.1, E.2.6.1, E.1.7.1, E.2.7.1, E.1.8.1, E.2.8.1, E.1.9.1, E.2.9.1, E.1.10.1, E.2.10.1,
+# #         E.1.11.1, E.2.11.1, E.1.12.1, E.2.12.1, E.1.13.1, E.2.13.1, E.1.14.1, E.2.14.1, E.1.15.1, E.2.15.1,
+# #         E.1.16.1, E.2.16.1,
+# #         #trt_type linear slopes: center digit refers to trts
+# #         E.1.1.2, E.2.1.2, E.1.2.2, E.2.2.2, E.1.3.2, E.2.3.2, E.1.4.2, E.2.4.2, E.1.5.2, E.2.5.2,
+# #         E.1.6.2, E.2.6.2, E.1.7.2, E.2.7.2, E.1.8.2, E.2.8.2, E.1.9.2, E.2.9.2, E.1.10.2, E.2.10.2,
+# #         E.1.11.2, E.2.11.2, E.1.12.2, E.2.12.2, E.1.13.2, E.2.13.2, E.1.14.2, E.2.14.2, E.1.15.2, E.2.15.2,
+# #         E.1.16.2, E.2.16.2,
+# #         #trt_type quadratic slopes: center digit refers to trts and interactions with anpp and gamma diversity
+# #         E.1.1.3, E.2.1.3, E.1.2.3, E.2.2.3, E.1.3.3, E.2.3.3, E.1.4.3, E.2.4.3, E.1.5.3, E.2.5.3,
+# #         E.1.6.3, E.2.6.3, E.1.7.3, E.2.7.3, E.1.8.3, E.2.8.3, E.1.9.3, E.2.9.3, E.1.10.3, E.2.10.3,
+# #         E.1.11.3, E.2.11.3, E.1.12.3, E.2.12.3, E.1.13.3, E.2.13.3, E.1.14.3, E.2.14.3, E.1.15.3, E.2.15.3,
+# #         E.1.16.3, E.2.16.3,
+# #         #ANPP intercept, linear, and quad slopes (center digit): 2=anpp
+# #         D.1.2.1, D.2.2.1,
+# #         D.1.2.2, D.2.2.2,
+# #         D.1.2.3, D.2.2.3,
+# #         #richness intercept, linear, and quad slopes (center digit): 3=gamma diversity
+# #         D.1.3.1, D.2.3.1,
+# #         D.1.3.2, D.2.3.2,
+# #         D.1.3.3, D.2.3.3,
+# #         #overall intercept, linear, and quad slopes (center digit): 1=overall
+# #         D.1.1.1, D.2.1.1,
+# #         D.1.1.2, D.2.1.2,
+# #         D.1.1.3, D.2.1.3)
+# # 
+# # chainsCommunitySummary <- chainsCommunitySummary%>%
+# #   gather(key=parameter, value=value, D.1.2.1:D.2.1.3)%>%
+# #   group_by(parameter)%>%
+# #   summarise(median=median(value), sd=sd(value))%>%
+# #   ungroup()%>%
+# #   mutate(CI=sd*2)%>%
+# #   separate(parameter, c('level', 'variable', 'predictor', 'parameter'))%>%
+# #   #rename parts to be more clear
+# #   mutate(variable=ifelse(variable==1, 'mean', 'richness'),
+# #          parameter=ifelse(parameter==1, 'intercept', ifelse(parameter==2, 'linear', 'quadratic')),
+# #          predictor2=ifelse(predictor==2, 'ANPP', ifelse(predictor==3, 'rrich', 'overall')))%>%
+# #   select(variable, parameter, predictor2, median, sd, CI)
 # 
-# chainsCommunitySummary <- chainsCommunitySummary%>%
-#   gather(key=parameter, value=value, D.1.2.1:D.2.1.3)%>%
-#   group_by(parameter)%>%
-#   summarise(median=median(value), sd=sd(value))%>%
-#   ungroup()%>%
-#   mutate(CI=sd*2)%>%
-#   separate(parameter, c('level', 'variable', 'predictor', 'parameter'))%>%
-#   #rename parts to be more clear
-#   mutate(variable=ifelse(variable==1, 'mean', 'richness'),
-#          parameter=ifelse(parameter==1, 'intercept', ifelse(parameter==2, 'linear', 'quadratic')),
-#          predictor2=ifelse(predictor==2, 'ANPP', ifelse(predictor==3, 'rrich', 'overall')))%>%
-#   select(variable, parameter, predictor2, median, sd, CI)
-
-# write.csv(chainsCommunitySummary, 'bayesian_output_summary_final plots_expinteraction_20yr_stdtimebytrt_04072019.csv')
-
-chainsCommunitySummary <- read.csv('bayesian_output_summary_final plots_expinteraction_20yr_stdtimebytrt_04072019.csv')
-
-chainsCommunityOverall <- chainsCommunitySummary%>%
-  mutate(type=paste(predictor2, parameter, sep='_'))
-
-
-
-###overall responses from bayesian output --------------------------------------------------------
-meanOverallPlot <- ggplot(data=subset(chainsCommunityOverall, variable=='mean' & predictor2!='trt_type'), aes(x=type, y=median)) +
-  geom_point(size=4) +
-  geom_errorbar(aes(ymin=median-CI, ymax=median+CI, width=0.4)) +
-  # scale_y_continuous(limits=c(-0.15, 0.25), breaks=seq(-0.1, 0.2, 0.1)) +
-  scale_x_discrete(limits=c('rrich_quadratic', 'ANPP_quadratic', 'overall_quadratic', 'rrich_linear', 'ANPP_linear', 'overall_linear'),
-                   labels=c('Gamma', 'ANPP', 'Overall', 'Gamma', 'ANPP', 'Overall')) +
-  theme(axis.title.x=element_blank(), axis.title.y=element_blank(), plot.title=element_text(size=40, vjust=2, margin=margin(b=15))) +
-  geom_hline(aes(yintercept=0)) +
-  geom_vline(aes(xintercept=3.5), linetype='dashed') +
-  coord_flip() +
-  ggtitle('Compositional Difference') +
-  annotate('text', x=6.3, y=-0.15, label='(b)', size=10, hjust='left')
-
-richnessOverallPlot <- ggplot(data=subset(chainsCommunityOverall, variable=='richness' & predictor2!='trt_type'), aes(x=type, y=median)) +
-  geom_point(size=4) +
-  geom_errorbar(aes(ymin=median-CI, ymax=median+CI, width=0.4)) +
-  # scale_y_continuous(limits=c(-0.15, 0.25), breaks=seq(-0.1, 0.2, 0.1)) +
-  scale_x_discrete(limits=c('rrich_quadratic', 'ANPP_quadratic', 'overall_quadratic', 'rrich_linear', 'ANPP_linear', 'overall_linear'),
-                   labels=c('Gamma', 'ANPP', 'Overall', 'Gamma', 'ANPP', 'Overall')) +
-  theme(axis.title.x=element_blank(), axis.title.y=element_blank(), plot.title=element_text(size=40, vjust=2, margin=margin(b=15))) +
-  geom_hline(aes(yintercept=0)) +
-  geom_vline(aes(xintercept=3.5), linetype='dashed') +
-  coord_flip() +
-  ggtitle('Richness Difference') +
-  annotate('text', x=6.3, y=-0.15, label='(a)', size=10, hjust='left')
-
-pushViewport(viewport(layout=grid.layout(1,2)))
-print(richnessOverallPlot, vp=viewport(layout.pos.row = 1, layout.pos.col = 1))
-print(meanOverallPlot, vp=viewport(layout.pos.row = 1, layout.pos.col = 2))
-#export at 1600x1000
+# # write.csv(chainsCommunitySummary, 'bayesian_output_summary_final plots_expinteraction_20yr_stdtimebytrt_04072019.csv')
+# 
+# chainsCommunitySummary <- read.csv('bayesian_output_summary_final plots_expinteraction_20yr_stdtimebytrt_04072019.csv')
+# 
+# chainsCommunityOverall <- chainsCommunitySummary%>%
+#   mutate(type=paste(predictor2, parameter, sep='_'))
+# 
+# 
+# 
+# ###overall responses from bayesian output --------------------------------------------------------
+# meanOverallPlot <- ggplot(data=subset(chainsCommunityOverall, variable=='mean' & predictor2!='trt_type'), aes(x=type, y=median)) +
+#   geom_point(size=4) +
+#   geom_errorbar(aes(ymin=median-CI, ymax=median+CI, width=0.4)) +
+#   # scale_y_continuous(limits=c(-0.15, 0.25), breaks=seq(-0.1, 0.2, 0.1)) +
+#   scale_x_discrete(limits=c('rrich_quadratic', 'ANPP_quadratic', 'overall_quadratic', 'rrich_linear', 'ANPP_linear', 'overall_linear'),
+#                    labels=c('Gamma', 'ANPP', 'Overall', 'Gamma', 'ANPP', 'Overall')) +
+#   theme(axis.title.x=element_blank(), axis.title.y=element_blank(), plot.title=element_text(size=40, vjust=2, margin=margin(b=15))) +
+#   geom_hline(aes(yintercept=0)) +
+#   geom_vline(aes(xintercept=3.5), linetype='dashed') +
+#   coord_flip() +
+#   ggtitle('Compositional Difference') +
+#   annotate('text', x=6.3, y=-0.15, label='(b)', size=10, hjust='left')
+# 
+# richnessOverallPlot <- ggplot(data=subset(chainsCommunityOverall, variable=='richness' & predictor2!='trt_type'), aes(x=type, y=median)) +
+#   geom_point(size=4) +
+#   geom_errorbar(aes(ymin=median-CI, ymax=median+CI, width=0.4)) +
+#   # scale_y_continuous(limits=c(-0.15, 0.25), breaks=seq(-0.1, 0.2, 0.1)) +
+#   scale_x_discrete(limits=c('rrich_quadratic', 'ANPP_quadratic', 'overall_quadratic', 'rrich_linear', 'ANPP_linear', 'overall_linear'),
+#                    labels=c('Gamma', 'ANPP', 'Overall', 'Gamma', 'ANPP', 'Overall')) +
+#   theme(axis.title.x=element_blank(), axis.title.y=element_blank(), plot.title=element_text(size=40, vjust=2, margin=margin(b=15))) +
+#   geom_hline(aes(yintercept=0)) +
+#   geom_vline(aes(xintercept=3.5), linetype='dashed') +
+#   coord_flip() +
+#   ggtitle('Richness Difference') +
+#   annotate('text', x=6.3, y=-0.15, label='(a)', size=10, hjust='left')
+# 
+# pushViewport(viewport(layout=grid.layout(1,2)))
+# print(richnessOverallPlot, vp=viewport(layout.pos.row = 1, layout.pos.col = 1))
+# print(meanOverallPlot, vp=viewport(layout.pos.row = 1, layout.pos.col = 2))
+# #export at 1600x1000
 
 
 
@@ -1442,10 +1439,10 @@ print(meanOverallPlot, vp=viewport(layout.pos.row = 1, layout.pos.col = 2))
 nData <- read.csv('ForAnalysis_allAnalysisNmag.csv')
 
 nDataMean <- nData%>%
-  summarise(mean_mean_change=mean(mean_change), sd_mean_change=sd(mean_change), mean_S_PC=mean(S_PC), sd_S_PC=sd(S_PC))
+  summarise(mean_mean_change=mean(composition_diff), sd_mean_change=sd(composition_diff), mean_S_PC=mean(S_PC), sd_S_PC=sd(S_PC))
 
 #mean change
-Nmean <- read.csv('C:\\Users\\lapie\\Dropbox (Smithsonian)\\working groups\\converge diverge working group\\converge_diverge\\nate_results\\manipulation\\posteriors_N_MeanChange.csv', comment.char='#')
+Nmean <- read.csv('C:\\Users\\lapie\\Dropbox (Smithsonian)\\working groups\\converge diverge working group\\converge_diverge\\La Pierre_comm difference_final model results_01122018\\magnitude_042019\\posteriors_N_MeanChange.csv', comment.char='#')
 NmeanMean <- as.data.frame(colMeans(Nmean))%>%
   add_rownames('parameter')
 names(NmeanMean)[names(NmeanMean) == 'colMeans(Nmean)'] <- 'mean'
@@ -1458,11 +1455,11 @@ NmeanOverall <- NmeanMean%>%
 
 # #get mean and sd to transform
 # nDataSummary <- nData%>%
-#   summarise(mean_change_mean=mean(mean_change), mean_change_sd=sd(mean_change), richness_mean=mean(S_PC), richness_sd=sd(S_PC), n_mean=mean(n), n_sd=sd(n), MAP_mean=mean(MAP), MAP_sd=sd(MAP))
+#   summarise(mean_change_mean=mean(composition_diff), mean_change_sd=sd(composition_diff), richness_mean=mean(S_PC), richness_sd=sd(S_PC), n_mean=mean(n), n_sd=sd(n), MAP_mean=mean(MAP), MAP_sd=sd(MAP))
 
 nDataTransform <- nData%>%
   #transform mean change
-  mutate(mean_change_transform=((mean_change-mean(mean_change))/sd(mean_change)))%>%
+  mutate(mean_change_transform=((composition_diff-mean(composition_diff))/sd(composition_diff)))%>%
   #transform proportional richness change
   mutate(S_PC_transform=((S_PC-mean(S_PC))/sd(S_PC)))%>%
   #transform N treatment magnitude
@@ -1470,10 +1467,10 @@ nDataTransform <- nData%>%
   #transform MAP
   mutate(MAP_transform=((MAP-mean(MAP))/sd(MAP)))
 
-meanNPlotFinal <- ggplot(data=subset(nData), aes(x=n, y=mean_change, color=MAP)) +
+meanNPlotFinal <- ggplot(data=subset(nData), aes(x=n, y=composition_diff, color=MAP)) +
   geom_point(size=5) +
   coord_cartesian(ylim=c(0,1)) +
-  scale_y_continuous(name='Compositional Response') +
+  scale_y_continuous(name='Composition Response') +
   stat_function(fun=function(x){(0.02512656 + 0.40341207*((1000-661.9362)/298.3696) + 0.54133077*(x-9.992142)/9.108662 + 0.28058497*((1000-661.9362)/298.3696)*(x-9.992142)/9.108662)*0.1658319+0.3699378}, size=5, color='#4793CF')  +
   stat_function(fun=function(x){(0.02512656 + 0.40341207*((600-661.9362)/298.3696) + 0.54133077*(x-9.992142)/9.108662 + 0.28058497*((600-661.9362)/298.3696)*(x-9.992142)/9.108662)*0.1658319+0.3699378}, size=5, color='#2D5E88') +
   stat_function(fun=function(x){(0.02512656 + 0.40341207*((200-661.9362)/298.3696) + 0.54133077*(x-9.992142)/9.108662 + 0.28058497*((200-661.9362)/298.3696)*(x-9.992142)/9.108662)*0.1658319+0.3699378}, size=5, color='#153049') +
@@ -1506,7 +1503,7 @@ richnessNPlotFinal <- ggplot(data=nData, aes(x=n, y=S_PC, color=MAP)) +
 #drought change
 droData <- read.csv('ForAnalysis_allAnalysisH2Omag_drought.csv')
 
-meanDroPlotFinal <- ggplot(data=droData, aes(x=precip, y=mean_change)) +
+meanDroPlotFinal <- ggplot(data=droData, aes(x=precip, y=composition_diff)) +
   geom_point(size=5) +
   coord_cartesian(ylim=c(0,1)) +
   scale_y_continuous(name='') +
@@ -1525,7 +1522,7 @@ richnessDroPlotFinal <- ggplot(data=droData, aes(x=precip, y=S_PC, color=MAP)) +
 #irrigation change
 irrData <- read.csv('ForAnalysis_allAnalysisH2Omag_irr.csv')
 
-meanIrrPlotFinal <- ggplot(data=irrData, aes(x=precip, y=mean_change)) +
+meanIrrPlotFinal <- ggplot(data=irrData, aes(x=precip, y=composition_diff)) +
   geom_point(size=5) +
   coord_cartesian(ylim=c(0,1)) +
   scale_y_continuous(name='') +
