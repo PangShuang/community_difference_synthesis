@@ -12,25 +12,53 @@ library(tidyverse)
 #kim
 setwd('C:\\Users\\lapie\\Dropbox (Smithsonian)\\working groups\\converge diverge working group\\converge_diverge\\datasets\\LongForm')
 
-#without intercept-only significance
-correProp <- read.csv('proportions significant comp difference_by trt type.csv')%>%
-  filter(total_possible>4)%>%
-  mutate(no_mean_change=total_possible-mean_change_nointercept, no_richness_change=total_possible-richness_change_nointercept)
+#significant lines
+correTotal <- read.csv('treatment_response_shape_classification_stdtimebytrt_04072019.csv')%>%
+  select(variable, trt_type, site_code, project_name, community_type, treatment, shape_category)%>%
+  group_by(variable, trt_type)%>%
+  summarise(total_possible=length(trt_type))%>%
+  ungroup()
+
+correProp <- read.csv('treatment_response_shape_classification_stdtimebytrt_04072019.csv')%>%
+  select(variable, trt_type, site_code, project_name, community_type, treatment, shape_category)%>%
+  mutate(sig_line=ifelse(shape_category==0, 0, 1))%>%
+  group_by(variable, trt_type)%>%
+  summarise(count_sig=sum(sig_line))%>%
+  ungroup()%>%
+  left_join(correTotal)%>%
+  mutate(count_nonsig=total_possible-count_sig)
 
 ###treatment type
 #richness responses
-prop.test(x=as.matrix(correProp[,c('richness_change_nointercept', 'no_richness_change')]), alternative='two.sided')
+correPropRich <- correProp%>%filter(variable=='richness')
+prop.test(x=as.matrix(correPropRich[,c('count_sig', 'count_nonsig')]), alternative='two.sided')
 #compositional responses
-prop.test(x=as.matrix(correProp[,c('mean_change_nointercept', 'no_mean_change')]), alternative='two.sided')
+correPropComp <- correProp%>%filter(variable=='mean')
+prop.test(x=as.matrix(correPropComp[,c('count_sig', 'count_nonsig')]), alternative='two.sided')
 
 
 ###treatment category
-correPropCategory <- correProp%>%
-  group_by(resource_category)%>%
-  summarise(sum_richness_change_nointercept=sum(richness_change_nointercept), sum_no_richness_change=sum(no_richness_change), sum_mean_change_nointercept=sum(mean_change_nointercept), sum_no_mean_change=sum(no_mean_change))%>%
+#significant lines
+correTotalCategory <- read.csv('treatment_response_shape_classification_stdtimebytrt_04072019.csv')%>%
+  select(variable, trt_type, site_code, project_name, community_type, treatment, shape_category)%>%
+  mutate(trt_category=ifelse(trt_type %in% c('threeway','RxRxR','RxR','RxN','NxN'), as.character(trt_type), ifelse(trt_type %in% c('burn','herb_removal','mow_clip','other_nonresource'), 'single_nonresource', 'single_resource')))%>%
+  group_by(variable, trt_category)%>%
+  summarise(total_possible=length(trt_category))%>%
   ungroup()
 
+correPropCategory <- read.csv('treatment_response_shape_classification_stdtimebytrt_04072019.csv')%>%
+  select(variable, trt_type, site_code, project_name, community_type, treatment, shape_category)%>%
+  mutate(trt_category=ifelse(trt_type %in% c('threeway','RxRxR','RxR','RxN','NxN'), as.character(trt_type), ifelse(trt_type %in% c('burn','herb_removal','mow_clip','other_nonresource'), 'single_nonresource', 'single_resource')))%>%
+  mutate(sig_line=ifelse(shape_category==0, 0, 1))%>%
+  group_by(variable, trt_category)%>%
+  summarise(count_sig=sum(sig_line))%>%
+  ungroup()%>%
+  left_join(correTotalCategory)%>%
+  mutate(count_nonsig=total_possible-count_sig)
+
 #richness responses
-prop.test(x=as.matrix(correPropCategory[,c('sum_richness_change_nointercept', 'sum_no_richness_change')]), alternative='two.sided')
+correPropCategoryRich <- correPropCategory%>%filter(variable=='richness')
+prop.test(x=as.matrix(correPropCategoryRich[,c('count_sig', 'count_nonsig')]), alternative='two.sided')
 #compositional responses
-prop.test(x=as.matrix(correPropCategory[,c('sum_mean_change_nointercept', 'sum_no_mean_change')]), alternative='two.sided')
+correPropCategoryComp <- correPropCategory%>%filter(variable=='mean')
+prop.test(x=as.matrix(correPropCategoryComp[,c('count_sig', 'count_nonsig')]), alternative='two.sided')
