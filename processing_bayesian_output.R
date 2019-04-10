@@ -70,7 +70,7 @@ rawData <- read.csv('ForAnalysis_allAnalysisAllDatasets_04082019.csv')
 rawData2<- rawData%>%
   left_join(trtInfo1)%>%
   filter(anpp!='NA', treatment_year!=0)%>%
-  summarise(mean_mean=mean(composition_diff), std_mean=sd(composition_diff), mean_rich=mean(S_lnRR), std_rich=sd(S_lnRR)) #to backtransform
+  summarise(mean_mean=mean(composition_diff), std_mean=sd(composition_diff), mean_rich=mean(S_lnRR), std_rich=sd(S_lnRR), mean_eH=mean(expH_lnRR), std_eH=sd(expH_lnRR), mean_PC=mean(S_PC), std_PC=sd(S_PC)) #to backtransform
 
 #select just data in this analysis
 expInfo2 <- rawData%>%
@@ -204,6 +204,23 @@ chainsFinal <- cbind(chainsFinalMean, chainsFinalSD)%>%
   spread(key=parameter, value=mean)
 
 # write.csv(chainsFinal, 'stdtimebytrt_N01_means_04092019.csv')
+
+
+#don't set mean to 0 to address reviewer 1 comments (for example only, but for main figures we set non-sig parameters to 0)
+chainsFinalAlt <- cbind(chainsFinalMean, chainsFinalSD)%>%
+  #split names into parts
+  separate(parameter, c('B', 'variable', 'id', 'parameter'))%>%
+  select(-B)%>%
+  #rename parts to be more clear
+  mutate(variable=ifelse(variable==1, 'mean', 'richness'),
+         parameter=ifelse(parameter==1, 'intercept', ifelse(parameter==2, 'linear', 'quadratic')),
+         id=as.integer(id))%>%
+  mutate(lower=mean-2*sd, upper=mean+2*sd, lower_sign=sign(lower), upper_sign=sign(upper), diff=lower_sign-upper_sign)%>%
+  #spread by variable
+  select(variable, id, parameter, mean)%>%
+  spread(key=parameter, value=mean)
+
+# write.csv(chainsFinalAlt, 'stdtimebytrt_N01_means_not0_04092019.csv')
 
 
 #merge together with experiment list
@@ -498,7 +515,7 @@ chainsEquations <- chainsExperiment%>%
          curve6='*((x-',
          curve7=')/',
          curve8=ifelse(variable=='mean', ')^2)*(0.1860342)+(0.3070874)}, size=2, xlim=c(0,',
-                       ')^2)*(0.340217)+(-0.1183477)}, size=2, xlim=c(0,'),
+                       ')^2)*(0.33205)+(-0.09101243)}, size=2, xlim=c(0,'),
          curve9=')) +',
          curve=paste(curve1, intercept, curve2, linear, curve3, time_mean, curve4, time_std, curve5, quadratic, curve6, time_mean, curve7, time_std, curve8, alt_length, curve9, sep=''))
 # mutate(trt_overall=ifelse(trt_type=='CO2'|trt_type=='N'|trt_type=='P'|trt_type=='drought'|trt_type=='irr'|trt_type=='precip_vari', 'single_resource', ifelse(trt_type=='burn'|trt_type=='mow_clip'|trt_type=='herb_rem'|trt_type=='temp'|trt_type=='plant_mani', 'single_nonresource', ifelse(trt_type=='all_resource'|trt_type=='both', 'three_way', 'two_way'))))
@@ -633,7 +650,7 @@ chainsEquations <- chainsExperiment%>%
          curve6='*((x-',
          curve7=')/',
          curve8=ifelse(variable=='mean', ')^2)*(0.1860342)+(0.3070874)}, size=2, xlim=c(0,',
-                       ')^2)*(0.340217)+(-0.1183477)}, size=2, xlim=c(0,'),
+                       ')^2)*(0.2458553)+(-0.06898448)}, size=2, xlim=c(0,'),
          curve9=')) +',
          curve=paste(curve1, intercept, curve2, linear, curve3, time_mean, curve4, time_std, curve5, quadratic, curve6, time_mean, curve7, time_std, curve8, alt_length, curve9, sep=''))
 # mutate(trt_overall=ifelse(trt_type=='CO2'|trt_type=='N'|trt_type=='P'|trt_type=='drought'|trt_type=='irr'|trt_type=='precip_vari', 'single_resource', ifelse(trt_type=='burn'|trt_type=='mow_clip'|trt_type=='herb_rem'|trt_type=='temp'|trt_type=='plant_mani', 'single_nonresource', ifelse(trt_type=='all_resource'|trt_type=='both', 'three_way', 'two_way'))))
