@@ -1,7 +1,7 @@
 ################################################################################
 ##  results_figures_all_years: Compiles Bayesian output and makes figures for the primary analysis of richness and compositonal differences between treatment and control plots.
 ##
-##  Author: Kimberly La Pierre
+##  Author: Kimberly Komatsu
 ##  Date created: January 17, 2018
 ##  See https://github.com/klapierre/Converge_Diverge/blob/master/core%20data%20paper_bayesian%20results_figures_sig%20test_expinteractions_20yr.R for full history.
 ################################################################################

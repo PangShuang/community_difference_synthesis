@@ -1,7 +1,7 @@
 ################################################################################
 ##  treatment_information.R: Manually code the treatment information for all experiments based on meta-data provided by experiment PIs. ((Twenty-times checked for accuracy. Oh boy.))
 ##
-##  Author: Kimberly La Pierre, Meghan Avolio
+##  Author: Kimberly Komatsu, Meghan Avolio
 ##  Date created: November 19, 2015
 ##  See https://github.com/klapierre/Converge_Diverge/blob/master/Merging%20to%20a%20single%20file_11172015.R for full history.
 ################################################################################

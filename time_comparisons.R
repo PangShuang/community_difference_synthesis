@@ -1,7 +1,7 @@
 ################################################################################
 ##  time_comparisons.R: Calculating changes and differences between treatment and control plots between first and last years of treatments for only the treatments that exhibited significant curvature.
 ##
-##  Author: Kimberly La Pierre
+##  Author: Kimberly Komatsu
 ##  Date created: March 18, 2019
 ################################################################################
 

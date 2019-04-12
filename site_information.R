@@ -1,7 +1,7 @@
 ################################################################################
 ##  site_information.R: Calculates gamma diversity and compiles site-level ANPP (control plots) for each experiment. Compiles MAP and MAT for each site.
 ##
-##  Author: Kimberly La Pierre, Meghan Avolio
+##  Author: Kimberly Komatsu, Meghan Avolio
 ##  Date created: November 20, 2015
 ##  See https://github.com/klapierre/Converge_Diverge/blob/master/site_information_11202015.R for full history.
 ################################################################################

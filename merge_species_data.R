@@ -1,7 +1,7 @@
 ################################################################################
 ##  merge_species_data.R: Merging together species raw abundance data from all projects.
 ##
-##  Author: Kimberly La Pierre, Meghan Avolio
+##  Author: Kimberly Komatsu, Meghan Avolio
 ##  Date created: November 19, 2015
 ##  See https://github.com/klapierre/Converge_Diverge/commits/master/Merging%20to%20a%20single%20file_11172015.R for full history.
 ################################################################################
