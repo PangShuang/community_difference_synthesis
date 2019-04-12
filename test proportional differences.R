@@ -46,18 +46,14 @@ prop.test(x=as.matrix(correPropComp[,c('count_sig', 'total_possible')]), alterna
 correPropRich <- correProp%>%filter(variable=='richness')%>%select(trt_type,count_sig,count_nonsig)
 trtType <- as.character(correPropRich$trt_type)
 correPropRichMatrix <- as.matrix(correPropRich[,c('count_sig', 'count_nonsig')], ncol=2, dimnames=list(rownames(c('CO2','drought','herb_removal','irr','mow_clip','N','other_nonresource','other_resource','P','plant_mani','precip_vari','temp')), colnames(c('count_sig','count_nonsig'))), byrow=T)
-fisher.test(correPropRichMatrix)
+fisher.test(correPropRichMatrix, workspace = 2e8)
+fisher.multcomp(correPropRichMatrix)
 #compositional responses
-correPropComp <- correProp%>%filter(variable=='mean')
-prop.test(x=as.matrix(correPropComp[,c('count_sig', 'total_possible')]), alternative='two.sided')
-
-
-
-
-tab.cont1 <- matrix(c(17,23,12,24,20,10),ncol=2,dimnames=list(c("Control",
-                                                                "Treatment1","Treatment2"),c("Alive","Dead")),byrow=TRUE)
-fisher.test(tab.cont1)
-fisher.multcomp(tab.cont1)
+correPropComp <- correProp%>%filter(variable=='mean')%>%select(trt_type,count_sig,count_nonsig)
+trtType <- as.character(correPropComp$trt_type)
+correPropCompMatrix <- as.matrix(correPropComp[,c('count_sig', 'count_nonsig')], ncol=2, dimnames=list(rownames(c('CO2','drought','herb_removal','irr','mow_clip','N','other_nonresource','other_resource','P','plant_mani','precip_vari','temp')), colnames(c('count_sig','count_nonsig'))), byrow=T)
+fisher.test(correPropCompMatrix, workspace = 2e8)
+fisher.multcomp(correPropCompMatrix)
 
 
 
@@ -87,3 +83,18 @@ prop.test(x=as.matrix(correPropCategoryRich[,c('count_sig', 'total_possible')]),
 #compositional responses
 correPropCategoryComp <- correPropCategory%>%filter(variable=='mean')
 prop.test(x=as.matrix(correPropCategoryComp[,c('count_sig', 'total_possible')]), alternative='two.sided')
+
+
+###treatment type -- single factor treatments only
+#richness responses
+correPropRich <- correPropCategory%>%filter(variable=='richness')%>%select(trt_category,count_sig,count_nonsig)
+trtType <- as.character(correPropRich$trt_category)
+correPropRichMatrix <- as.matrix(correPropRich[,c('count_sig', 'count_nonsig')], ncol=2, dimnames=list(rownames(c('NxN','RxN','RxR','RxRxR','single_nonresource','single_resource','threeway')), colnames(c('count_sig','count_nonsig'))), byrow=T)
+fisher.test(correPropRichMatrix, workspace = 2e8)
+fisher.multcomp(correPropRichMatrix)
+#compositional responses
+correPropComp <- correPropCategory%>%filter(variable=='mean')%>%select(trt_category,count_sig,count_nonsig)
+trtType <- as.character(correPropComp$trt_category)
+correPropCompMatrix <- as.matrix(correPropComp[,c('count_sig', 'count_nonsig')], ncol=2, dimnames=list(rownames(c('NxN','RxN','RxR','RxRxR','single_nonresource','single_resource','threeway')), colnames(c('count_sig','count_nonsig'))), byrow=T)
+fisher.test(correPropCompMatrix, workspace = 2e8)
+fisher.multcomp(correPropCompMatrix)
