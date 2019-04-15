@@ -384,9 +384,9 @@ for.analysis.change=rbind(for.analysis.change, changeKBStilled, changeKBSuntille
 # write.csv(for.analysis.difference, 'time_comparisons_change.csv')
 
 ###final numbers for difference and change
-curveShape <- read.csv('treatment_response_shape_classification_stdtimebytrt_04072019.csv')%>%
-  select(variable, site_code, project_name, community_type, treatment, shape_category)%>%
-  spread(key=variable, value=shape_category)%>%
+curveShape <- read.csv('stdtimebytrt_shape_classification_04072019.csv')%>%
+  select(variable, site_code, project_name, community_type, treatment, N01_shape)%>%
+  spread(key=variable, value=N01_shape)%>%
   rename(mean_shape=mean, richness_shape=richness)
 
 #compositional difference
@@ -418,7 +418,7 @@ changeCtlMean <- for.analysis.change%>%
   mutate(mean_shape=ifelse(treatment=='TRUECONTROL', 999, mean_shape))%>%
   filter(mean_shape==999)%>%
   mutate(site_project_comm=paste(site_code, project_name, community_type, sep='::'))%>%
-  filter(site_project_comm %in% expToUse$site_project_comm)
+  filter(site_project_comm %in% expToUseMean$site_project_comm)
 
 changeAllMean <- rbind(changeTrtMean, changeCtlMean)%>%
   mutate(comparison=ifelse(treatment=='TRUECONTROL', 'ctl_first-last', 'trt_first-last'))%>%
@@ -457,7 +457,7 @@ changeCtlRich <- for.analysis.change%>%
   mutate(richness_shape=ifelse(treatment=='TRUECONTROL', 999, richness_shape))%>%
   filter(richness_shape==999)%>%
   mutate(site_project_comm=paste(site_code, project_name, community_type, sep='::'))%>%
-  filter(site_project_comm %in% expToUse$site_project_comm)
+  filter(site_project_comm %in% expToUseRich$site_project_comm)
 
 changeAllRich <- rbind(changeTrtRich, changeCtlRich)%>%
   mutate(comparison=ifelse(treatment=='TRUECONTROL', 'ctl_first-last', 'trt_first-last'))%>%
@@ -471,24 +471,35 @@ meanComparisonFig <- ggplot(data=barGraphStats(data=comparisonsMean, variable="v
   geom_bar(stat='identity', color='black', fill='white') +
   geom_errorbar(aes(ymin=mean-se, ymax=mean+se), width=0.2) +
   ylab('') +
-  scale_x_discrete(limits=c('ctl_first-last', 'trt_first-last', 'trt-ctl_first', 'trt-ctl_last'),
-                   labels=c('ctl change', 'trt change', 'initial diff', 'final diff')) +
+  scale_x_discrete(limits=c('trt-ctl_first', 'ctl_first-last', 'trt_first-last'),
+                   labels=c('initial diff', 'ctl change', 'trt change')) +
   theme(axis.title.x=element_blank()) +
-  annotate('text', x=0.5, y=0.65, label='(b) Composition Response', size=12, hjust='left')
+  annotate('text', x=0.5, y=0.65, label='(b) Composition Response', size=12, hjust='left') +
+  annotate('text', x=1, y=0.29, label='a', size=12, hjust='center') +
+  annotate('text', x=2, y=0.52, label='b', size=12, hjust='center') +
+  annotate('text', x=3, y=0.57, label='b', size=12, hjust='center')
   
 
 richComparisonFig <- ggplot(data=barGraphStats(data=comparisonsRich, variable="value", byFactorNames=c("comparison")), aes(x=comparison, y=mean)) +
   geom_bar(stat='identity', color='black', fill='white') +
   geom_errorbar(aes(ymin=mean-se, ymax=mean+se), width=0.2) +
   ylab('Response Magnitude') +
-  scale_x_discrete(limits=c('ctl_first-last', 'trt_first-last', 'trt-ctl_first', 'trt-ctl_last'),
-                   labels=c('ctl change', 'trt change', 'initial diff', 'final diff')) +
+  scale_x_discrete(limits=c('trt-ctl_first', 'ctl_first-last', 'trt_first-last'),
+                   labels=c('initial diff', 'ctl change', 'trt change')) +
   theme(axis.title.x=element_blank()) +
-  annotate('text', x=0.5, y=0.65, label='(a) Richness Response', size=12, hjust='left')
+  annotate('text', x=0.5, y=0.65, label='(a) Richness Response', size=12, hjust='left') +
+  annotate('text', x=1, y=0.27, label='a', size=12, hjust='center') +
+  annotate('text', x=2, y=0.60, label='b', size=12, hjust='center') +
+  annotate('text', x=3, y=0.55, label='b', size=12, hjust='center')
 
 pushViewport(viewport(layout=grid.layout(1,2)))
 print(richComparisonFig, vp=viewport(layout.pos.row = 1, layout.pos.col = 1))
 print(meanComparisonFig, vp=viewport(layout.pos.row = 1, layout.pos.col = 2))
 #export at 2400 x 1200
 
+summary(aov(value~comparison, data=subset(comparisonsMean, comparison!='trt-ctl_last')))
+pairwise.t.test(comparisonsMean$value, comparisonsMean$comparison)
+
+summary(aov(value~comparison, data=subset(comparisonsRich, comparison!='trt-ctl_last')))
+pairwise.t.test(comparisonsRich$value, comparisonsRich$comparison)
 
