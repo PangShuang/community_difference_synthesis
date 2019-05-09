@@ -108,17 +108,20 @@ trtInfo <- rawData%>%
 ################################################################################
 trtShape <- read.csv('stdtimebytrt_shape_classification_04072019.csv')
 
+#do the parabolic shapes cluster in certain trt types?
+para <- trtShape%>%filter(N01_shape>6)%>%group_by(trt_type, variable)%>%summarise(n=length(variable))%>%ungroup()
+
 
 ###main figure (Figure 1)
-# compositional response panels 
+# compositional response panels------------ 
 #------------------------
 meanPlot0 <- ggplot(data=data.frame(x=c(0,0))) + 
-  coord_cartesian(ylim=c(0,1))  +
+  coord_cartesian(ylim=c(0,1.1))  +
   scale_x_continuous(limits=c(0,30), breaks=seq(4,30,5), labels=seq(5,30,5)) +
   ylim(-10,10) +
   xlab('') +
   ylab('') +
-  annotate('text', x=0, y=1, label='(b) 64.4%', size=15, hjust='left') +
+  annotate('text', x=0, y=1, label='(j) 64.4%', size=15, hjust='left') +
   #below are the individual treatment lines
   stat_function(fun=function(x){(-0.545480733206665 + 0*((x-1)/1) + 0*((x-1)/1)^2)*(0.1860342)+(0.3070874)}, size=2, xlim=c(0,2)) +
   stat_function(fun=function(x){(0 + 0*((x-1)/1) + 0*((x-1)/1)^2)*(0.1860342)+(0.3070874)}, size=2, xlim=c(0,2)) +
@@ -408,12 +411,12 @@ meanPlot0 <- ggplot(data=data.frame(x=c(0,0))) +
 
 #------------------------
 meanPlot1 <- ggplot(data=data.frame(x=c(0,0))) + 
-  coord_cartesian(ylim=c(0,1))  +
+  coord_cartesian(ylim=c(0,1.1))  +
   scale_x_continuous(limits=c(0,30), breaks=seq(4,30,5), labels=seq(5,30,5)) +
   ylim(-10,10) +
   xlab('') +
   ylab('') +
-  annotate('text', x=0, y=1, label='(d) 21.2%', size=15, hjust='left') +
+  annotate('text', x=0, y=1, label='(k) 21.2%', size=15, hjust='left') +
   #below are the individual treatment lines
   stat_function(fun=function(x){(0.6803039682 + 0.430476176647*((x-5.5)/3.60555127546399) + 0*((x-5.5)/3.60555127546399)^2)*(0.1860342)+(0.3070874)}, size=2, xlim=c(0,11)) +
   stat_function(fun=function(x){(0.74415501475 + 0.56593681165*((x-5.63636363636364)/3.93122696553448) + 0*((x-5.63636363636364)/3.93122696553448)^2)*(0.1860342)+(0.3070874)}, size=2, xlim=c(0,12)) +
@@ -513,12 +516,12 @@ meanPlot1 <- ggplot(data=data.frame(x=c(0,0))) +
   
 #------------------------
 meanPlot2 <- ggplot(data=data.frame(x=c(0,0))) + 
-  coord_cartesian(ylim=c(0,1))  +
+  coord_cartesian(ylim=c(0,1.1))  +
   scale_x_continuous(limits=c(0,30), breaks=seq(4,30,5), labels=seq(5,30,5)) +
   ylim(-10,10) +
   xlab('') +
   ylab('') +
-  annotate('text', x=0, y=1, label='(f) 1.1%', size=15, hjust='left') +
+  annotate('text', x=0, y=1, label='(o) 1.1%', size=15, hjust='left') +
   #below are the individual treatment lines
   stat_function(fun=function(x){(0.3586980483978 + 0.6703595036*((x-5)/3.3166247903554) + 0.186086150542465*((x-5)/3.3166247903554)^2)*(0.1860342)+(0.3070874)}, size=2, xlim=c(0,10)) +
   stat_function(fun=function(x){(-0.592662817399 + 0.2644996450147*((x-5)/3.3166247903554) + 0.25718613591405*((x-5)/3.3166247903554)^2)*(0.1860342)+(0.3070874)}, size=2, xlim=c(0,10)) +
@@ -530,12 +533,12 @@ meanPlot2 <- ggplot(data=data.frame(x=c(0,0))) +
   
 #------------------------
 meanPlot3 <- ggplot(data=data.frame(x=c(0,0))) + 
-  coord_cartesian(ylim=c(0,1))  +
+  coord_cartesian(ylim=c(0,1.1))  +
   scale_x_continuous(limits=c(0,30), breaks=seq(4,30,5), labels=seq(5,30,5)) +
   ylim(-10,10) +
   xlab('') +
   ylab('') +
-  annotate('text', x=0, y=1, label='(h) 3.2%', size=15, hjust='left') +
+  annotate('text', x=0, y=1, label='(p) 3.2%', size=15, hjust='left') +
   #below are the individual treatment lines
   stat_function(fun=function(x){(1.9018044975 + 0.6200037609*((x-12.4)/8.13428956127495) + -0.1480241259277*((x-12.4)/8.13428956127495)^2)*(0.1860342)+(0.3070874)}, size=2, xlim=c(0,30)) +
   stat_function(fun=function(x){(2.4725529915 + 0.6659252855*((x-12.4)/8.13428956127495) + -0.253791414825*((x-12.4)/8.13428956127495)^2)*(0.1860342)+(0.3070874)}, size=2, xlim=c(0,30)) +
@@ -555,18 +558,7 @@ meanPlot3 <- ggplot(data=data.frame(x=c(0,0))) +
   
 #------------------------
 meanPlot4 <- ggplot(data=data.frame(x=c(0,0))) + 
-  coord_cartesian(ylim=c(0,1))  +
-  scale_x_continuous(limits=c(0,30), breaks=seq(4,30,5), labels=seq(5,30,5)) +
-  ylim(-10,10) +
-  xlab('') +
-  ylab('') +
-  annotate('text', x=0, y=1, label='(j) 0%', size=15, hjust='left')
-  #below are the individual treatment lines
-  
-
-#------------------------ 
-meanPlot5 <- ggplot(data=data.frame(x=c(0,0))) + 
-  coord_cartesian(ylim=c(0,1))  +
+  coord_cartesian(ylim=c(0,1.1))  +
   scale_x_continuous(limits=c(0,30), breaks=seq(4,30,5), labels=seq(5,30,5)) +
   ylim(-10,10) +
   xlab('') +
@@ -575,25 +567,36 @@ meanPlot5 <- ggplot(data=data.frame(x=c(0,0))) +
   #below are the individual treatment lines
   
 
-#------------------------
-meanPlot6 <- ggplot(data=data.frame(x=c(0,0))) + 
-  coord_cartesian(ylim=c(0,1))  +
+#------------------------ 
+meanPlot5 <- ggplot(data=data.frame(x=c(0,0))) + 
+  coord_cartesian(ylim=c(0,1.1))  +
   scale_x_continuous(limits=c(0,30), breaks=seq(4,30,5), labels=seq(5,30,5)) +
   ylim(-10,10) +
   xlab('') +
   ylab('') +
-  annotate('text', x=0, y=1, label='(n) 0%', size=15, hjust='left')
+  annotate('text', x=0, y=1, label='(q) 0%', size=15, hjust='left')
+  #below are the individual treatment lines
+  
+
+#------------------------
+meanPlot6 <- ggplot(data=data.frame(x=c(0,0))) + 
+  coord_cartesian(ylim=c(0,1.1))  +
+  scale_x_continuous(limits=c(0,30), breaks=seq(4,30,5), labels=seq(5,30,5)) +
+  ylim(-10,10) +
+  xlab('Year of Experiment') +
+  ylab('') +
+  annotate('text', x=0, y=1, label='(r) 0%', size=15, hjust='left')
   #below are the individual treatment lines
   
 
 #------------------------
 meanPlot7 <- ggplot(data=data.frame(x=c(0,0))) + 
-  coord_cartesian(ylim=c(0,1))  +
+  coord_cartesian(ylim=c(0,1.1))  +
   scale_x_continuous(limits=c(0,30), breaks=seq(4,30,5), labels=seq(5,30,5)) +
   ylim(-10,10) +
   xlab('') +
   ylab('') +
-  annotate('text', x=0, y=1, label='(p) 9.6%', size=15, hjust='left') +
+  annotate('text', x=0, y=1, label='(m) 9.6%', size=15, hjust='left') +
   #below are the individual treatment lines  
   stat_function(fun=function(x){(-0.395011920057185 + 0*((x-2)/1.58113883008419) + -0.22781205201671*((x-2)/1.58113883008419)^2)*(0.1860342)+(0.3070874)}, size=2, xlim=c(0,4)) +
   stat_function(fun=function(x){(0 + 0.23487945604354*((x-6.30769230769231)/4.44193305113542) + -0.16609392205037*((x-6.30769230769231)/4.44193305113542)^2)*(0.1860342)+(0.3070874)}, size=2, xlim=c(0,15)) +
@@ -643,12 +646,12 @@ meanPlot7 <- ggplot(data=data.frame(x=c(0,0))) +
   
 #------------------------
 meanPlot8 <- ggplot(data=data.frame(x=c(0,0))) + 
-  coord_cartesian(ylim=c(0,1))  +
+  coord_cartesian(ylim=c(0,1.1))  +
   scale_x_continuous(limits=c(0,30), breaks=seq(4,30,5), labels=seq(5,30,5)) +
   ylim(-10,10) +
-  xlab('Standardized Time') +
+  xlab('') +
   ylab('') +
-  annotate('text', x=0, y=1, label='(r) 0.5%', size=15, hjust='left') +
+  annotate('text', x=0, y=1, label='(n) 0.5%', size=15, hjust='left') +
   #below are the individual treatment lines
   stat_function(fun=function(x){(-0.64363426886 + 0*((x-5)/3.3166247903554) + 0.2695130746677*((x-5)/3.3166247903554)^2)*(0.1860342)+(0.3070874)}, size=2, xlim=c(0,10)) +
   stat_function(fun=function(x){(0 + 0.210021988195509*((x-5)/3.3166247903554) + 0.23105613000231*((x-5)/3.3166247903554)^2)*(0.1860342)+(0.3070874)}, size=2, xlim=c(0,10))
@@ -658,12 +661,12 @@ meanPlot8 <- ggplot(data=data.frame(x=c(0,0))) +
   
 
 
-#richness response panels 
+#richness response panels------------ 
 #------------------------
 richnessPlot0 <- ggplot(data=data.frame(x=c(0,0))) +
-  coord_cartesian(ylim=c(-1.0,2.0))  +
+  coord_cartesian(ylim=c(-1.0,2.3))  +
   scale_x_continuous(limits=c(0,30), breaks=seq(4,30,5), labels=seq(5,30,5)) +
-  scale_y_continuous(limits=c(-2,2), breaks=seq(-2,2,1)) +
+  scale_y_continuous(limits=c(-2,2.2), breaks=seq(-2,2,1)) +
   xlab('') +
   ylab('Response') +
   annotate('text', x=0, y=2.0, label='(a) 77.7%', size=15, hjust='left') +
@@ -1010,12 +1013,12 @@ richnessPlot0 <- ggplot(data=data.frame(x=c(0,0))) +
 
 #------------------------
 richnessPlot1 <- ggplot(data=data.frame(x=c(0,0))) +
-  coord_cartesian(ylim=c(-1.0,2.0))  +
+  coord_cartesian(ylim=c(-1.0,2.3))  +
   scale_x_continuous(limits=c(0,30), breaks=seq(4,30,5), labels=seq(5,30,5)) +
-  scale_y_continuous(limits=c(-2,2), breaks=seq(-2,2,1)) +
+  scale_y_continuous(limits=c(-2,2.2), breaks=seq(-2,2,1)) +
   xlab('') +
   ylab('Response') +
-  annotate('text', x=0, y=2.0, label='(c) 0.2%', size=15, hjust='left') +
+  annotate('text', x=0, y=2.0, label='(b) 0.2%', size=15, hjust='left') +
   #below are the individual treatment lines
   stat_function(fun=function(x){(0.67000616894983 + 0.370184221889863*((x-1)/1) + 0*((x-1)/1)^2)*(0.340217)+(-0.1183477)}, size=2, xlim=c(0,2))
 
@@ -1023,21 +1026,21 @@ richnessPlot1 <- ggplot(data=data.frame(x=c(0,0))) +
   
 #------------------------
 richnessPlot2 <- ggplot(data=data.frame(x=c(0,0))) +
-  coord_cartesian(ylim=c(-1.0,2.0))  +
+  coord_cartesian(ylim=c(-1.0,2.3))  +
   scale_x_continuous(limits=c(0,30), breaks=seq(4,30,5), labels=seq(5,30,5)) +
-  scale_y_continuous(limits=c(-2,2), breaks=seq(-2,2,1)) +
+  scale_y_continuous(limits=c(-2,2.2), breaks=seq(-2,2,1)) +
   xlab('') +
   ylab('Response') +
-  annotate('text', x=0, y=2.0, label='(e) 0%', size=15, hjust='left')
+  annotate('text', x=0, y=2.0, label='(f) 0%', size=15, hjust='left')
   #below are the individual treatment lines
 
     
   
 #------------------------
 richnessPlot3 <- ggplot(data=data.frame(x=c(0,0))) +
-  coord_cartesian(ylim=c(-1.0,2.0))  +
+  coord_cartesian(ylim=c(-1.0,2.3))  +
   scale_x_continuous(limits=c(0,30), breaks=seq(4,30,5), labels=seq(5,30,5)) +
-  scale_y_continuous(limits=c(-2,2), breaks=seq(-2,2,1)) +
+  scale_y_continuous(limits=c(-2,2.2), breaks=seq(-2,2,1)) +
   xlab('') +
   ylab('Response') +
   annotate('text', x=0, y=2.0, label='(g) 0%', size=15, hjust='left')
@@ -1047,12 +1050,12 @@ richnessPlot3 <- ggplot(data=data.frame(x=c(0,0))) +
   
 #-------------------
 richnessPlot4 <- ggplot(data=data.frame(x=c(0,0))) +
-  coord_cartesian(ylim=c(-1.0,2.0))  +
+  coord_cartesian(ylim=c(-1.0,2.3))  +
   scale_x_continuous(limits=c(0,30), breaks=seq(4,30,5), labels=seq(5,30,5)) +
-  scale_y_continuous(limits=c(-2,2), breaks=seq(-2,2,1)) +
+  scale_y_continuous(limits=c(-2,2.2), breaks=seq(-2,2,1)) +
   xlab('') +
   ylab('Response') +
-  annotate('text', x=0, y=2.0, label='(i) 9.1%', size=15, hjust='left') +
+  annotate('text', x=0, y=2.0, label='(c) 9.1%', size=15, hjust='left') +
   #below are the individual treatment lines
   stat_function(fun=function(x){(0 + -0.41770228673315*((x-1)/1) + 0*((x-1)/1)^2)*(0.340217)+(-0.1183477)}, size=2, xlim=c(0,2)) +
   stat_function(fun=function(x){(0 + -0.3458910584223*((x-1)/1) + 0*((x-1)/1)^2)*(0.340217)+(-0.1183477)}, size=2, xlim=c(0,2)) +
@@ -1098,12 +1101,12 @@ richnessPlot4 <- ggplot(data=data.frame(x=c(0,0))) +
   
 #------------------------
 richnessPlot5 <- ggplot(data=data.frame(x=c(0,0))) +
-  coord_cartesian(ylim=c(-1.0,2.0))  +
+  coord_cartesian(ylim=c(-1.0,2.3))  +
   scale_x_continuous(limits=c(0,30), breaks=seq(4,30,5), labels=seq(5,30,5)) +
-  scale_y_continuous(limits=c(-2,2), breaks=seq(-2,2,1)) +
+  scale_y_continuous(limits=c(-2,2.2), breaks=seq(-2,2,1)) +
   xlab('') +
   ylab('Response') +
-  annotate('text', x=0, y=2.0, label='(k) 0.5%', size=15, hjust='left') +
+  annotate('text', x=0, y=2.0, label='(h) 0.5%', size=15, hjust='left') +
   #below are the individual treatment lines
   stat_function(fun=function(x){(0 + -0.30220571316688*((x-3.5)/2.44948974278318) + -0.2990267342657*((x-3.5)/2.44948974278318)^2)*(0.340217)+(-0.1183477)}, size=2, xlim=c(0,7)) +
   stat_function(fun=function(x){(0 + -0.48135776152*((x-3.5)/2.44948974278318) + -0.24315536556735*((x-3.5)/2.44948974278318)^2)*(0.340217)+(-0.1183477)}, size=2, xlim=c(0,7))
@@ -1113,12 +1116,12 @@ richnessPlot5 <- ggplot(data=data.frame(x=c(0,0))) +
   
 #------------------------
 richnessPlot6 <- ggplot(data=data.frame(x=c(0,0))) +
-  coord_cartesian(ylim=c(-1.0,2.0))  +
+  coord_cartesian(ylim=c(-1.0,2.3))  +
   scale_x_continuous(limits=c(0,30), breaks=seq(4,30,5), labels=seq(5,30,5)) +
-  scale_y_continuous(limits=c(-2,2), breaks=seq(-2,2,1)) +
-  xlab('') +
+  scale_y_continuous(limits=c(-2,2.2), breaks=seq(-2,2,1)) +
+  xlab('Year of Experiment') +
   ylab('Response') +
-  annotate('text', x=0, y=2.0, label='(m) 2.7%', size=15, hjust='left') +
+  annotate('text', x=0, y=2.0, label='(i) 2.7%', size=15, hjust='left') +
   #below are the individual treatment lines
   stat_function(fun=function(x){(-3.102091284 + -1.01257748045*((x-4.5)/3.02765035409749) + 0.8036600226*((x-4.5)/3.02765035409749)^2)*(0.340217)+(-0.1183477)}, size=2, xlim=c(0,9)) +
   stat_function(fun=function(x){(-4.9400637535 + -1.0788990159*((x-4.5)/3.02765035409749) + 0.9792800206*((x-4.5)/3.02765035409749)^2)*(0.340217)+(-0.1183477)}, size=2, xlim=c(0,9)) +
@@ -1137,12 +1140,12 @@ richnessPlot6 <- ggplot(data=data.frame(x=c(0,0))) +
   
 #------------------------
 richnessPlot7 <- ggplot(data=data.frame(x=c(0,0))) +
-  coord_cartesian(ylim=c(-1.0,2.0))  +
+  coord_cartesian(ylim=c(-1.0,2.3))  +
   scale_x_continuous(limits=c(0,30), breaks=seq(4,30,5), labels=seq(5,30,5)) +
-  scale_y_continuous(limits=c(-2,2), breaks=seq(-2,2,1)) +
+  scale_y_continuous(limits=c(-2,2.2), breaks=seq(-2,2,1)) +
   xlab('') +
   ylab('Response') +
-  annotate('text', x=0, y=2.0, label='(o) 5.0%', size=15, hjust='left') +
+  annotate('text', x=0, y=2.0, label='(d) 5.0%', size=15, hjust='left') +
   #below are the individual treatment lines
   stat_function(fun=function(x){(0.620495545878 + 0*((x-3.5)/2.44948974278318) + -0.333058498201*((x-3.5)/2.44948974278318)^2)*(0.340217)+(-0.1183477)}, size=2, xlim=c(0,7)) +
   stat_function(fun=function(x){(1.1291262488 + 0*((x-3.75)/2.81577190634672) + -0.3049487342346*((x-3.75)/2.81577190634672)^2)*(0.340217)+(-0.1183477)}, size=2, xlim=c(0,8)) +
@@ -1174,12 +1177,12 @@ richnessPlot7 <- ggplot(data=data.frame(x=c(0,0))) +
   
 #------------------------
 richnessPlot8 <- ggplot(data=data.frame(x=c(0,0))) +
-  coord_cartesian(ylim=c(-1.0,2.0))  +
+  coord_cartesian(ylim=c(-1.0,2.3))  +
   scale_x_continuous(limits=c(0,30), breaks=seq(4,30,5), labels=seq(5,30,5)) +
-  scale_y_continuous(limits=c(-2,2), breaks=seq(-2,2,1)) +
-  xlab('Standardized Time') +
+  scale_y_continuous(limits=c(-2,2.2), breaks=seq(-2,2,1)) +
+  xlab('') +
   ylab('Response') +
-  annotate('text', x=0, y=2.0, label='(q) 5.5%', size=15, hjust='left') +
+  annotate('text', x=0, y=2.0, label='(e) 5.5%', size=15, hjust='left') +
   #below are the individual treatment lines
   stat_function(fun=function(x){(0 + 0*((x-2)/1.58113883008419) + 0.301447826221775*((x-2)/1.58113883008419)^2)*(0.340217)+(-0.1183477)}, size=2, xlim=c(0,4)) +
   stat_function(fun=function(x){(-0.7487398982095 + 0*((x-10.4)/8.38450952650183) + 0.364892731240955*((x-10.4)/8.38450952650183)^2)*(0.340217)+(-0.1183477)}, size=2, xlim=c(0,21)) +
@@ -1214,22 +1217,22 @@ richnessPlot8 <- ggplot(data=data.frame(x=c(0,0))) +
 pushViewport(viewport(layout=grid.layout(9,2)))
 print(richnessPlot0, vp=viewport(layout.pos.row=1, layout.pos.col=1))
 print(richnessPlot1, vp=viewport(layout.pos.row=2, layout.pos.col=1))
-print(richnessPlot2, vp=viewport(layout.pos.row=3, layout.pos.col=1))
-print(richnessPlot3, vp=viewport(layout.pos.row=4, layout.pos.col=1))
-print(richnessPlot4, vp=viewport(layout.pos.row=5, layout.pos.col=1))
-print(richnessPlot5, vp=viewport(layout.pos.row=6, layout.pos.col=1))
-print(richnessPlot6, vp=viewport(layout.pos.row=7, layout.pos.col=1))
-print(richnessPlot7, vp=viewport(layout.pos.row=8, layout.pos.col=1))
-print(richnessPlot8, vp=viewport(layout.pos.row=9, layout.pos.col=1))
+print(richnessPlot4, vp=viewport(layout.pos.row=3, layout.pos.col=1))
+print(richnessPlot7, vp=viewport(layout.pos.row=4, layout.pos.col=1))
+print(richnessPlot8, vp=viewport(layout.pos.row=5, layout.pos.col=1))
+print(richnessPlot2, vp=viewport(layout.pos.row=6, layout.pos.col=1))
+print(richnessPlot3, vp=viewport(layout.pos.row=7, layout.pos.col=1))
+print(richnessPlot5, vp=viewport(layout.pos.row=8, layout.pos.col=1))
+print(richnessPlot6, vp=viewport(layout.pos.row=9, layout.pos.col=1))
 print(meanPlot0, vp=viewport(layout.pos.row=1, layout.pos.col=2))
 print(meanPlot1, vp=viewport(layout.pos.row=2, layout.pos.col=2))
-print(meanPlot2, vp=viewport(layout.pos.row=3, layout.pos.col=2))
-print(meanPlot3, vp=viewport(layout.pos.row=4, layout.pos.col=2))
-print(meanPlot4, vp=viewport(layout.pos.row=5, layout.pos.col=2))
-print(meanPlot5, vp=viewport(layout.pos.row=6, layout.pos.col=2))
-print(meanPlot6, vp=viewport(layout.pos.row=7, layout.pos.col=2))
-print(meanPlot7, vp=viewport(layout.pos.row=8, layout.pos.col=2))
-print(meanPlot8, vp=viewport(layout.pos.row=9, layout.pos.col=2))
+print(meanPlot4, vp=viewport(layout.pos.row=3, layout.pos.col=2))
+print(meanPlot7, vp=viewport(layout.pos.row=4, layout.pos.col=2))
+print(meanPlot8, vp=viewport(layout.pos.row=5, layout.pos.col=2))
+print(meanPlot2, vp=viewport(layout.pos.row=6, layout.pos.col=2))
+print(meanPlot3, vp=viewport(layout.pos.row=7, layout.pos.col=2))
+print(meanPlot5, vp=viewport(layout.pos.row=8, layout.pos.col=2))
+print(meanPlot6, vp=viewport(layout.pos.row=9, layout.pos.col=2))
 #export at 2400 x 4800
 
 

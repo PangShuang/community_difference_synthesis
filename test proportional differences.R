@@ -16,6 +16,18 @@ setwd('C:\\Users\\lapie\\Dropbox (Smithsonian)\\working groups\\CoRRE\\converge_
 #kim's desktop
 setwd('C:\\Users\\la pierrek\\Dropbox (Smithsonian)\\working groups\\CoRRE\\converge_diverge\\datasets\\LongForm')
 
+
+
+theme_set(theme_bw())
+theme_update(axis.title.x=element_text(size=40, vjust=-0.35, margin=margin(t=15)), axis.text.x=element_text(size=34, color='black'),
+             axis.title.y=element_text(size=40, angle=90, vjust=0.5, margin=margin(r=15)), axis.text.y=element_text(size=34, color='black'),
+             plot.title = element_text(size=40, vjust=2),
+             panel.grid.major=element_blank(), panel.grid.minor=element_blank(),
+             legend.title=element_blank(), legend.text=element_text(size=20))
+
+
+
+
 ####all data---------------
 #significant lines
 correTotal <- read.csv('stdtimebytrt_shape_classification_04072019.csv')%>%
@@ -57,6 +69,32 @@ trtType <- as.character(correPropComp$trt_type)
 correPropCompMatrix <- as.matrix(correPropComp[,c('count_sig', 'count_nonsig')], ncol=2, dimnames=list(rownames(c('CO2','drought','herb_removal','irr','mow_clip','N','other_nonresource','other_resource','P','plant_mani','precip_vari','temp')), colnames(c('count_sig','count_nonsig'))), byrow=T)
 fisher.test(correPropCompMatrix, workspace = 2e8)
 fisher.multcomp(correPropCompMatrix)
+
+
+
+###figure 2
+rich <- ggplot(data=subset(correPropRich, trt_type!='other_resource'&trt_type!='other_nonresource'), aes(x=trt_type, y=proportion)) +
+  geom_bar(stat='identity')  +
+  scale_x_discrete(limits=c('CO2', 'drought', 'irr', 'precip_vari', 'N', 'P', 'temp', 'mow_clip', 'herb_removal', 'plant_mani'),
+                   labels=c('CO2', 'drought', 'irrigation', 'precip. vari.', 'nitrogen', 'phosphorus', 'temperature', 'mow', 'herbivore rem.', 'plant manip.')) +
+  xlab('Treatment Type') + ylab('Proportion') +
+  theme(axis.text.x=element_text(angle=90, hjust=1, vjust=0.5)) +
+  annotate('text', x=0.5, y=0.4, label='(a) Richness Response', size=12, hjust='left')
+
+comp <- ggplot(data=subset(correPropComp, trt_type!='other_resource'&trt_type!='other_nonresource'), aes(x=trt_type, y=proportion)) +
+  geom_bar(stat='identity')  +
+  scale_x_discrete(limits=c('CO2', 'drought', 'irr', 'precip_vari', 'N', 'P', 'temp', 'mow_clip', 'herb_removal', 'plant_mani'),
+                   labels=c('CO2', 'drought', 'irrigation', 'precip. vari.', 'nitrogen', 'phosphorus', 'temperature', 'mow', 'herbivore rem.', 'plant manip.')) +
+  xlab('Treatment Type') + ylab('') +
+  theme(axis.text.x=element_text(angle=90, hjust=1, vjust=0.5)) +
+  annotate('text', x=0.5, y=0.4, label='(b) Composition Response', size=12, hjust='left')
+
+pushViewport(viewport(layout=grid.layout(1,2)))
+print(rich, vp=viewport(layout.pos.row = 1, layout.pos.col = 1))
+print(comp, vp=viewport(layout.pos.row = 1, layout.pos.col = 2))
+#export at 2400x1000
+
+
 
 
 
@@ -104,16 +142,7 @@ fisher.multcomp(correPropCompMatrix)
 
 
 
-
-###figure
-theme_set(theme_bw())
-theme_update(axis.title.x=element_text(size=40, vjust=-0.35, margin=margin(t=15)), axis.text.x=element_text(size=34, color='black'),
-             axis.title.y=element_text(size=40, angle=90, vjust=0.5, margin=margin(r=15)), axis.text.y=element_text(size=34, color='black'),
-             plot.title = element_text(size=40, vjust=2),
-             panel.grid.major=element_blank(), panel.grid.minor=element_blank(),
-             legend.title=element_blank(), legend.text=element_text(size=20))
-
-
+###figure 3
 rich <- ggplot(data=correPropCategoryRich, aes(x=trt_category, y=proportion)) +
   geom_bar(stat='identity')  +
   scale_x_discrete(limits=c('single_resource', 'single_nonresource', 'RxR', 'NxN', 'RxN', 'RxRxR', 'threeway'),
