@@ -58,15 +58,15 @@ prop.test(x=as.matrix(correPropComp[,c('count_sig', 'total_possible')]), alterna
 
 ###treatment type -- single factor treatments only
 #richness responses
-correPropRich <- correProp%>%filter(variable=='richness')%>%select(trt_type,count_sig,count_nonsig)
-trtType <- as.character(correPropRich$trt_type)
-correPropRichMatrix <- as.matrix(correPropRich[,c('count_sig', 'count_nonsig')], ncol=2, dimnames=list(rownames(c('CO2','drought','herb_removal','irr','mow_clip','N','other_nonresource','other_resource','P','plant_mani','precip_vari','temp')), colnames(c('count_sig','count_nonsig'))), byrow=T)
+correPropRichTest <- correProp%>%filter(variable=='richness')%>%select(trt_type,count_sig,count_nonsig)
+trtType <- as.character(correPropRichTest$trt_type)
+correPropRichMatrix <- as.matrix(correPropRichTest[,c('count_sig', 'count_nonsig')], ncol=2, dimnames=list(rownames(c('CO2','drought','herb_removal','irr','mow_clip','N','other_nonresource','other_resource','P','plant_mani','precip_vari','temp')), colnames(c('count_sig','count_nonsig'))), byrow=T)
 fisher.test(correPropRichMatrix, workspace = 2e8)
 fisher.multcomp(correPropRichMatrix)
 #compositional responses
-correPropComp <- correProp%>%filter(variable=='mean')%>%select(trt_type,count_sig,count_nonsig)
-trtType <- as.character(correPropComp$trt_type)
-correPropCompMatrix <- as.matrix(correPropComp[,c('count_sig', 'count_nonsig')], ncol=2, dimnames=list(rownames(c('CO2','drought','herb_removal','irr','mow_clip','N','other_nonresource','other_resource','P','plant_mani','precip_vari','temp')), colnames(c('count_sig','count_nonsig'))), byrow=T)
+correPropCompTest <- correProp%>%filter(variable=='mean')%>%select(trt_type,count_sig,count_nonsig)
+trtType <- as.character(correPropCompTest$trt_type)
+correPropCompMatrix <- as.matrix(correPropCompTest[,c('count_sig', 'count_nonsig')], ncol=2, dimnames=list(rownames(c('CO2','drought','herb_removal','irr','mow_clip','N','other_nonresource','other_resource','P','plant_mani','precip_vari','temp')), colnames(c('count_sig','count_nonsig'))), byrow=T)
 fisher.test(correPropCompMatrix, workspace = 2e8)
 fisher.multcomp(correPropCompMatrix)
 
@@ -76,18 +76,20 @@ fisher.multcomp(correPropCompMatrix)
 rich <- ggplot(data=subset(correPropRich, trt_type!='other_resource'&trt_type!='other_nonresource'), aes(x=trt_type, y=proportion)) +
   geom_bar(stat='identity')  +
   scale_x_discrete(limits=c('CO2', 'drought', 'irr', 'precip_vari', 'N', 'P', 'temp', 'mow_clip', 'herb_removal', 'plant_mani'),
-                   labels=c('CO2', 'drought', 'irrigation', 'precip. vari.', 'nitrogen', 'phosphorus', 'temperature', 'mow', 'herbivore rem.', 'plant manip.')) +
+                   labels=c(expression(CO[2]), 'drought', 'irrigation', 'precip. vari.', 'nitrogen', 'phosphorus', 'temperature', 'mow', 'herbivore rem.', 'plant manip.')) +
   xlab('Treatment Type') + ylab('Proportion') +
+  scale_y_continuous(limits=c(0,1)) +
   theme(axis.text.x=element_text(angle=90, hjust=1, vjust=0.5)) +
-  annotate('text', x=0.5, y=0.4, label='(a) Richness Response', size=12, hjust='left')
+  annotate('text', x=0.5, y=0.97, label='(a) Richness Response', size=12, hjust='left')
 
 comp <- ggplot(data=subset(correPropComp, trt_type!='other_resource'&trt_type!='other_nonresource'), aes(x=trt_type, y=proportion)) +
   geom_bar(stat='identity')  +
   scale_x_discrete(limits=c('CO2', 'drought', 'irr', 'precip_vari', 'N', 'P', 'temp', 'mow_clip', 'herb_removal', 'plant_mani'),
-                   labels=c('CO2', 'drought', 'irrigation', 'precip. vari.', 'nitrogen', 'phosphorus', 'temperature', 'mow', 'herbivore rem.', 'plant manip.')) +
+                   labels=c(expression(CO[2]), 'drought', 'irrigation', 'precip. vari.', 'nitrogen', 'phosphorus', 'temperature', 'mow', 'herbivore rem.', 'plant manip.')) +
   xlab('Treatment Type') + ylab('') +
+  scale_y_continuous(limits=c(0,1)) +
   theme(axis.text.x=element_text(angle=90, hjust=1, vjust=0.5)) +
-  annotate('text', x=0.5, y=0.4, label='(b) Composition Response', size=12, hjust='left')
+  annotate('text', x=0.5, y=0.97, label='(b) Composition Response', size=12, hjust='left')
 
 pushViewport(viewport(layout=grid.layout(1,2)))
 print(rich, vp=viewport(layout.pos.row = 1, layout.pos.col = 1))
