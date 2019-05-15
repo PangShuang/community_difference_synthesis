@@ -1170,7 +1170,7 @@ meanOverallPlot <- ggplot(data=NmeanOverall, aes(x=parameter, y=mean)) +
   geom_errorbar(aes(ymin=mean-2*sd, ymax=mean+2*sd, width=0.4)) +
   scale_x_discrete(limits=c('Intercept', 'std_func.n.', 'std_func.MAP.', 'std_func.n..std_func.MAP.'),
                    labels=c('intercept', 'N', 'MAP', 'N*MAP')) +
-  theme(axis.title.x=element_blank(), axis.title.y=element_blank(), plot.title=element_text(size=40, vjust=2, margin=margin(b=15))) +
+  theme(axis.title.x=element_blank(), axis.title.y=element_blank(), plot.title=element_text(size=60, vjust=2, margin=margin(b=15))) +
   geom_hline(aes(yintercept=0))
 
 richnessOverallPlot <- ggplot(data=NrichnessOverall, aes(x=parameter, y=mean)) +
@@ -1178,7 +1178,7 @@ richnessOverallPlot <- ggplot(data=NrichnessOverall, aes(x=parameter, y=mean)) +
   geom_errorbar(aes(ymin=mean-2*sd, ymax=mean+2*sd, width=0.4)) +
   scale_x_discrete(limits=c('Intercept', 'std_func.n.', 'std_func.MAP.', 'std_func.n..std_func.MAP.'),
                    labels=c('intercept', 'N', 'MAP', 'N*MAP')) +
-  theme(axis.title.x=element_blank(), axis.title.y=element_blank(), plot.title=element_text(size=40, vjust=2, margin=margin(b=15))) +
+  theme(axis.title.x=element_blank(), axis.title.y=element_blank(), plot.title=element_text(size=60, vjust=2, margin=margin(b=15))) +
   geom_hline(aes(yintercept=0))
 
 pushViewport(viewport(layout=grid.layout(1,2)))

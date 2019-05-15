@@ -19,9 +19,9 @@ setwd('C:\\Users\\la pierrek\\Dropbox (Smithsonian)\\working groups\\CoRRE\\conv
 
 
 theme_set(theme_bw())
-theme_update(axis.title.x=element_text(size=40, vjust=-0.35, margin=margin(t=15)), axis.text.x=element_text(size=34, color='black'),
-             axis.title.y=element_text(size=40, angle=90, vjust=0.5, margin=margin(r=15)), axis.text.y=element_text(size=34, color='black'),
-             plot.title = element_text(size=40, vjust=2),
+theme_update(axis.title.x=element_text(size=60, vjust=-0.35, margin=margin(t=15)), axis.text.x=element_text(size=45, color='black'),
+             axis.title.y=element_text(size=60, angle=90, vjust=0.5, margin=margin(r=15)), axis.text.y=element_text(size=45, color='black'),
+             plot.title = element_text(size=60, vjust=2),
              panel.grid.major=element_blank(), panel.grid.minor=element_blank(),
              legend.title=element_blank(), legend.text=element_text(size=20))
 
@@ -79,8 +79,8 @@ rich <- ggplot(data=subset(correPropRich, trt_type!='other_resource'&trt_type!='
                    labels=c(expression(CO[2]), 'drought', 'irrigation', 'precip. vari.', 'nitrogen', 'phosphorus', 'temperature', 'mow', 'herbivore rem.', 'plant manip.')) +
   xlab('Treatment Type') + ylab('Proportion') +
   scale_y_continuous(limits=c(0,1)) +
-  theme(axis.text.x=element_text(angle=90, hjust=1, vjust=0.5)) +
-  annotate('text', x=0.5, y=0.97, label='(a) Richness Response', size=12, hjust='left')
+  theme(axis.text.x=element_text(angle=90, hjust=1, vjust=0.5, size=)) +
+  annotate('text', x=0.5, y=0.97, label='(a) Richness Response', size=20, hjust='left')
 
 comp <- ggplot(data=subset(correPropComp, trt_type!='other_resource'&trt_type!='other_nonresource'), aes(x=trt_type, y=proportion)) +
   geom_bar(stat='identity')  +
@@ -89,7 +89,7 @@ comp <- ggplot(data=subset(correPropComp, trt_type!='other_resource'&trt_type!='
   xlab('Treatment Type') + ylab('') +
   scale_y_continuous(limits=c(0,1)) +
   theme(axis.text.x=element_text(angle=90, hjust=1, vjust=0.5)) +
-  annotate('text', x=0.5, y=0.97, label='(b) Composition Response', size=12, hjust='left')
+  annotate('text', x=0.5, y=0.97, label='(b) Composition Response', size=20, hjust='left')
 
 pushViewport(viewport(layout=grid.layout(1,2)))
 print(rich, vp=viewport(layout.pos.row = 1, layout.pos.col = 1))
@@ -150,28 +150,30 @@ rich <- ggplot(data=correPropCategoryRich, aes(x=trt_category, y=proportion)) +
   scale_x_discrete(limits=c('single_resource', 'single_nonresource', 'RxR', 'NxN', 'RxN', 'RxRxR', 'threeway'),
                    labels=c('R', 'N', 'R*R', 'N*N', 'R*N', 'R*R*R', '3+')) +
   xlab('Treatment Category') + ylab('Proportion') +
-  annotate('text', x=0.5, y=0.7, label='(a) Richness Response', size=12, hjust='left') +
-  annotate('text', x=1, y=0.20, label='a', size=12, hjust='center') +
-  annotate('text', x=2, y=0.14, label='a', size=12, hjust='center') +
-  annotate('text', x=3, y=0.29, label='ab', size=12, hjust='center') +
-  annotate('text', x=4, y=0.18, label='ab', size=12, hjust='center') +
-  annotate('text', x=5, y=0.20, label='ab', size=12, hjust='center') +
-  annotate('text', x=6, y=0.59, label='c', size=12, hjust='center') +
-  annotate('text', x=7, y=0.38, label='b', size=12, hjust='center')
+  theme(axis.text.x=element_text(angle=90, hjust=1, vjust=0.5)) +
+  annotate('text', x=0.5, y=0.7, label='(a) Richness Response', size=20, hjust='left') +
+  annotate('text', x=1, y=0.20, label='a', size=18, hjust='center') +
+  annotate('text', x=2, y=0.14, label='a', size=18, hjust='center') +
+  annotate('text', x=3, y=0.29, label='ab', size=18, hjust='center') +
+  annotate('text', x=4, y=0.18, label='ab', size=18, hjust='center') +
+  annotate('text', x=5, y=0.20, label='ab', size=18, hjust='center') +
+  annotate('text', x=6, y=0.59, label='c', size=18, hjust='center') +
+  annotate('text', x=7, y=0.38, label='b', size=18, hjust='center')
 
 comp <- ggplot(data=correPropCategoryComp, aes(x=trt_category, y=proportion)) +
   geom_bar(stat='identity')  +
   scale_x_discrete(limits=c('single_resource', 'single_nonresource', 'RxR', 'NxN', 'RxN', 'RxRxR', 'threeway'),
                    labels=c('R', 'N', 'R*R', 'N*N', 'R*N', 'R*R*R', '3+')) +
   xlab('Treatment Category') + ylab('') +
-  annotate('text', x=0.5, y=0.7, label='(b) Composition Response', size=12, hjust='left') +
-  annotate('text', x=1, y=0.32, label='a', size=12, hjust='center') +
-  annotate('text', x=2, y=0.22, label='a', size=12, hjust='center') +
-  annotate('text', x=3, y=0.55, label='bc', size=12, hjust='center') +
-  annotate('text', x=4, y=0.26, label='abc', size=12, hjust='center') +
-  annotate('text', x=5, y=0.33, label='ab', size=12, hjust='center') +
-  annotate('text', x=6, y=0.66, label='c', size=12, hjust='center') +
-  annotate('text', x=7, y=0.53, label='bc', size=12, hjust='center')
+  theme(axis.text.x=element_text(angle=90, hjust=1, vjust=0.5)) +
+  annotate('text', x=0.5, y=0.7, label='(b) Composition Response', size=20, hjust='left') +
+  annotate('text', x=1, y=0.32, label='a', size=18, hjust='center') +
+  annotate('text', x=2, y=0.22, label='a', size=18, hjust='center') +
+  annotate('text', x=3, y=0.55, label='bc', size=18, hjust='center') +
+  annotate('text', x=4, y=0.26, label='abc', size=18, hjust='center') +
+  annotate('text', x=5, y=0.33, label='ab', size=18, hjust='center') +
+  annotate('text', x=6, y=0.66, label='c', size=18, hjust='center') +
+  annotate('text', x=7, y=0.53, label='bc', size=18, hjust='center')
 
 pushViewport(viewport(layout=grid.layout(1,2)))
 print(rich, vp=viewport(layout.pos.row = 1, layout.pos.col = 1))
