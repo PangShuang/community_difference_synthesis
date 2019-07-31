@@ -1143,7 +1143,7 @@ nDataMean <- nData%>%
   summarise(mean_mean_change=mean(composition_diff), sd_mean_change=sd(composition_diff), mean_S_PC=mean(S_PC), sd_S_PC=sd(S_PC))
 
 #mean change
-Nmean <- read.csv('C:\\Users\\la pierrek\\Dropbox (Smithsonian)\\working groups\\CoRRE\\converge_diverge\\La Pierre_comm difference_final model results_01122018\\magnitude_042019\\posteriors_N_MeanChange.csv', comment.char='#')
+Nmean <- read.csv('C:\\Users\\lapie\\Dropbox (Smithsonian)\\working groups\\CoRRE\\converge_diverge\\La Pierre_comm difference_final model results_01122018\\magnitude_042019\\posteriors_N_MeanChange.csv', comment.char='#')
 NmeanMean <- as.data.frame(colMeans(Nmean))%>%
   add_rownames('parameter')
 names(NmeanMean)[names(NmeanMean) == 'colMeans(Nmean)'] <- 'mean'
@@ -1154,7 +1154,7 @@ NmeanOverall <- NmeanMean%>%
   left_join(NmeanSD)
 
 #richness difference
-Nrichness <- read.csv('C:\\Users\\la pierrek\\Dropbox (Smithsonian)\\working groups\\CoRRE\\converge_diverge\\La Pierre_comm difference_final model results_01122018\\magnitude_042019\\posteriors_N_Richness.csv', comment.char='#')
+Nrichness <- read.csv('C:\\Users\\lapie\\Dropbox (Smithsonian)\\working groups\\CoRRE\\converge_diverge\\La Pierre_comm difference_final model results_01122018\\magnitude_042019\\posteriors_N_Richness.csv', comment.char='#')
 NrichnessMean <- as.data.frame(colMeans(Nrichness))%>%
   add_rownames('parameter')
 names(NrichnessMean)[names(NrichnessMean) == 'colMeans(Nrichness)'] <- 'mean'
@@ -1216,16 +1216,16 @@ richnessNPlotFinal <- ggplot(data=nData, aes(x=n, y=S_PC, color=MAP)) +
   stat_function(fun=function(x){(-0.1436441 + -0.4789404*((1000-709.6087)/313.6992) + 0.3777062*(x-15.65652)/18.28532 + 0.28058497*((1000-709.6087)/313.6992)*(x-9.992142)/9.108662)*0.2170204-0.1416691}, size=5, color='#4793CF')  +
   stat_function(fun=function(x){(-0.1436441 + -0.4789404*((600-709.6087)/313.6992) + 0.3777062*(x-15.65652)/18.28532 + 0.28058497*((600-709.6087)/313.6992)*(x-9.992142)/9.108662)*0.2170204-0.1416691}, size=5, color='#2D5E88') +
   stat_function(fun=function(x){(-0.1436441 + -0.4789404*((200-709.6087)/313.6992) + 0.3777062*(x-15.65652)/18.28532 + 0.28058497*((200-709.6087)/313.6992)*(x-9.992142)/9.108662)*0.2170204-0.1416691}, size=5, color='#153049') +
-  xlab('') +
+  xlab(expression(paste('N added (g', m^-2, ')'))) +
   annotate('text', x=1.0, y=1.0, label='(a)', size=12, hjust='left') +
-  theme(legend.position=c(0.75,0.70), legend.justification=c(0,0), legend.title=element_text(size=24)) 
+  theme(legend.position=c(0.55,0.60), legend.justification=c(0,0), legend.title=element_text(size=40), legend.text=element_text(size=30)) 
 
 
 #drought change
 droData <- read.csv('ForAnalysis_allAnalysisH2Omag_drought.csv')
 
 #mean change
-dromean <- read.csv('C:\\Users\\la pierrek\\Dropbox (Smithsonian)\\working groups\\CoRRE\\converge_diverge\\La Pierre_comm difference_final model results_01122018\\magnitude_042019\\posteriors_Drought_MeanChange.csv', comment.char='#')
+dromean <- read.csv('C:\\Users\\lapie\\Dropbox (Smithsonian)\\working groups\\CoRRE\\converge_diverge\\La Pierre_comm difference_final model results_01122018\\magnitude_042019\\posteriors_Drought_MeanChange.csv', comment.char='#')
 dromeanMean <- as.data.frame(colMeans(dromean))%>%
   add_rownames('parameter')
 names(dromeanMean)[names(dromeanMean) == 'colMeans(dromean)'] <- 'mean'
@@ -1236,7 +1236,7 @@ dromeanOverall <- dromeanMean%>%
   left_join(dromeanSD)
 
 #richness difference
-drorichness <- read.csv('C:\\Users\\la pierrek\\Dropbox (Smithsonian)\\working groups\\CoRRE\\converge_diverge\\La Pierre_comm difference_final model results_01122018\\magnitude_042019\\posteriors_Drought_Richness.csv', comment.char='#')
+drorichness <- read.csv('C:\\Users\\lapie\\Dropbox (Smithsonian)\\working groups\\CoRRE\\converge_diverge\\La Pierre_comm difference_final model results_01122018\\magnitude_042019\\posteriors_Drought_Richness.csv', comment.char='#')
 drorichnessMean <- as.data.frame(colMeans(drorichness))%>%
   add_rownames('parameter')
 names(drorichnessMean)[names(drorichnessMean) == 'colMeans(drorichness)'] <- 'mean'
@@ -1271,15 +1271,15 @@ print(meanOverallPlot, vp=viewport(layout.pos.row = 1, layout.pos.col = 2))
 meanDroPlotFinal <- ggplot(data=droData, aes(x=precip, y=composition_diff)) +
   geom_point(size=5) +
   coord_cartesian(ylim=c(0,1)) +
-  scale_y_continuous(name='') +
+  scale_y_continuous(name='Composition Response') +
   xlab(expression(paste(H[2], 'O deviation from ambient (%)'))) +
   annotate('text', x=-100, y=1, label='(e)', size=12, hjust='left')
 
 richnessDroPlotFinal <- ggplot(data=droData, aes(x=precip, y=S_PC)) +
   geom_point(size=5) +
   coord_cartesian(ylim=c(-0.8,1)) +
-  scale_y_continuous(name='') +
-  xlab('') +
+  scale_y_continuous(name='Richness Response') +
+  xlab(expression(paste(H[2], 'O deviation from ambient (%)'))) +
   annotate('text', x=-100, y=1, label='(b)', size=12, hjust='left') +
   theme(legend.position='none')
 
@@ -1288,7 +1288,7 @@ richnessDroPlotFinal <- ggplot(data=droData, aes(x=precip, y=S_PC)) +
 irrData <- read.csv('ForAnalysis_allAnalysisH2Omag_irr.csv')
 
 #mean change
-irrmean <- read.csv('C:\\Users\\la pierrek\\Dropbox (Smithsonian)\\working groups\\CoRRE\\converge_diverge\\La Pierre_comm difference_final model results_01122018\\magnitude_042019\\posteriors_Irr_MeanChange.csv', comment.char='#')
+irrmean <- read.csv('C:\\Users\\lapie\\Dropbox (Smithsonian)\\working groups\\CoRRE\\converge_diverge\\La Pierre_comm difference_final model results_01122018\\magnitude_042019\\posteriors_Irr_MeanChange.csv', comment.char='#')
 irrmeanMean <- as.data.frame(colMeans(irrmean))%>%
   add_rownames('parameter')
 names(irrmeanMean)[names(irrmeanMean) == 'colMeans(irrmean)'] <- 'mean'
@@ -1299,7 +1299,7 @@ irrmeanOverall <- irrmeanMean%>%
   left_join(irrmeanSD)
 
 #richness difference
-irrrichness <- read.csv('C:\\Users\\la pierrek\\Dropbox (Smithsonian)\\working groups\\CoRRE\\converge_diverge\\La Pierre_comm difference_final model results_01122018\\magnitude_042019\\posteriors_Irr_Richness.csv', comment.char='#')
+irrrichness <- read.csv('C:\\Users\\lapie\\Dropbox (Smithsonian)\\working groups\\CoRRE\\converge_diverge\\La Pierre_comm difference_final model results_01122018\\magnitude_042019\\posteriors_Irr_Richness.csv', comment.char='#')
 irrrichnessMean <- as.data.frame(colMeans(irrrichness))%>%
   add_rownames('parameter')
 names(irrrichnessMean)[names(irrrichnessMean) == 'colMeans(irrrichness)'] <- 'mean'
@@ -1334,26 +1334,26 @@ print(meanOverallPlot, vp=viewport(layout.pos.row = 1, layout.pos.col = 2))
 meanIrrPlotFinal <- ggplot(data=irrData, aes(x=precip, y=composition_diff)) +
   geom_point(size=5) +
   coord_cartesian(ylim=c(0,1)) +
-  scale_y_continuous(name='') +
+  scale_y_continuous(name='Composition Response') +
   xlab(expression(paste(H[2], 'O deviation from ambient (%)'))) +
   annotate('text', x=0, y=1, label='(f)', size=12, hjust='left')
 
 richnessIrrPlotFinal <- ggplot(data=irrData, aes(x=precip, y=S_PC, color=MAP)) +
   geom_point(size=5) +
   coord_cartesian(ylim=c(-0.8,1)) +
-  scale_y_continuous(name='') +
-  xlab('') +
+  scale_y_continuous(name='Richness Response') +
+  xlab(expression(paste(H[2], 'O deviation from ambient (%)'))) +
   annotate('text', x=0, y=1, label='(c)', size=12, hjust='left') +
   theme(legend.position='none')
 
-pushViewport(viewport(layout=grid.layout(2,3)))
+pushViewport(viewport(layout=grid.layout(3,2)))
 print(richnessNPlotFinal, vp=viewport(layout.pos.row = 1, layout.pos.col = 1))
-print(meanNPlotFinal, vp=viewport(layout.pos.row = 2, layout.pos.col = 1))
-print(richnessDroPlotFinal, vp=viewport(layout.pos.row = 1, layout.pos.col = 2))
+print(meanNPlotFinal, vp=viewport(layout.pos.row = 1, layout.pos.col = 2))
+print(richnessDroPlotFinal, vp=viewport(layout.pos.row = 2, layout.pos.col = 1))
 print(meanDroPlotFinal, vp=viewport(layout.pos.row = 2, layout.pos.col = 2))
-print(richnessIrrPlotFinal, vp=viewport(layout.pos.row = 1, layout.pos.col = 3))
-print(meanIrrPlotFinal, vp=viewport(layout.pos.row = 2, layout.pos.col = 3))
-#export at 2700 x 1600
+print(richnessIrrPlotFinal, vp=viewport(layout.pos.row = 3, layout.pos.col = 1))
+print(meanIrrPlotFinal, vp=viewport(layout.pos.row = 3, layout.pos.col = 2))
+#export at 1800 x 2000
 
 
 

@@ -56,6 +56,7 @@ correPropComp <- correProp%>%filter(variable=='mean')
 prop.test(x=as.matrix(correPropComp[,c('count_sig', 'total_possible')]), alternative='two.sided')
 
 
+
 ###treatment type -- single factor treatments only
 #richness responses
 correPropRichTest <- correProp%>%filter(variable=='richness')%>%select(trt_type,count_sig,count_nonsig)
@@ -70,34 +71,24 @@ correPropCompMatrix <- as.matrix(correPropCompTest[,c('count_sig', 'count_nonsig
 fisher.test(correPropCompMatrix, workspace = 2e8)
 fisher.multcomp(correPropCompMatrix)
 
-
-
 ###figure 2
-rich <- ggplot(data=subset(correPropRich, trt_type!='other_resource'&trt_type!='other_nonresource'), aes(x=trt_type, y=proportion)) +
+richType <- ggplot(data=subset(correPropRich, trt_type!='other_resource'&trt_type!='other_nonresource'), aes(x=trt_type, y=proportion)) +
   geom_bar(stat='identity')  +
   scale_x_discrete(limits=c('CO2', 'drought', 'irr', 'precip_vari', 'N', 'P', 'temp', 'mow_clip', 'herb_removal', 'plant_mani'),
                    labels=c(expression(CO[2]), 'drought', 'irrigation', 'precip. vari.', 'nitrogen', 'phosphorus', 'temperature', 'mow', 'herbivore rem.', 'plant manip.')) +
-  xlab('Treatment Type') + ylab('Proportion') +
+  xlab('') + ylab('Proportion\nRichness Response') +
   scale_y_continuous(limits=c(0,1)) +
   theme(axis.text.x=element_text(angle=90, hjust=1, vjust=0.5, size=)) +
-  annotate('text', x=0.5, y=0.97, label='(a) Richness Response', size=20, hjust='left')
+  annotate('text', x=0.5, y=0.97, label='(a)', size=20, hjust='left')
 
-comp <- ggplot(data=subset(correPropComp, trt_type!='other_resource'&trt_type!='other_nonresource'), aes(x=trt_type, y=proportion)) +
+compType <- ggplot(data=subset(correPropComp, trt_type!='other_resource'&trt_type!='other_nonresource'), aes(x=trt_type, y=proportion)) +
   geom_bar(stat='identity')  +
   scale_x_discrete(limits=c('CO2', 'drought', 'irr', 'precip_vari', 'N', 'P', 'temp', 'mow_clip', 'herb_removal', 'plant_mani'),
                    labels=c(expression(CO[2]), 'drought', 'irrigation', 'precip. vari.', 'nitrogen', 'phosphorus', 'temperature', 'mow', 'herbivore rem.', 'plant manip.')) +
-  xlab('Treatment Type') + ylab('') +
+  xlab('Treatment Type') + ylab('Proportion\nComposition Response') +
   scale_y_continuous(limits=c(0,1)) +
   theme(axis.text.x=element_text(angle=90, hjust=1, vjust=0.5)) +
-  annotate('text', x=0.5, y=0.97, label='(b) Composition Response', size=20, hjust='left')
-
-pushViewport(viewport(layout=grid.layout(1,2)))
-print(rich, vp=viewport(layout.pos.row = 1, layout.pos.col = 1))
-print(comp, vp=viewport(layout.pos.row = 1, layout.pos.col = 2))
-#export at 2400x1000
-
-
-
+  annotate('text', x=0.5, y=0.97, label='(b)', size=20, hjust='left')
 
 
 ###treatment category
@@ -144,14 +135,15 @@ fisher.multcomp(correPropCompMatrix)
 
 
 
-###figure 3
-rich <- ggplot(data=correPropCategoryRich, aes(x=trt_category, y=proportion)) +
+
+###fig 2 cont
+richCat <- ggplot(data=correPropCategoryRich, aes(x=trt_category, y=proportion)) +
   geom_bar(stat='identity')  +
   scale_x_discrete(limits=c('single_resource', 'single_nonresource', 'RxR', 'NxN', 'RxN', 'RxRxR', 'threeway'),
                    labels=c('R', 'N', 'R*R', 'N*N', 'R*N', 'R*R*R', '3+')) +
-  xlab('Treatment Category') + ylab('Proportion') +
+  xlab('') + ylab('') +
   theme(axis.text.x=element_text(angle=90, hjust=1, vjust=0.5)) +
-  annotate('text', x=0.5, y=0.7, label='(a) Richness Response', size=20, hjust='left') +
+  annotate('text', x=0.5, y=0.7, label='(c)', size=20, hjust='left') +
   annotate('text', x=1, y=0.20, label='a', size=18, hjust='center') +
   annotate('text', x=2, y=0.14, label='a', size=18, hjust='center') +
   annotate('text', x=3, y=0.29, label='ab', size=18, hjust='center') +
@@ -160,13 +152,13 @@ rich <- ggplot(data=correPropCategoryRich, aes(x=trt_category, y=proportion)) +
   annotate('text', x=6, y=0.59, label='c', size=18, hjust='center') +
   annotate('text', x=7, y=0.38, label='b', size=18, hjust='center')
 
-comp <- ggplot(data=correPropCategoryComp, aes(x=trt_category, y=proportion)) +
+compCat <- ggplot(data=correPropCategoryComp, aes(x=trt_category, y=proportion)) +
   geom_bar(stat='identity')  +
   scale_x_discrete(limits=c('single_resource', 'single_nonresource', 'RxR', 'NxN', 'RxN', 'RxRxR', 'threeway'),
                    labels=c('R', 'N', 'R*R', 'N*N', 'R*N', 'R*R*R', '3+')) +
   xlab('Treatment Category') + ylab('') +
   theme(axis.text.x=element_text(angle=90, hjust=1, vjust=0.5)) +
-  annotate('text', x=0.5, y=0.7, label='(b) Composition Response', size=20, hjust='left') +
+  annotate('text', x=0.5, y=0.7, label='(d)', size=20, hjust='left') +
   annotate('text', x=1, y=0.32, label='a', size=18, hjust='center') +
   annotate('text', x=2, y=0.22, label='a', size=18, hjust='center') +
   annotate('text', x=3, y=0.55, label='bc', size=18, hjust='center') +
@@ -175,10 +167,13 @@ comp <- ggplot(data=correPropCategoryComp, aes(x=trt_category, y=proportion)) +
   annotate('text', x=6, y=0.66, label='c', size=18, hjust='center') +
   annotate('text', x=7, y=0.53, label='bc', size=18, hjust='center')
 
-pushViewport(viewport(layout=grid.layout(1,2)))
-print(rich, vp=viewport(layout.pos.row = 1, layout.pos.col = 1))
-print(comp, vp=viewport(layout.pos.row = 1, layout.pos.col = 2))
-#export at 2400x1000
+
+pushViewport(viewport(layout=grid.layout(2,2)))
+print(richType, vp=viewport(layout.pos.row = 1, layout.pos.col = 1))
+print(compType, vp=viewport(layout.pos.row = 2, layout.pos.col = 1))
+print(richCat, vp=viewport(layout.pos.row = 1, layout.pos.col = 2))
+print(compCat, vp=viewport(layout.pos.row = 2, layout.pos.col = 2))
+#export at 2400x2000
 
 
 #####10 year or longer-----------------
